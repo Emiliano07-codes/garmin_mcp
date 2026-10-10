@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garmin Performance Lab V2 | Telemetría & Fisiología Computacional</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111726;
+      --surface-border: #1e293b;
+      --surface-elevated: #162032;
+      --text-main: #f1f5f9;
+      --text-muted: #8492a6;
+      --accent-primary: #3b82f6;
+      --accent-z2: #10b981;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+      --accent-purple: #8b5cf6;
+      --chart-grid: rgba(255, 255, 255, 0.05);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-border: #e2e8f0;
+      --surface-elevated: #f1f5f9;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent-primary: #2563eb;
+      --accent-z2: #059669;
+      --accent-warning: #d97706;
+      --accent-danger: #dc2626;
+      --accent-purple: #7c3aed;
+      --chart-grid: rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 80px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .container {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Top Technical Header */
+    header {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 20px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .athlete-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--surface-border);
+      padding: 3px 10px;
+      border-radius: 6px;
+      color: var(--accent-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-btn {
+      background: var(--surface-elevated);
+      border: 1px solid var(--surface-border);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Navigation & Tabs */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .tab-pills {
+      display: flex;
+      gap: 6px;
+      background: var(--surface);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--surface-border);
+    }
+
+    .tab-pill {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tab-pill.active {
+      background: var(--surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--surface-border);
+    }
+
+    /* KPI Cards / Mosaics */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 18px;
+      position: relative;
+    }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .kpi-subtext {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Layout Grid */
+    .layout-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1080px) {
+      .layout-2 { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 22px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .panel-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Filter Toolbar */
+    .filter-pills {
+      display: flex;
+      gap: 4px;
+      background: var(--surface-elevated);
+      padding: 3px;
+      border-radius: 6px;
+      border: 1px solid var(--surface-border);
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background: var(--accent-primary);
+      color: #fff;
+    }
+
+    /* Data Table */
+    .table-responsive {
+      overflow-x: auto;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--surface-elevated);
+      color: var(--text-muted);
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-top: 1px solid var(--surface-border);
+      color: var(--text-main);
+    }
+
+    tr:hover td { background: var(--surface-elevated); }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-run { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+    .badge-gym { background: rgba(139, 92, 246, 0.15); color: #c084fc; }
+    .badge-walk { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .badge-z2-pure { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .badge-z2-drift { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+    /* Tab Page Containers */
+    .tab-page { display: none; }
+    .tab-page.active { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div>
+      <div class="brand-title">
+        <span>Laboratorio de Fisiología & Telemetría Garmin</span>
+        <span class="athlete-chip">Atleta: Emiliano</span>
+      </div>
+      <div style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">
+        VO₂ Máx: <strong>53.0 ml/kg/min</strong> • 
+        Umbral Lactato: <strong>179 ppm</strong> • 
+        Peso: <strong>74.0 kg</strong>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="theme-btn" onclick="toggleTheme()">🌓 Alternar Modo Claro / Oscuro</button>
+      <div class="filter-pills">
+        <button class="filter-btn active" id="btn-u-km" onclick="setUnit('km')">KM</button>
+        <button class="filter-btn" id="btn-u-mi" onclick="setUnit('mi')">Millas</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <div class="nav-bar">
+    <div class="tab-pills">
+      <button class="tab-pill active" onclick="showTab('page-endurance')">🛡️ Endurance Score & Carga</button>
+      <button class="tab-pill" onclick="showTab('page-multisport')">🏋️ Volumen Multideporte (Gym/Run/Walk)</button>
+      <button class="tab-pill" onclick="showTab('page-z2')">💚 Desglose Fisiológico Zona 2</button>
+      <button class="tab-pill" onclick="showTab('page-recovery')">🧠 VFC Autonómica & Recuperación</button>
+      <button class="tab-pill" onclick="showTab('page-table')">📋 Registro Crudo de Sesiones</button>
+    </div>
+  </div>
+
+  <!-- Top KPI Grid -->
+  <div class="kpi-grid">
+    <!-- Endurance Score Destacado -->
+    <div class="kpi-card" style="border-left: 4px solid var(--accent-primary);">
+      <div class="kpi-header">
+        <span class="kpi-label">Endurance Score (Algorítmico)</span>
+      </div>
+      <div class="kpi-value" style="color: var(--accent-primary);">4322</div>
+      <div class="kpi-subtext">Nivel: <strong>Avanzado / Entrenado</strong> (Firstbeat)</div>
+    </div>
+
+    <!-- Carga EWMA -->
+    <div class="kpi-card" style="border-left: 4px solid var(--accent-warning);">
+      <div class="kpi-header">
+        <span class="kpi-label">Ratio ACWR (EWMA)</span>
+      </div>
+      <div class="kpi-value">1.46</div>
+      <div class="kpi-subtext">Rango Sweet Spot (0.8 - 1.3)</div>
+    </div>
+
+    <!-- Horas Zona 2 Últimas 4 Semanas -->
+    <div class="kpi-card" style="border-left: 4px solid var(--accent-z2);">
+      <div class="kpi-header">
+        <span class="kpi-label">Volumen Zona 2 (Últ. 4 Sem.)</span>
+      </div>
+      <div class="kpi-value" style="color: var(--accent-z2);">6.2 <span style="font-size:16px;">h</span></div>
+      <div class="kpi-subtext">Base Mitocondrial Activa</div>
+    </div>
+
+    <!-- VFC Nocturna -->
+    <div class="kpi-card" style="border-left: 4px solid var(--accent-purple);">
+      <div class="kpi-header">
+        <span class="kpi-label">VFC / RMSSD Nocturno</span>
+      </div>
+      <div class="kpi-value">42 <span style="font-size:16px;">ms</span></div>
+      <div class="kpi-subtext">Tono Vagal Equilibrado</div>
+    </div>
+  </div>
+
+  <!-- ================= PÁGINA 1: ENDURANCE SCORE & PMC ================= -->
+  <div id="page-endurance" class="tab-page active">
+    <div class="layout-2">
+      <!-- Desglose de Endurance Score -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Arquitectura del Endurance Score</div>
+            <div class="panel-subtitle">Descomposición factorial según Firstbeat Analytics</div>
+          </div>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+            A diferencia de un reloj estándar que solo lee el VO₂ Máx pico, este algoritmo integra tu <strong>cilindrada aeróbica (40%)</strong>, la <strong>resistencia estructural acumulada a 90 días (40%)</strong> y la <strong>densidad mitocondrial en Zona 2 (20%)</strong>.
+          </p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+              <span>Aporte VO₂ Máx (53.0 ml/kg/min)</span>
+              <strong>2385 pts</strong>
+            </div>
+            <div style="height:6px; background:var(--surface-elevated); border-radius:3px; overflow:hidden;">
+              <div style="width: 50%; height:100%; background:var(--accent-primary);"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+              <span>Base de Carga Crónica (CTL 90 días)</span>
+              <strong>1782 pts</strong>
+            </div>
+            <div style="height:6px; background:var(--surface-elevated); border-radius:3px; overflow:hidden;">
+              <div style="width: 35%; height:100%; background:var(--accent-warning);"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+              <span>Volumen Específico Zona 2 (6.2 h)</span>
+              <strong>156 pts</strong>
+            </div>
+            <div style="height:6px; background:var(--surface-elevated); border-radius:3px; overflow:hidden;">
+              <div style="width: 15%; height:100%; background:var(--accent-z2);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Curva PMC EWMA -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Curva de Gestión de Rendimiento (PMC)</div>
+            <div class="panel-subtitle">Fitness (CTL 42d), Fatiga (ATL 7d) y Forma (TSB)</div>
+          </div>
+        </div>
+        <div style="height: 250px;">
+          <canvas id="chartPMC"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PÁGINA 2: VOLUMEN MULTIDEPORTE ================= -->
+  <div id="page-multisport" class="tab-page">
+    <div class="layout-2">
+      <!-- Gráfico de Distribución Multideporte -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Distribución de Carga por Disciplina</div>
+            <div class="panel-subtitle">Carrera, Gimnasio / Fuerza, Caminatas y HIIT</div>
+          </div>
+        </div>
+        <div style="height: 260px;">
+          <canvas id="chartSportsSplit"></canvas>
+        </div>
+      </div>
+
+      <!-- Horas de Entrenamiento Semanales por Deporte -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Carga Semanal Acumulada por Disciplina</div>
+            <div class="panel-subtitle">Equilibrio entre trabajo cardiovascular y fuerza estructural</div>
+          </div>
+        </div>
+        <div style="height: 260px;">
+          <canvas id="chartWeeklySports"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PÁGINA 3: ZONA 2 DETALLADA ================= -->
+  <div id="page-z2" class="tab-page">
+    <div class="panel" style="margin-bottom: 24px;">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Monitor Fisiológico de Zona 2 (142 - 158 ppm)</div>
+          <div class="panel-subtitle">Filtrable dinámicamente por granularidad temporal</div>
+        </div>
+        <div class="filter-pills">
+          <button class="filter-btn active" onclick="filterZ2Granularity('week')">Por Semana</button>
+          <button class="filter-btn" onclick="filterZ2Granularity('month')">Por Mes</button>
+          <button class="filter-btn" onclick="filterZ2Granularity('session')">Por Sesión</button>
+        </div>
+      </div>
+      <div style="height: 280px;">
+        <canvas id="chartZ2Dynamic"></canvas>
+      </div>
+    </div>
+
+    <!-- Regla 80/20 y Desacople -->
+    <div class="layout-2">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Polarización de Intensidad (Modelo 80/20)</div>
+        </div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Según la literatura deportiva (Seiler & San Millán), el 80% del tiempo total de entrenamiento debe permanecer estrictamente en Zona 1-2 para estimular biogénesis mitocondrial sin fatiga autonómica.
+        </div>
+        <div style="height: 180px;">
+          <canvas id="chartPolarization"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Verificación de Desacople Aeróbico (&lt; 5%)</div>
+        </div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+          Análisis de deriva cardíaca en tus tiradas continuas (>45 min):
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="background:var(--surface-elevated); padding:12px; border-radius:6px; font-size:13px;">
+            <div style="font-weight:600;">15.5K Buenos Aires (04/10) • 1h 33m</div>
+            <div style="color:var(--accent-z2); font-size:12px; margin-top:2px;">Deriva calculada: +3.8% (Excelente acoplamiento aeróbico)</div>
+          </div>
+          <div style="background:var(--surface-elevated); padding:12px; border-radius:6px; font-size:13px;">
+            <div style="font-weight:600;">3.5K Progresivo (07/10) • 22m</div>
+            <div style="color:var(--text-muted); font-size:12px; margin-top:2px;">Sesión corta / No califica para test de desacople (>45 min req.)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PÁGINA 4: RECUPERACIÓN & VFC ================= -->
+  <div id="page-recovery" class="tab-page">
+    <div class="layout-2">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Corredor Basal de VFC Nocturna (RMSSD)</div>
+            <div class="panel-subtitle">Línea base personalizada (43 - 56 ms)</div>
+          </div>
+        </div>
+        <div style="height: 260px;">
+          <canvas id="chartHRVBase"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Frecuencia Cardíaca en Reposo (RHR)</div>
+            <div class="panel-subtitle">Tendencia de estabilidad cardiovascular</div>
+          </div>
+        </div>
+        <div style="height: 260px;">
+          <canvas id="chartRHRTrend"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PÁGINA 5: REGISTRO CRUDO ================= -->
+  <div id="page-table" class="tab-page">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Bitácora Integral de Sesiones</div>
+          <div class="panel-subtitle">Carreras, gimnasio, fuerza, caminatas y sesiones de calidad</div>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Actividad</th>
+              <th>Disciplina</th>
+              <th>Intensidad / Tipo</th>
+              <th>Distancia</th>
+              <th>Tiempo</th>
+              <th>FC Prom / Máx</th>
+              <th>Carga</th>
+              <th>Zona 2</th>
+            </tr>
+          </thead>
+          <tbody id="table-raw-body">
+            <!-- Rellenado por JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DATA JAVASCRIPT INLINE -->
+<script>
+  const ACTIVITIES = [{"id": 24668282957, "name": "Ciudad de Buenos Aires - 3x2000 (3:55)", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-10-09", "datetime": "2026-10-09 20:26:33", "distance_km": 8.64, "distance_mi": 5.37, "duration_min": 48.1, "duration_sec": 2885.029052734375, "pace_str": "5:33/km", "pace_sec_km": 333.9041906800863, "avg_hr": 155, "max_hr": 186, "load": 245.9, "calories": 644, "z2_sec": 1627, "z2_hours": 0.45, "z2_pct": 56.4, "z1_sec": 313, "z3_sec": 147, "z4_sec": 130, "z5_sec": 542}, {"id": 24646331588, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-10-07", "datetime": "2026-10-07 21:05:48", "distance_km": 3.49, "distance_mi": 2.17, "duration_min": 22.0, "duration_sec": 1322.2440185546875, "pace_str": "6:19/km", "pace_sec_km": 379.24463681480836, "avg_hr": 153, "max_hr": 162, "load": 56.0, "calories": 282, "z2_sec": 1152, "z2_hours": 0.32, "z2_pct": 87.1, "z1_sec": 0, "z3_sec": 170, "z4_sec": 0, "z5_sec": 0}, {"id": 24646331183, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Intenso / Calidad", "date": "2026-10-07", "datetime": "2026-10-07 20:54:12", "distance_km": 1.5, "distance_mi": 0.93, "duration_min": 11.0, "duration_sec": 662.9940185546875, "pace_str": "7:21/km", "pace_sec_km": 441.2224009904509, "avg_hr": 168, "max_hr": 189, "load": 125.8, "calories": 166, "z2_sec": 68, "z2_hours": 0.02, "z2_pct": 10.3, "z1_sec": 20, "z3_sec": 239, "z4_sec": 181, "z5_sec": 148}, {"id": 24646330834, "name": "Ciudad de Buenos Aires - 8x400 (3:30)", "type": "running", "sport": "Carrera", "intensity": "Intenso / Calidad", "date": "2026-10-07", "datetime": "2026-10-07 20:50:26", "distance_km": 0.22, "distance_mi": 0.14, "duration_min": 1.4, "duration_sec": 81.8010025024414, "pace_str": "6:16/km", "pace_sec_km": 376.2868702889217, "avg_hr": 132, "max_hr": 143, "load": 3.3, "calories": 15, "z2_sec": 15, "z2_hours": 0.0, "z2_pct": 18.3, "z1_sec": 52, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24646057652, "name": "HIIT", "type": "hiit", "sport": "HIIT / Cardio", "intensity": "Moderado", "date": "2026-10-07", "datetime": "2026-10-07 20:36:52", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 10.2, "duration_sec": 614.9310302734375, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 128, "max_hr": 164, "load": 32.6, "calories": 108, "z2_sec": 177, "z2_hours": 0.05, "z2_pct": 28.8, "z1_sec": 250, "z3_sec": 25, "z4_sec": 0, "z5_sec": 0}, {"id": 24608418075, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-10-04", "datetime": "2026-10-04 18:03:16", "distance_km": 15.53, "distance_mi": 9.65, "duration_min": 93.3, "duration_sec": 5599.701171875, "pace_str": "6:00/km", "pace_sec_km": 360.5631836691576, "avg_hr": 143, "max_hr": 163, "load": 142.2, "calories": 1140, "z2_sec": 4438, "z2_hours": 1.23, "z2_pct": 79.3, "z1_sec": 1043, "z3_sec": 28, "z4_sec": 0, "z5_sec": 0}, {"id": 24583965343, "name": "Ciudad de Buenos Aires - 3x1000 (3:50)", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-10-02", "datetime": "2026-10-02 19:32:18", "distance_km": 10.25, "distance_mi": 6.37, "duration_min": 61.8, "duration_sec": 3708.550048828125, "pace_str": "6:01/km", "pace_sec_km": 361.87719910455877, "avg_hr": 150, "max_hr": 187, "load": 214.3, "calories": 789, "z2_sec": 2102, "z2_hours": 0.58, "z2_pct": 56.7, "z1_sec": 658, "z3_sec": 129, "z4_sec": 197, "z5_sec": 489}, {"id": 24560945100, "name": "Ciudad de Buenos Aires - 6x400 ( 3:32)", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-09-30", "datetime": "2026-09-30 19:46:42", "distance_km": 9.67, "distance_mi": 6.01, "duration_min": 57.1, "duration_sec": 3423.759033203125, "pace_str": "5:54/km", "pace_sec_km": 354.0521919413631, "avg_hr": 149, "max_hr": 186, "load": 274.2, "calories": 725, "z2_sec": 1785, "z2_hours": 0.5, "z2_pct": 52.1, "z1_sec": 402, "z3_sec": 220, "z4_sec": 188, "z5_sec": 497}, {"id": 24519961955, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-09-27", "datetime": "2026-09-27 11:10:58", "distance_km": 16.57, "distance_mi": 10.3, "duration_min": 98.3, "duration_sec": 5899.87109375, "pace_str": "5:56/km", "pace_sec_km": 356.09265590003537, "avg_hr": 149, "max_hr": 171, "load": 177.9, "calories": 1231, "z2_sec": 4385, "z2_hours": 1.22, "z2_pct": 74.3, "z1_sec": 735, "z3_sec": 686, "z4_sec": 66, "z5_sec": 0}, {"id": 24510942125, "name": "HIIT", "type": "hiit", "sport": "HIIT / Cardio", "intensity": "Moderado", "date": "2026-09-26", "datetime": "2026-09-26 20:46:33", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 11.1, "duration_sec": 665.447998046875, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 131, "max_hr": 165, "load": 33.3, "calories": 117, "z2_sec": 107, "z2_hours": 0.03, "z2_pct": 16.0, "z1_sec": 436, "z3_sec": 29, "z4_sec": 0, "z5_sec": 0}, {"id": 24499235187, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-09-25", "datetime": "2026-09-25 20:21:55", "distance_km": 12.77, "distance_mi": 7.94, "duration_min": 74.1, "duration_sec": 4447.72216796875, "pace_str": "5:48/km", "pace_sec_km": 348.1833635586222, "avg_hr": 151, "max_hr": 169, "load": 148.8, "calories": 951, "z2_sec": 3475, "z2_hours": 0.97, "z2_pct": 78.1, "z1_sec": 228, "z3_sec": 715, "z4_sec": 5, "z5_sec": 0}, {"id": 24476067534, "name": "Ciudad de Buenos Aires - 4 x1200 (3:55)", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-09-23", "datetime": "2026-09-23 19:43:57", "distance_km": 11.16, "distance_mi": 6.93, "duration_min": 63.5, "duration_sec": 3807.37109375, "pace_str": "5:41/km", "pace_sec_km": 341.1855120765075, "avg_hr": 156, "max_hr": 188, "load": 275.1, "calories": 850, "z2_sec": 1859, "z2_hours": 0.52, "z2_pct": 48.8, "z1_sec": 466, "z3_sec": 602, "z4_sec": 262, "z5_sec": 556}, {"id": 24435034971, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-09-20", "datetime": "2026-09-20 12:36:09", "distance_km": 5.67, "distance_mi": 3.52, "duration_min": 31.8, "duration_sec": 1906.988037109375, "pace_str": "5:36/km", "pace_sec_km": 336.615602317784, "avg_hr": 152, "max_hr": 167, "load": 89.4, "calories": 421, "z2_sec": 1242, "z2_hours": 0.35, "z2_pct": 65.1, "z1_sec": 139, "z3_sec": 472, "z4_sec": 0, "z5_sec": 0}, {"id": 24314322880, "name": "Jun\u00edn Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-09-10", "datetime": "2026-09-10 16:13:27", "distance_km": 10.53, "distance_mi": 6.54, "duration_min": 62.3, "duration_sec": 3740.680908203125, "pace_str": "5:55/km", "pace_sec_km": 355.4043968203732, "avg_hr": 147, "max_hr": 162, "load": 120.1, "calories": 777, "z2_sec": 2932, "z2_hours": 0.81, "z2_pct": 78.4, "z1_sec": 173, "z3_sec": 447, "z4_sec": 0, "z5_sec": 0}, {"id": 24276352095, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-07", "datetime": "2026-09-07 16:58:06", "distance_km": 1.99, "distance_mi": 1.24, "duration_min": 8.2, "duration_sec": 490.3070068359375, "pace_str": "4:06/km", "pace_sec_km": 246.51674825800586, "avg_hr": 119, "max_hr": 146, "load": 15.0, "calories": 76, "z2_sec": 53, "z2_hours": 0.01, "z2_pct": 10.8, "z1_sec": 216, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24276182742, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-07", "datetime": "2026-09-07 16:38:29", "distance_km": 1.88, "distance_mi": 1.17, "duration_min": 8.3, "duration_sec": 499.81298828125, "pace_str": "4:25/km", "pace_sec_km": 265.99237662294297, "avg_hr": 113, "max_hr": 139, "load": 12.1, "calories": 70, "z2_sec": 0, "z2_hours": 0.0, "z2_pct": 0.0, "z1_sec": 281, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24275988946, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-07", "datetime": "2026-09-07 16:14:16", "distance_km": 2.08, "distance_mi": 1.29, "duration_min": 12.5, "duration_sec": 749.4420166015625, "pace_str": "6:00/km", "pace_sec_km": 360.9055338900652, "avg_hr": 117, "max_hr": 148, "load": 18.8, "calories": 110, "z2_sec": 37, "z2_hours": 0.01, "z2_pct": 4.9, "z1_sec": 383, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24272203250, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-07", "datetime": "2026-09-07 12:09:42", "distance_km": 1.2, "distance_mi": 0.74, "duration_min": 9.1, "duration_sec": 545.6820068359375, "pace_str": "7:36/km", "pace_sec_km": 456.42375129007183, "avg_hr": 115, "max_hr": 142, "load": 11.3, "calories": 77, "z2_sec": 2, "z2_hours": 0.0, "z2_pct": 0.4, "z1_sec": 271, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24260105860, "name": "Ushuaia Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-09-06", "datetime": "2026-09-06 09:16:52", "distance_km": 14.29, "distance_mi": 8.88, "duration_min": 90.5, "duration_sec": 5431.93896484375, "pace_str": "6:20/km", "pace_sec_km": 380.21588130971094, "avg_hr": 135, "max_hr": 167, "load": 110.6, "calories": 1012, "z2_sec": 1544, "z2_hours": 0.43, "z2_pct": 28.4, "z1_sec": 3370, "z3_sec": 151, "z4_sec": 0, "z5_sec": 0}, {"id": 24251751361, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-05", "datetime": "2026-09-05 16:47:53", "distance_km": 3.97, "distance_mi": 2.47, "duration_min": 38.8, "duration_sec": 2330.028076171875, "pace_str": "9:47/km", "pace_sec_km": 587.0478253728947, "avg_hr": 123, "max_hr": 160, "load": 68.7, "calories": 313, "z2_sec": 505, "z2_hours": 0.14, "z2_pct": 21.7, "z1_sec": 841, "z3_sec": 8, "z4_sec": 0, "z5_sec": 0}, {"id": 24251439915, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-05", "datetime": "2026-09-05 16:04:54", "distance_km": 3.83, "distance_mi": 2.38, "duration_min": 27.0, "duration_sec": 1620.926025390625, "pace_str": "7:03/km", "pace_sec_km": 423.1387409644317, "avg_hr": 122, "max_hr": 153, "load": 42.0, "calories": 237, "z2_sec": 246, "z2_hours": 0.07, "z2_pct": 15.2, "z1_sec": 833, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24238899572, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-04", "datetime": "2026-09-04 15:59:56", "distance_km": 4.16, "distance_mi": 2.58, "duration_min": 20.4, "duration_sec": 1222.616943359375, "pace_str": "4:53/km", "pace_sec_km": 293.9873313686583, "avg_hr": 114, "max_hr": 129, "load": 11.8, "calories": 161, "z2_sec": 0, "z2_hours": 0.0, "z2_pct": 0.0, "z1_sec": 642, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24238299458, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-04", "datetime": "2026-09-04 14:46:12", "distance_km": 3.17, "distance_mi": 1.97, "duration_min": 25.9, "duration_sec": 1551.011962890625, "pace_str": "8:08/km", "pace_sec_km": 488.9897459817518, "avg_hr": 114, "max_hr": 133, "load": 12.1, "calories": 199, "z2_sec": 0, "z2_hours": 0.0, "z2_pct": 0.0, "z1_sec": 678, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24237997685, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-04", "datetime": "2026-09-04 14:31:23", "distance_km": 1.78, "distance_mi": 1.1, "duration_min": 12.9, "duration_sec": 773.2650146484375, "pace_str": "7:15/km", "pace_sec_km": 435.3822444837219, "avg_hr": 106, "max_hr": 123, "load": 5.4, "calories": 88, "z2_sec": 0, "z2_hours": 0.0, "z2_pct": 0.0, "z1_sec": 119, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24237428311, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-04", "datetime": "2026-09-04 13:46:52", "distance_km": 1.48, "distance_mi": 0.92, "duration_min": 7.5, "duration_sec": 448.78900146484375, "pace_str": "5:02/km", "pace_sec_km": 302.9451392257597, "avg_hr": 115, "max_hr": 134, "load": 7.1, "calories": 65, "z2_sec": 0, "z2_hours": 0.0, "z2_pct": 0.0, "z1_sec": 200, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24236531864, "name": "Cerro Castor Snowboard", "type": "resort_snowboarding", "sport": "Otro", "intensity": "Moderado", "date": "2026-09-04", "datetime": "2026-09-04 12:05:02", "distance_km": 3.11, "distance_mi": 1.93, "duration_min": 21.3, "duration_sec": 1277.5689697265625, "pace_str": "6:50/km", "pace_sec_km": 410.79123661690153, "avg_hr": 114, "max_hr": 142, "load": 14.8, "calories": 164, "z2_sec": 5, "z2_hours": 0.0, "z2_pct": 0.4, "z1_sec": 558, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24227628075, "name": "Ushuaia Caminar", "type": "walking", "sport": "Caminata", "intensity": "Recuperaci\u00f3n Activa", "date": "2026-09-03", "datetime": "2026-09-03 16:33:59", "distance_km": 0.39, "distance_mi": 0.24, "duration_min": 5.3, "duration_sec": 315.3529968261719, "pace_str": "13:34/km", "pace_sec_km": 814.2134177119042, "avg_hr": 128, "max_hr": 140, "load": 6.1, "calories": 49, "z2_sec": 0, "z2_hours": 0.0, "z2_pct": 0.0, "z1_sec": 315, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 24227627730, "name": "Ushuaia Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-09-03", "datetime": "2026-09-03 15:20:46", "distance_km": 11.15, "distance_mi": 6.93, "duration_min": 67.0, "duration_sec": 4021.202880859375, "pace_str": "6:00/km", "pace_sec_km": 360.77024055719863, "avg_hr": 142, "max_hr": 165, "load": 110.9, "calories": 815, "z2_sec": 1956, "z2_hours": 0.54, "z2_pct": 48.6, "z1_sec": 1681, "z3_sec": 292, "z4_sec": 0, "z5_sec": 0}, {"id": 24202944908, "name": "Ciudad de Buenos Aires - 6x400 (3:30)", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-09-01", "datetime": "2026-09-01 17:52:13", "distance_km": 9.67, "distance_mi": 6.01, "duration_min": 57.9, "duration_sec": 3471.618896484375, "pace_str": "5:59/km", "pace_sec_km": 359.0221731129192, "avg_hr": 148, "max_hr": 186, "load": 257.7, "calories": 733, "z2_sec": 1655, "z2_hours": 0.46, "z2_pct": 47.7, "z1_sec": 853, "z3_sec": 198, "z4_sec": 245, "z5_sec": 371}, {"id": 24174851206, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-08-30", "datetime": "2026-08-30 11:45:23", "distance_km": 13.34, "distance_mi": 8.29, "duration_min": 81.6, "duration_sec": 4893.759765625, "pace_str": "6:06/km", "pace_sec_km": 366.9332795196839, "avg_hr": 147, "max_hr": 163, "load": 136.0, "calories": 1012, "z2_sec": 4466, "z2_hours": 1.24, "z2_pct": 91.3, "z1_sec": 358, "z3_sec": 46, "z4_sec": 0, "z5_sec": 0}, {"id": 24153975580, "name": "Ciudad de Buenos Aires - Farlek (3x2)- chill", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-08-28", "datetime": "2026-08-28 20:10:41", "distance_km": 11.13, "distance_mi": 6.92, "duration_min": 59.5, "duration_sec": 3568.198974609375, "pace_str": "5:20/km", "pace_sec_km": 320.5430624309801, "avg_hr": 155, "max_hr": 180, "load": 219.2, "calories": 803, "z2_sec": 1352, "z2_hours": 0.38, "z2_pct": 37.9, "z1_sec": 541, "z3_sec": 858, "z4_sec": 652, "z5_sec": 103}, {"id": 24130075601, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-08-26", "datetime": "2026-08-26 19:17:28", "distance_km": 10.28, "distance_mi": 6.39, "duration_min": 62.6, "duration_sec": 3758.447998046875, "pace_str": "6:05/km", "pace_sec_km": 365.7248294768463, "avg_hr": 146, "max_hr": 161, "load": 113.0, "calories": 770, "z2_sec": 3119, "z2_hours": 0.87, "z2_pct": 83.0, "z1_sec": 447, "z3_sec": 143, "z4_sec": 0, "z5_sec": 0}, {"id": 24085146314, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Intenso / Calidad", "date": "2026-08-23", "datetime": "2026-08-23 08:01:00", "distance_km": 21.27, "distance_mi": 13.22, "duration_min": 95.9, "duration_sec": 5754.97314453125, "pace_str": "4:30/km", "pace_sec_km": 270.5673653038268, "avg_hr": 173, "max_hr": 186, "load": 477.4, "calories": 1487, "z2_sec": 125, "z2_hours": 0.03, "z2_pct": 2.2, "z1_sec": 22, "z3_sec": 582, "z4_sec": 3688, "z5_sec": 1306}, {"id": 24078075108, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-08-22", "datetime": "2026-08-22 18:51:28", "distance_km": 4.38, "distance_mi": 2.72, "duration_min": 26.4, "duration_sec": 1582.6719970703125, "pace_str": "6:01/km", "pace_sec_km": 361.4966381597723, "avg_hr": 144, "max_hr": 168, "load": 71.3, "calories": 334, "z2_sec": 1148, "z2_hours": 0.32, "z2_pct": 72.6, "z1_sec": 162, "z3_sec": 123, "z4_sec": 0, "z5_sec": 0}, {"id": 24047454491, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-08-19", "datetime": "2026-08-19 20:32:40", "distance_km": 6.86, "distance_mi": 4.26, "duration_min": 40.1, "duration_sec": 2406.22998046875, "pace_str": "5:50/km", "pace_sec_km": 350.8345061137408, "avg_hr": 149, "max_hr": 171, "load": 99.7, "calories": 521, "z2_sec": 1337, "z2_hours": 0.37, "z2_pct": 55.6, "z1_sec": 405, "z3_sec": 630, "z4_sec": 25, "z5_sec": 0}, {"id": 24004352788, "name": "HIIT", "type": "hiit", "sport": "HIIT / Cardio", "intensity": "Moderado", "date": "2026-08-16", "datetime": "2026-08-16 20:12:01", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 20.0, "duration_sec": 1201.8809814453125, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 147, "max_hr": 183, "load": 106.6, "calories": 262, "z2_sec": 533, "z2_hours": 0.15, "z2_pct": 44.4, "z1_sec": 302, "z3_sec": 229, "z4_sec": 49, "z5_sec": 26}, {"id": 23979463683, "name": "Cindy ?", "type": "hiit", "sport": "HIIT / Cardio", "intensity": "Moderado", "date": "2026-08-14", "datetime": "2026-08-14 19:14:06", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 21.6, "duration_sec": 1298.26904296875, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 139, "max_hr": 167, "load": 82.8, "calories": 261, "z2_sec": 527, "z2_hours": 0.15, "z2_pct": 40.6, "z1_sec": 592, "z3_sec": 91, "z4_sec": 0, "z5_sec": 0}, {"id": 23956105248, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-08-12", "datetime": "2026-08-12 20:15:39", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 57.9, "duration_sec": 3473.325927734375, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 111, "max_hr": 145, "load": 28.8, "calories": 379, "z2_sec": 14, "z2_hours": 0.0, "z2_pct": 0.4, "z1_sec": 1255, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 23893616285, "name": "Cindy ?", "type": "hiit", "sport": "HIIT / Cardio", "intensity": "Moderado", "date": "2026-08-07", "datetime": "2026-08-07 23:29:18", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 21.4, "duration_sec": 1283.9990234375, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 138, "max_hr": 165, "load": 72.8, "calories": 254, "z2_sec": 510, "z2_hours": 0.14, "z2_pct": 39.7, "z1_sec": 557, "z3_sec": 99, "z4_sec": 0, "z5_sec": 0}, {"id": 23830413647, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-08-02", "datetime": "2026-08-02 19:41:05", "distance_km": 14.08, "distance_mi": 8.75, "duration_min": 84.5, "duration_sec": 5068.791015625, "pace_str": "6:00/km", "pace_sec_km": 360.0277537644841, "avg_hr": 139, "max_hr": 156, "load": 119.9, "calories": 1019, "z2_sec": 1738, "z2_hours": 0.48, "z2_pct": 34.3, "z1_sec": 3255, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 23806121627, "name": "Ciudad de Buenos Aires - Farlek 12(3x2)", "type": "running", "sport": "Carrera", "intensity": "Intenso / Calidad", "date": "2026-07-31", "datetime": "2026-07-31 19:37:01", "distance_km": 15.82, "distance_mi": 9.83, "duration_min": 82.5, "duration_sec": 4947.6689453125, "pace_str": "5:12/km", "pace_sec_km": 312.772241226145, "avg_hr": 164, "max_hr": 186, "load": 498.4, "calories": 1175, "z2_sec": 1201, "z2_hours": 0.33, "z2_pct": 24.3, "z1_sec": 462, "z3_sec": 930, "z4_sec": 628, "z5_sec": 1613}, {"id": 23782763452, "name": "Ciudad de Buenos Aires - 3 x 1200 (3:45)", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-07-29", "datetime": "2026-07-29 19:46:09", "distance_km": 10.0, "distance_mi": 6.21, "duration_min": 57.0, "duration_sec": 3419.722900390625, "pace_str": "5:41/km", "pace_sec_km": 341.9692176593726, "avg_hr": 148, "max_hr": 186, "load": 246.2, "calories": 740, "z2_sec": 1697, "z2_hours": 0.47, "z2_pct": 49.6, "z1_sec": 995, "z3_sec": 104, "z4_sec": 60, "z5_sec": 462}, {"id": 23744134398, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-07-26", "datetime": "2026-07-26 16:53:06", "distance_km": 18.24, "distance_mi": 11.33, "duration_min": 108.0, "duration_sec": 6478.4541015625, "pace_str": "5:55/km", "pace_sec_km": 355.2668135873656, "avg_hr": 149, "max_hr": 175, "load": 184.6, "calories": 1363, "z2_sec": 5494, "z2_hours": 1.53, "z2_pct": 84.8, "z1_sec": 682, "z3_sec": 224, "z4_sec": 31, "z5_sec": 0}, {"id": 23697589998, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-07-22", "datetime": "2026-07-22 20:44:36", "distance_km": 14.19, "distance_mi": 8.82, "duration_min": 81.2, "duration_sec": 4871.3310546875, "pace_str": "5:43/km", "pace_sec_km": 343.35517240263744, "avg_hr": 153, "max_hr": 171, "load": 164.1, "calories": 1061, "z2_sec": 3043, "z2_hours": 0.85, "z2_pct": 62.5, "z1_sec": 340, "z3_sec": 1452, "z4_sec": 7, "z5_sec": 0}, {"id": 23656625863, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-07-19", "datetime": "2026-07-19 12:08:43", "distance_km": 15.64, "distance_mi": 9.72, "duration_min": 89.0, "duration_sec": 5338.25, "pace_str": "5:41/km", "pace_sec_km": 341.3316708740175, "avg_hr": 149, "max_hr": 173, "load": 158.4, "calories": 1150, "z2_sec": 4497, "z2_hours": 1.25, "z2_pct": 84.2, "z1_sec": 370, "z3_sec": 423, "z4_sec": 10, "z5_sec": 0}, {"id": 23656625560, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-07-16", "datetime": "2026-07-16 18:25:42", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 20.5, "duration_sec": 1232.5789794921875, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 116, "max_hr": 153, "load": 21.7, "calories": 166, "z2_sec": 15, "z2_hours": 0.0, "z2_pct": 1.2, "z1_sec": 542, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 23613416990, "name": "Ciudad de Buenos Aires Caminar", "type": "walking", "sport": "Caminata", "intensity": "Recuperaci\u00f3n Activa", "date": "2026-07-15", "datetime": "2026-07-15 21:32:09", "distance_km": 1.57, "distance_mi": 0.97, "duration_min": 17.1, "duration_sec": 1023.6890258789062, "pace_str": "10:53/km", "pace_sec_km": 653.2086481833165, "avg_hr": 114, "max_hr": 126, "load": 5.0, "calories": 105, "z2_sec": 0, "z2_hours": 0.0, "z2_pct": 0.0, "z1_sec": 358, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 23613416943, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-07-15", "datetime": "2026-07-15 20:24:49", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 64.1, "duration_sec": 3846.783935546875, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 115, "max_hr": 167, "load": 49.8, "calories": 453, "z2_sec": 135, "z2_hours": 0.04, "z2_pct": 3.5, "z1_sec": 1748, "z3_sec": 42, "z4_sec": 0, "z5_sec": 0}, {"id": 23613416886, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-07-15", "datetime": "2026-07-15 20:12:16", "distance_km": 1.68, "distance_mi": 1.04, "duration_min": 9.8, "duration_sec": 589.6090087890625, "pace_str": "5:51/km", "pace_sec_km": 351.9738532047583, "avg_hr": 141, "max_hr": 151, "load": 28.8, "calories": 124, "z2_sec": 367, "z2_hours": 0.1, "z2_pct": 62.3, "z1_sec": 193, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 23600971595, "name": "Ciudad de Buenos Aires - 10x400", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-07-14", "datetime": "2026-07-14 19:45:11", "distance_km": 10.02, "distance_mi": 6.23, "duration_min": 57.3, "duration_sec": 3439.113037109375, "pace_str": "5:43/km", "pace_sec_km": 343.1741495514128, "avg_hr": 155, "max_hr": 187, "load": 254.5, "calories": 779, "z2_sec": 1891, "z2_hours": 0.53, "z2_pct": 55.0, "z1_sec": 335, "z3_sec": 681, "z4_sec": 142, "z5_sec": 336}, {"id": 23572180689, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-07-12", "datetime": "2026-07-12 11:16:36", "distance_km": 12.54, "distance_mi": 7.79, "duration_min": 72.3, "duration_sec": 4339.908203125, "pace_str": "5:46/km", "pace_sec_km": 346.07744870883647, "avg_hr": 150, "max_hr": 168, "load": 144.5, "calories": 943, "z2_sec": 3074, "z2_hours": 0.85, "z2_pct": 70.8, "z1_sec": 439, "z3_sec": 769, "z4_sec": 0, "z5_sec": 0}, {"id": 23559745424, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-07-11", "datetime": "2026-07-11 10:25:52", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 52.0, "duration_sec": 3119.62890625, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 119, "max_hr": 178, "load": 57.8, "calories": 410, "z2_sec": 48, "z2_hours": 0.01, "z2_pct": 1.5, "z1_sec": 1706, "z3_sec": 12, "z4_sec": 94, "z5_sec": 4}, {"id": 23541331609, "name": "Ciudad de Buenos Aires - 3x1300", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-07-09", "datetime": "2026-07-09 18:59:09", "distance_km": 9.82, "distance_mi": 6.1, "duration_min": 59.4, "duration_sec": 3566.742919921875, "pace_str": "6:03/km", "pace_sec_km": 363.21099025220593, "avg_hr": 157, "max_hr": 192, "load": 337.7, "calories": 788, "z2_sec": 1817, "z2_hours": 0.5, "z2_pct": 51.0, "z1_sec": 523, "z3_sec": 233, "z4_sec": 106, "z5_sec": 844}, {"id": 23459527625, "name": "Ciudad de Buenos Aires - 3 x 1200 (3:40)", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-07-02", "datetime": "2026-07-02 19:43:32", "distance_km": 11.28, "distance_mi": 7.01, "duration_min": 63.2, "duration_sec": 3793.4560546875, "pace_str": "5:36/km", "pace_sec_km": 336.15357995217437, "avg_hr": 153, "max_hr": 187, "load": 316.1, "calories": 833, "z2_sec": 1662, "z2_hours": 0.46, "z2_pct": 43.8, "z1_sec": 845, "z3_sec": 337, "z4_sec": 292, "z5_sec": 581}, {"id": 23412756277, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-06-28", "datetime": "2026-06-28 19:36:54", "distance_km": 14.2, "distance_mi": 8.82, "duration_min": 87.2, "duration_sec": 5231.591796875, "pace_str": "6:08/km", "pace_sec_km": 368.53329712080847, "avg_hr": 151, "max_hr": 167, "load": 143.8, "calories": 1103, "z2_sec": 3154, "z2_hours": 0.88, "z2_pct": 60.3, "z1_sec": 538, "z3_sec": 1386, "z4_sec": 0, "z5_sec": 0}, {"id": 23333255968, "name": "Jun\u00edn Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-06-21", "datetime": "2026-06-21 16:02:05", "distance_km": 16.01, "distance_mi": 9.95, "duration_min": 92.3, "duration_sec": 5536.287109375, "pace_str": "5:45/km", "pace_sec_km": 345.80310487033233, "avg_hr": 155, "max_hr": 165, "load": 151.6, "calories": 1220, "z2_sec": 4068, "z2_hours": 1.13, "z2_pct": 73.5, "z1_sec": 118, "z3_sec": 1324, "z4_sec": 0, "z5_sec": 0}, {"id": 23301146204, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-06-18", "datetime": "2026-06-18 22:31:09", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 46.8, "duration_sec": 2809.56396484375, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 119, "max_hr": 171, "load": 78.9, "calories": 406, "z2_sec": 309, "z2_hours": 0.09, "z2_pct": 11.0, "z1_sec": 1284, "z3_sec": 63, "z4_sec": 16, "z5_sec": 0}, {"id": 23227835581, "name": "HIIT", "type": "hiit", "sport": "HIIT / Cardio", "intensity": "Moderado", "date": "2026-06-12", "datetime": "2026-06-12 19:42:49", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 14.9, "duration_sec": 892.1400146484375, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 147, "max_hr": 172, "load": 90.6, "calories": 204, "z2_sec": 466, "z2_hours": 0.13, "z2_pct": 52.3, "z1_sec": 209, "z3_sec": 159, "z4_sec": 31, "z5_sec": 0}, {"id": 23156989044, "name": "HIIT", "type": "hiit", "sport": "HIIT / Cardio", "intensity": "Moderado", "date": "2026-06-06", "datetime": "2026-06-06 20:03:28", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 18.9, "duration_sec": 1131.4029541015625, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 155, "max_hr": 174, "load": 135.8, "calories": 275, "z2_sec": 526, "z2_hours": 0.15, "z2_pct": 46.5, "z1_sec": 85, "z3_sec": 401, "z4_sec": 87, "z5_sec": 0}, {"id": 23156886572, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-06-06", "datetime": "2026-06-06 19:36:43", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 23.4, "duration_sec": 1404.738037109375, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 118, "max_hr": 157, "load": 34.1, "calories": 202, "z2_sec": 121, "z2_hours": 0.03, "z2_pct": 8.6, "z1_sec": 544, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 23128616664, "name": "Itaja\u00ed Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-06-04", "datetime": "2026-06-04 09:58:33", "distance_km": 8.5, "distance_mi": 5.28, "duration_min": 49.3, "duration_sec": 2960.56396484375, "pace_str": "5:48/km", "pace_sec_km": 348.19227278563926, "avg_hr": 141, "max_hr": 158, "load": 84.0, "calories": 633, "z2_sec": 1649, "z2_hours": 0.46, "z2_pct": 55.7, "z1_sec": 1253, "z3_sec": 5, "z4_sec": 0, "z5_sec": 0}, {"id": 23109184129, "name": "Itaja\u00ed Caminar", "type": "walking", "sport": "Caminata", "intensity": "Recuperaci\u00f3n Activa", "date": "2026-06-02", "datetime": "2026-06-02 18:03:17", "distance_km": 5.29, "distance_mi": 3.29, "duration_min": 65.8, "duration_sec": 3947.125, "pace_str": "12:26/km", "pace_sec_km": 746.1568644862, "avg_hr": 86, "max_hr": 101, "load": 9.2, "calories": 331, "z2_sec": 0, "z2_hours": 0.0, "z2_pct": 0.0, "z1_sec": 0, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 23081122111, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-05-31", "datetime": "2026-05-31 10:21:02", "distance_km": 16.27, "distance_mi": 10.11, "duration_min": 91.9, "duration_sec": 5513.05810546875, "pace_str": "5:38/km", "pace_sec_km": 338.85931793098496, "avg_hr": 148, "max_hr": 167, "load": 142.1, "calories": 1210, "z2_sec": 4726, "z2_hours": 1.31, "z2_pct": 85.7, "z1_sec": 520, "z3_sec": 238, "z4_sec": 0, "z5_sec": 0}, {"id": 23061049712, "name": "Ciudad de Buenos Aires - 10x400", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-05-29", "datetime": "2026-05-29 18:42:26", "distance_km": 12.02, "distance_mi": 7.47, "duration_min": 67.5, "duration_sec": 4048.7099609375, "pace_str": "5:36/km", "pace_sec_km": 336.86641711064834, "avg_hr": 156, "max_hr": 189, "load": 393.8, "calories": 931, "z2_sec": 1969, "z2_hours": 0.55, "z2_pct": 48.6, "z1_sec": 567, "z3_sec": 426, "z4_sec": 256, "z5_sec": 753}, {"id": 22997309144, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-05-24", "datetime": "2026-05-24 11:16:26", "distance_km": 13.94, "distance_mi": 8.66, "duration_min": 79.8, "duration_sec": 4787.14306640625, "pace_str": "5:43/km", "pace_sec_km": 343.4566262945656, "avg_hr": 148, "max_hr": 169, "load": 127.7, "calories": 1047, "z2_sec": 3738, "z2_hours": 1.04, "z2_pct": 78.1, "z1_sec": 702, "z3_sec": 309, "z4_sec": 2, "z5_sec": 0}, {"id": 22976950806, "name": "Ciudad de Buenos Aires - 8x400", "type": "running", "sport": "Carrera", "intensity": "Intenso / Calidad", "date": "2026-05-22", "datetime": "2026-05-22 19:21:34", "distance_km": 10.99, "distance_mi": 6.83, "duration_min": 61.6, "duration_sec": 3693.597900390625, "pace_str": "5:36/km", "pace_sec_km": 336.1896273264873, "avg_hr": 154, "max_hr": 188, "load": 329.1, "calories": 837, "z2_sec": 1467, "z2_hours": 0.41, "z2_pct": 39.7, "z1_sec": 787, "z3_sec": 614, "z4_sec": 286, "z5_sec": 493}, {"id": 22929654242, "name": "Rosario Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-05-18", "datetime": "2026-05-18 19:34:31", "distance_km": 10.04, "distance_mi": 6.24, "duration_min": 55.0, "duration_sec": 3302.5869140625, "pace_str": "5:28/km", "pace_sec_km": 328.9370326881911, "avg_hr": 147, "max_hr": 160, "load": 116.3, "calories": 739, "z2_sec": 2781, "z2_hours": 0.77, "z2_pct": 84.2, "z1_sec": 426, "z3_sec": 54, "z4_sec": 0, "z5_sec": 0}, {"id": 22900850553, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-05-16", "datetime": "2026-05-16 08:18:42", "distance_km": 16.07, "distance_mi": 9.98, "duration_min": 90.0, "duration_sec": 5402.6171875, "pace_str": "5:36/km", "pace_sec_km": 336.2534196494073, "avg_hr": 144, "max_hr": 161, "load": 146.7, "calories": 1161, "z2_sec": 3662, "z2_hours": 1.02, "z2_pct": 67.8, "z1_sec": 1472, "z3_sec": 238, "z4_sec": 0, "z5_sec": 0}, {"id": 22895119611, "name": "Ciudad de Buenos Aires - 3x1300 (3:40)", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-05-15", "datetime": "2026-05-15 19:32:45", "distance_km": 11.8, "distance_mi": 7.33, "duration_min": 64.0, "duration_sec": 3840.248046875, "pace_str": "5:25/km", "pace_sec_km": 325.4646010502991, "avg_hr": 149, "max_hr": 189, "load": 263.1, "calories": 851, "z2_sec": 1489, "z2_hours": 0.41, "z2_pct": 38.8, "z1_sec": 1295, "z3_sec": 92, "z4_sec": 99, "z5_sec": 715}, {"id": 22833371053, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-05-10", "datetime": "2026-05-10 09:47:26", "distance_km": 16.22, "distance_mi": 10.08, "duration_min": 90.8, "duration_sec": 5450.93896484375, "pace_str": "5:36/km", "pace_sec_km": 336.04997376566945, "avg_hr": 147, "max_hr": 162, "load": 153.7, "calories": 1195, "z2_sec": 4955, "z2_hours": 1.38, "z2_pct": 90.9, "z1_sec": 413, "z3_sec": 54, "z4_sec": 0, "z5_sec": 0}, {"id": 22814064519, "name": "Ciudad de Buenos Aires - 3 x 1200 (3:45)", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-05-08", "datetime": "2026-05-08 19:43:32", "distance_km": 11.51, "distance_mi": 7.15, "duration_min": 62.4, "duration_sec": 3744.14990234375, "pace_str": "5:25/km", "pace_sec_km": 325.25553789870855, "avg_hr": 152, "max_hr": 193, "load": 279.1, "calories": 859, "z2_sec": 2045, "z2_hours": 0.57, "z2_pct": 54.6, "z1_sec": 643, "z3_sec": 181, "z4_sec": 118, "z5_sec": 645}, {"id": 22739979282, "name": "Ciudad de Buenos Aires - 3 x 1000 (3:45)", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-05-02", "datetime": "2026-05-02 11:26:40", "distance_km": 11.01, "distance_mi": 6.84, "duration_min": 59.9, "duration_sec": 3594.610107421875, "pace_str": "5:26/km", "pace_sec_km": 326.3561040809134, "avg_hr": 157, "max_hr": 189, "load": 276.1, "calories": 851, "z2_sec": 1681, "z2_hours": 0.47, "z2_pct": 46.8, "z1_sec": 363, "z3_sec": 755, "z4_sec": 108, "z5_sec": 633}, {"id": 22730733996, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-05-01", "datetime": "2026-05-01 16:50:49", "distance_km": 15.01, "distance_mi": 9.33, "duration_min": 86.4, "duration_sec": 5181.64599609375, "pace_str": "5:45/km", "pace_sec_km": 345.1563574241943, "avg_hr": 151, "max_hr": 165, "load": 142.0, "calories": 1130, "z2_sec": 4178, "z2_hours": 1.16, "z2_pct": 80.6, "z1_sec": 275, "z3_sec": 690, "z4_sec": 0, "z5_sec": 0}, {"id": 22657558893, "name": "Ciudad de Buenos Aires - 4x900", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-04-25", "datetime": "2026-04-25 13:22:07", "distance_km": 10.7, "distance_mi": 6.65, "duration_min": 58.4, "duration_sec": 3505.00390625, "pace_str": "5:27/km", "pace_sec_km": 327.58699215160084, "avg_hr": 152, "max_hr": 189, "load": 206.8, "calories": 819, "z2_sec": 1595, "z2_hours": 0.44, "z2_pct": 45.5, "z1_sec": 763, "z3_sec": 288, "z4_sec": 300, "z5_sec": 462}, {"id": 22646723769, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-04-24", "datetime": "2026-04-24 17:22:48", "distance_km": 8.87, "distance_mi": 5.51, "duration_min": 52.4, "duration_sec": 3144.23291015625, "pace_str": "5:54/km", "pace_sec_km": 354.6349848445246, "avg_hr": 141, "max_hr": 154, "load": 83.8, "calories": 666, "z2_sec": 358, "z2_hours": 0.1, "z2_pct": 11.4, "z1_sec": 16, "z3_sec": 2739, "z4_sec": 12, "z5_sec": 0}, {"id": 22581828231, "name": "General Pueyrred\u00f3n Carrera", "type": "running", "sport": "Carrera", "intensity": "Intenso / Calidad", "date": "2026-04-19", "datetime": "2026-04-19 07:00:30", "distance_km": 21.29, "distance_mi": 13.23, "duration_min": 88.4, "duration_sec": 5304.09912109375, "pace_str": "4:09/km", "pace_sec_km": 249.09205687927144, "avg_hr": 176, "max_hr": 191, "load": 583.3, "calories": 1518, "z2_sec": 61, "z2_hours": 0.02, "z2_pct": 1.2, "z1_sec": 14, "z3_sec": 58, "z4_sec": 454, "z5_sec": 4712}, {"id": 22581826476, "name": "General Pueyrred\u00f3n Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-04-19", "datetime": "2026-04-19 06:18:24", "distance_km": 2.14, "distance_mi": 1.33, "duration_min": 13.5, "duration_sec": 810.885986328125, "pace_str": "6:18/km", "pace_sec_km": 378.4129367659566, "avg_hr": 139, "max_hr": 163, "load": 36.8, "calories": 171, "z2_sec": 398, "z2_hours": 0.11, "z2_pct": 49.1, "z1_sec": 323, "z3_sec": 49, "z4_sec": 0, "z5_sec": 0}, {"id": 22575195776, "name": "General Pueyrred\u00f3n Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-04-18", "datetime": "2026-04-18 16:56:29", "distance_km": 0.71, "distance_mi": 0.44, "duration_min": 4.0, "duration_sec": 237.0290069580078, "pace_str": "5:32/km", "pace_sec_km": 332.9854055987234, "avg_hr": 122, "max_hr": 145, "load": 8.7, "calories": 46, "z2_sec": 31, "z2_hours": 0.01, "z2_pct": 13.1, "z1_sec": 173, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 22575029784, "name": "General Pueyrred\u00f3n Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-04-18", "datetime": "2026-04-18 15:48:45", "distance_km": 2.09, "distance_mi": 1.3, "duration_min": 12.5, "duration_sec": 749.6079711914062, "pace_str": "5:58/km", "pace_sec_km": 358.6315082384717, "avg_hr": 145, "max_hr": 162, "load": 35.7, "calories": 168, "z2_sec": 430, "z2_hours": 0.12, "z2_pct": 57.3, "z1_sec": 161, "z3_sec": 144, "z4_sec": 0, "z5_sec": 0}, {"id": 22517056040, "name": "Ciudad de Buenos Aires Ciclismo", "type": "cycling", "sport": "Ciclismo", "intensity": "Moderado", "date": "2026-04-13", "datetime": "2026-04-13 21:09:09", "distance_km": 2.89, "distance_mi": 1.8, "duration_min": 10.2, "duration_sec": 613.489013671875, "pace_str": "3:32/km", "pace_sec_km": 212.1955050392032, "avg_hr": 132, "max_hr": 146, "load": 23.1, "calories": 126, "z2_sec": 102, "z2_hours": 0.03, "z2_pct": 16.6, "z1_sec": 503, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 22516983577, "name": "Ciudad de Buenos Aires - 6 x 500", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-04-13", "datetime": "2026-04-13 20:04:59", "distance_km": 6.14, "distance_mi": 3.82, "duration_min": 31.5, "duration_sec": 1890.383056640625, "pace_str": "5:07/km", "pace_sec_km": 307.87997665156763, "avg_hr": 157, "max_hr": 186, "load": 269.1, "calories": 468, "z2_sec": 803, "z2_hours": 0.22, "z2_pct": 42.5, "z1_sec": 147, "z3_sec": 161, "z4_sec": 174, "z5_sec": 549}, {"id": 22516473117, "name": "Ciudad de Buenos Aires Ciclismo", "type": "cycling", "sport": "Ciclismo", "intensity": "Moderado", "date": "2026-04-13", "datetime": "2026-04-13 19:49:41", "distance_km": 3.31, "distance_mi": 2.06, "duration_min": 10.9, "duration_sec": 653.2369995117188, "pace_str": "3:17/km", "pace_sec_km": 197.47308126669896, "avg_hr": 130, "max_hr": 143, "load": 20.6, "calories": 129, "z2_sec": 80, "z2_hours": 0.02, "z2_pct": 12.2, "z1_sec": 488, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 22516384868, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-04-13", "datetime": "2026-04-13 19:41:40", "distance_km": 1.25, "distance_mi": 0.78, "duration_min": 6.6, "duration_sec": 397.8299865722656, "pace_str": "5:17/km", "pace_sec_km": 317.9511303135704, "avg_hr": 144, "max_hr": 165, "load": 23.3, "calories": 91, "z2_sec": 269, "z2_hours": 0.07, "z2_pct": 67.7, "z1_sec": 66, "z3_sec": 38, "z4_sec": 8, "z5_sec": 0}, {"id": 22502601790, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-04-12", "datetime": "2026-04-12 11:02:28", "distance_km": 21.13, "distance_mi": 13.13, "duration_min": 112.5, "duration_sec": 6748.919921875, "pace_str": "5:19/km", "pace_sec_km": 319.3246349034433, "avg_hr": 149, "max_hr": 171, "load": 200.1, "calories": 1548, "z2_sec": 5271, "z2_hours": 1.46, "z2_pct": 78.1, "z1_sec": 257, "z3_sec": 1133, "z4_sec": 25, "z5_sec": 0}, {"id": 22482416030, "name": "Ciudad de Buenos Aires Ciclismo", "type": "cycling", "sport": "Ciclismo", "intensity": "Moderado", "date": "2026-04-10", "datetime": "2026-04-10 20:59:42", "distance_km": 4.42, "distance_mi": 2.74, "duration_min": 16.9, "duration_sec": 1013.3980102539062, "pace_str": "3:49/km", "pace_sec_km": 229.44168969994936, "avg_hr": 124, "max_hr": 149, "load": 23.2, "calories": 180, "z2_sec": 111, "z2_hours": 0.03, "z2_pct": 11.0, "z1_sec": 773, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 22482296545, "name": "Ciudad de Buenos Aires - 2 x 2500", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-04-10", "datetime": "2026-04-10 19:36:05", "distance_km": 11.04, "distance_mi": 6.86, "duration_min": 56.3, "duration_sec": 3375.966064453125, "pace_str": "5:05/km", "pace_sec_km": 305.8596909206105, "avg_hr": 155, "max_hr": 187, "load": 207.0, "calories": 825, "z2_sec": 1345, "z2_hours": 0.37, "z2_pct": 39.8, "z1_sec": 501, "z3_sec": 277, "z4_sec": 155, "z5_sec": 1025}, {"id": 22479585004, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-04-10", "datetime": "2026-04-10 13:08:44", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 68.9, "duration_sec": 4136.39013671875, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 120, "max_hr": 167, "load": 67.9, "calories": 603, "z2_sec": 594, "z2_hours": 0.16, "z2_pct": 14.4, "z1_sec": 2111, "z3_sec": 64, "z4_sec": 8, "z5_sec": 0}, {"id": 22420020733, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-04-05", "datetime": "2026-04-05 14:35:07", "distance_km": 18.69, "distance_mi": 11.61, "duration_min": 96.7, "duration_sec": 5799.78515625, "pace_str": "5:10/km", "pace_sec_km": 310.37151265937496, "avg_hr": 147, "max_hr": 156, "load": 177.0, "calories": 1336, "z2_sec": 5455, "z2_hours": 1.52, "z2_pct": 94.1, "z1_sec": 277, "z3_sec": 32, "z4_sec": 0, "z5_sec": 0}, {"id": 22410126975, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-04-04", "datetime": "2026-04-04 17:56:38", "distance_km": 18.15, "distance_mi": 11.28, "duration_min": 95.5, "duration_sec": 5728.416015625, "pace_str": "5:15/km", "pace_sec_km": 315.56600215896947, "avg_hr": 146, "max_hr": 160, "load": 177.2, "calories": 1312, "z2_sec": 5240, "z2_hours": 1.46, "z2_pct": 91.5, "z1_sec": 375, "z3_sec": 89, "z4_sec": 0, "z5_sec": 0}, {"id": 22397923765, "name": "Ciudad de Buenos Aires - Farlek 3kmx2km - 3.04", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-04-03", "datetime": "2026-04-03 15:21:54", "distance_km": 13.32, "distance_mi": 8.28, "duration_min": 71.0, "duration_sec": 4259.68896484375, "pace_str": "5:19/km", "pace_sec_km": 319.7414973216953, "avg_hr": 154, "max_hr": 186, "load": 234.8, "calories": 994, "z2_sec": 1389, "z2_hours": 0.39, "z2_pct": 32.6, "z1_sec": 671, "z3_sec": 734, "z4_sec": 460, "z5_sec": 906}, {"id": 22383758408, "name": "Ciudad de Buenos Aires - 8x400 (3:25)", "type": "running", "sport": "Carrera", "intensity": "Intenso / Calidad", "date": "2026-04-02", "datetime": "2026-04-02 11:03:13", "distance_km": 10.02, "distance_mi": 6.23, "duration_min": 56.8, "duration_sec": 3410.85595703125, "pace_str": "5:40/km", "pace_sec_km": 340.30392688824816, "avg_hr": 156, "max_hr": 186, "load": 306.1, "calories": 805, "z2_sec": 1375, "z2_hours": 0.38, "z2_pct": 40.3, "z1_sec": 295, "z3_sec": 740, "z4_sec": 254, "z5_sec": 684}, {"id": 22350912053, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-03-30", "datetime": "2026-03-30 13:14:11", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 50.6, "duration_sec": 3038.860107421875, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 116, "max_hr": 152, "load": 40.9, "calories": 413, "z2_sec": 120, "z2_hours": 0.03, "z2_pct": 3.9, "z1_sec": 1645, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 22341135763, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-03-29", "datetime": "2026-03-29 12:18:18", "distance_km": 19.28, "distance_mi": 11.98, "duration_min": 99.8, "duration_sec": 5990.369140625, "pace_str": "5:10/km", "pace_sec_km": 310.78212383340264, "avg_hr": 147, "max_hr": 159, "load": 183.6, "calories": 1377, "z2_sec": 5370, "z2_hours": 1.49, "z2_pct": 89.6, "z1_sec": 429, "z3_sec": 164, "z4_sec": 0, "z5_sec": 0}, {"id": 22331971719, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-03-28", "datetime": "2026-03-28 18:49:09", "distance_km": 15.41, "distance_mi": 9.57, "duration_min": 78.3, "duration_sec": 4699.4619140625, "pace_str": "5:05/km", "pace_sec_km": 305.0544759039719, "avg_hr": 152, "max_hr": 164, "load": 196.8, "calories": 1136, "z2_sec": 1777, "z2_hours": 0.49, "z2_pct": 37.8, "z1_sec": 285, "z3_sec": 2600, "z4_sec": 0, "z5_sec": 0}, {"id": 22320423593, "name": "Ciudad de Buenos Aires - 4 x 1000", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-03-27", "datetime": "2026-03-27 17:39:40", "distance_km": 9.79, "distance_mi": 6.08, "duration_min": 51.2, "duration_sec": 3069.593994140625, "pace_str": "5:13/km", "pace_sec_km": 313.5966855128117, "avg_hr": 157, "max_hr": 189, "load": 323.6, "calories": 753, "z2_sec": 1199, "z2_hours": 0.33, "z2_pct": 39.1, "z1_sec": 398, "z3_sec": 479, "z4_sec": 98, "z5_sec": 847}, {"id": 22289724076, "name": "Ciudad de Buenos Aires Carrera", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-03-24", "datetime": "2026-03-24 18:22:06", "distance_km": 16.02, "distance_mi": 9.96, "duration_min": 82.2, "duration_sec": 4933.86376953125, "pace_str": "5:07/km", "pace_sec_km": 307.9153812928971, "avg_hr": 146, "max_hr": 156, "load": 172.2, "calories": 1156, "z2_sec": 4511, "z2_hours": 1.25, "z2_pct": 91.4, "z1_sec": 370, "z3_sec": 16, "z4_sec": 0, "z5_sec": 0}, {"id": 22276180429, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-03-23", "datetime": "2026-03-23 17:05:34", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 42.3, "duration_sec": 2537.674072265625, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 117, "max_hr": 154, "load": 49.2, "calories": 364, "z2_sec": 259, "z2_hours": 0.07, "z2_pct": 10.2, "z1_sec": 1272, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 22265454192, "name": "Ciudad de Buenos Aires - Apronte 17km", "type": "running", "sport": "Carrera", "intensity": "Moderado / Tempo", "date": "2026-03-22", "datetime": "2026-03-22 15:26:57", "distance_km": 21.04, "distance_mi": 13.07, "duration_min": 99.0, "duration_sec": 5940.96923828125, "pace_str": "4:42/km", "pace_sec_km": 282.4292194426617, "avg_hr": 160, "max_hr": 182, "load": 376.3, "calories": 1519, "z2_sec": 939, "z2_hours": 0.26, "z2_pct": 15.8, "z1_sec": 523, "z3_sec": 609, "z4_sec": 3213, "z5_sec": 560}, {"id": 22253839820, "name": "Fuerza", "type": "strength_training", "sport": "Gimnasio / Fuerza", "intensity": "Fuerza Estructural", "date": "2026-03-21", "datetime": "2026-03-21 18:31:42", "distance_km": 0.0, "distance_mi": 0.0, "duration_min": 32.0, "duration_sec": 1918.406005859375, "pace_str": "-", "pace_sec_km": 0, "avg_hr": 101, "max_hr": 145, "load": 12.1, "calories": 202, "z2_sec": 30, "z2_hours": 0.01, "z2_pct": 1.6, "z1_sec": 354, "z3_sec": 0, "z4_sec": 0, "z5_sec": 0}, {"id": 22242849127, "name": "Ciudad de Buenos Aires - 2 x 1000", "type": "running", "sport": "Carrera", "intensity": "F\u00e1cil / Base Z2", "date": "2026-03-20", "datetime": "2026-03-20 19:27:12", "distance_km": 8.53, "distance_mi": 5.3, "duration_min": 47.1, "duration_sec": 2823.222900390625, "pace_str": "5:30/km", "pace_sec_km": 330.84655984747315, "avg_hr": 148, "max_hr": 185, "load": 188.6, "calories": 639, "z2_sec": 1766, "z2_hours": 0.49, "z2_pct": 62.6, "z1_sec": 534, "z3_sec": 57, "z4_sec": 81, "z5_sec": 348}];
+  const PMC_DATA = [{"date": "2026-07-17", "ctl": 390.0, "atl": 544.0, "tsb": -154.0, "acwr": 1.39, "day_load": 0.0}, {"date": "2026-07-18", "ctl": 390.0, "atl": 430.0, "tsb": -40.0, "acwr": 1.1, "day_load": 0.0}, {"date": "2026-07-19", "ctl": 426.0, "atl": 517.0, "tsb": -91.0, "acwr": 1.21, "day_load": 158.4}, {"date": "2026-07-20", "ctl": 420.0, "atl": 425.0, "tsb": -5.0, "acwr": 1.01, "day_load": 0.0}, {"date": "2026-07-21", "ctl": 413.0, "atl": 333.0, "tsb": 80.0, "acwr": 0.81, "day_load": 0.0}, {"date": "2026-07-22", "ctl": 443.0, "atl": 458.0, "tsb": -15.0, "acwr": 1.03, "day_load": 164.1}, {"date": "2026-07-23", "ctl": 434.0, "atl": 371.0, "tsb": 63.0, "acwr": 0.85, "day_load": 0.0}, {"date": "2026-07-24", "ctl": 425.0, "atl": 284.0, "tsb": 141.0, "acwr": 0.67, "day_load": 0.0}, {"date": "2026-07-25", "ctl": 411.0, "atl": 230.0, "tsb": 181.0, "acwr": 0.56, "day_load": 0.0}, {"date": "2026-07-26", "ctl": 437.0, "atl": 421.0, "tsb": 16.0, "acwr": 0.96, "day_load": 184.6}, {"date": "2026-07-27", "ctl": 425.0, "atl": 356.0, "tsb": 69.0, "acwr": 0.84, "day_load": 0.0}, {"date": "2026-07-28", "ctl": 412.0, "atl": 292.0, "tsb": 120.0, "acwr": 0.71, "day_load": 0.0}, {"date": "2026-07-29", "ctl": 455.0, "atl": 541.0, "tsb": -86.0, "acwr": 1.19, "day_load": 246.2}, {"date": "2026-07-30", "ctl": 441.0, "atl": 465.0, "tsb": -24.0, "acwr": 1.05, "day_load": 0.0}, {"date": "2026-07-31", "ctl": 542.0, "atl": 1023.0, "tsb": -481.0, "acwr": 1.89, "day_load": 498.4}, {"date": "2026-08-01", "ctl": 533.0, "atl": 884.0, "tsb": -351.0, "acwr": 1.66, "day_load": 0.0}, {"date": "2026-08-02", "ctl": 547.0, "atl": 919.0, "tsb": -372.0, "acwr": 1.68, "day_load": 119.9}, {"date": "2026-08-03", "ctl": 537.0, "atl": 785.0, "tsb": -248.0, "acwr": 1.46, "day_load": 0.0}, {"date": "2026-08-04", "ctl": 527.0, "atl": 652.0, "tsb": -125.0, "acwr": 1.24, "day_load": 0.0}, {"date": "2026-08-05", "ctl": 518.0, "atl": 518.0, "tsb": 0.0, "acwr": 1.0, "day_load": 0.0}, {"date": "2026-08-06", "ctl": 503.0, "atl": 408.0, "tsb": 95.0, "acwr": 0.81, "day_load": 0.0}, {"date": "2026-08-07", "ctl": 510.0, "atl": 391.0, "tsb": 119.0, "acwr": 0.77, "day_load": 72.8}, {"date": "2026-08-08", "ctl": 501.0, "atl": 271.0, "tsb": 230.0, "acwr": 0.54, "day_load": 0.0}, {"date": "2026-08-09", "ctl": 486.0, "atl": 183.0, "tsb": 303.0, "acwr": 0.38, "day_load": 0.0}, {"date": "2026-08-10", "ctl": 471.0, "atl": 95.0, "tsb": 376.0, "acwr": 0.2, "day_load": 0.0}, {"date": "2026-08-11", "ctl": 445.0, "atl": 71.0, "tsb": 374.0, "acwr": 0.16, "day_load": 0.0}, {"date": "2026-08-12", "ctl": 425.0, "atl": 83.0, "tsb": 342.0, "acwr": 0.2, "day_load": 28.8}, {"date": "2026-08-13", "ctl": 396.0, "atl": 70.0, "tsb": 326.0, "acwr": 0.18, "day_load": 0.0}, {"date": "2026-08-14", "ctl": 391.0, "atl": 163.0, "tsb": 228.0, "acwr": 0.42, "day_load": 82.8}, {"date": "2026-08-15", "ctl": 367.0, "atl": 139.0, "tsb": 228.0, "acwr": 0.38, "day_load": 0.0}, {"date": "2026-08-16", "ctl": 369.0, "atl": 251.0, "tsb": 118.0, "acwr": 0.68, "day_load": 106.6}, {"date": "2026-08-17", "ctl": 349.0, "atl": 214.0, "tsb": 135.0, "acwr": 0.61, "day_load": 0.0}, {"date": "2026-08-18", "ctl": 328.0, "atl": 186.0, "tsb": 142.0, "acwr": 0.57, "day_load": 0.0}, {"date": "2026-08-19", "ctl": 332.0, "atl": 286.0, "tsb": 46.0, "acwr": 0.86, "day_load": 99.7}, {"date": "2026-08-20", "ctl": 316.0, "atl": 245.0, "tsb": 71.0, "acwr": 0.78, "day_load": 0.0}, {"date": "2026-08-21", "ctl": 301.0, "atl": 205.0, "tsb": 96.0, "acwr": 0.68, "day_load": 0.0}, {"date": "2026-08-22", "ctl": 301.0, "atl": 255.0, "tsb": 46.0, "acwr": 0.85, "day_load": 71.3}, {"date": "2026-08-23", "ctl": 395.0, "atl": 817.0, "tsb": -422.0, "acwr": 2.07, "day_load": 477.4}, {"date": "2026-08-24", "ctl": 386.0, "atl": 710.0, "tsb": -324.0, "acwr": 1.84, "day_load": 0.0}, {"date": "2026-08-25", "ctl": 375.0, "atl": 614.0, "tsb": -239.0, "acwr": 1.64, "day_load": 0.0}, {"date": "2026-08-26", "ctl": 390.0, "atl": 662.0, "tsb": -272.0, "acwr": 1.7, "day_load": 113.0}, {"date": "2026-08-27", "ctl": 380.0, "atl": 565.0, "tsb": -185.0, "acwr": 1.49, "day_load": 0.0}, {"date": "2026-08-28", "ctl": 420.0, "atl": 747.0, "tsb": -327.0, "acwr": 1.78, "day_load": 219.2}, {"date": "2026-08-29", "ctl": 412.0, "atl": 622.0, "tsb": -210.0, "acwr": 1.51, "day_load": 0.0}, {"date": "2026-08-30", "ctl": 433.0, "atl": 683.0, "tsb": -250.0, "acwr": 1.58, "day_load": 136.0}, {"date": "2026-08-31", "ctl": 427.0, "atl": 553.0, "tsb": -126.0, "acwr": 1.3, "day_load": 0.0}, {"date": "2026-09-01", "ctl": 479.0, "atl": 752.0, "tsb": -273.0, "acwr": 1.57, "day_load": 257.7}, {"date": "2026-09-02", "ctl": 474.0, "atl": 599.0, "tsb": -125.0, "acwr": 1.26, "day_load": 0.0}, {"date": "2026-09-03", "ctl": 487.0, "atl": 656.0, "tsb": -169.0, "acwr": 1.35, "day_load": 117.0}, {"date": "2026-09-04", "ctl": 487.0, "atl": 613.0, "tsb": -126.0, "acwr": 1.26, "day_load": 51.2}, {"date": "2026-09-05", "ctl": 507.0, "atl": 640.0, "tsb": -133.0, "acwr": 1.26, "day_load": 110.7}, {"date": "2026-09-06", "ctl": 526.0, "atl": 668.0, "tsb": -142.0, "acwr": 1.27, "day_load": 110.6}, {"date": "2026-09-07", "ctl": 535.0, "atl": 613.0, "tsb": -78.0, "acwr": 1.15, "day_load": 57.2}, {"date": "2026-09-08", "ctl": 527.0, "atl": 506.0, "tsb": 21.0, "acwr": 0.96, "day_load": 0.0}, {"date": "2026-09-09", "ctl": 519.0, "atl": 399.0, "tsb": 120.0, "acwr": 0.77, "day_load": 0.0}, {"date": "2026-09-10", "ctl": 535.0, "atl": 462.0, "tsb": 73.0, "acwr": 0.86, "day_load": 120.1}, {"date": "2026-09-11", "ctl": 524.0, "atl": 357.0, "tsb": 167.0, "acwr": 0.68, "day_load": 0.0}, {"date": "2026-09-12", "ctl": 509.0, "atl": 285.0, "tsb": 224.0, "acwr": 0.56, "day_load": 0.0}, {"date": "2026-09-13", "ctl": 494.0, "atl": 213.0, "tsb": 281.0, "acwr": 0.43, "day_load": 0.0}, {"date": "2026-09-14", "ctl": 476.0, "atl": 156.0, "tsb": 320.0, "acwr": 0.33, "day_load": 0.0}, {"date": "2026-09-15", "ctl": 456.0, "atl": 105.0, "tsb": 351.0, "acwr": 0.23, "day_load": 0.0}, {"date": "2026-09-16", "ctl": 435.0, "atl": 68.0, "tsb": 367.0, "acwr": 0.16, "day_load": 0.0}, {"date": "2026-09-17", "ctl": 411.0, "atl": 46.0, "tsb": 365.0, "acwr": 0.11, "day_load": 0.0}, {"date": "2026-09-18", "ctl": 386.0, "atl": 31.0, "tsb": 355.0, "acwr": 0.08, "day_load": 0.0}, {"date": "2026-09-19", "ctl": 362.0, "atl": 15.0, "tsb": 347.0, "acwr": 0.04, "day_load": 0.0}, {"date": "2026-09-20", "ctl": 358.0, "atl": 114.0, "tsb": 244.0, "acwr": 0.32, "day_load": 89.4}, {"date": "2026-09-21", "ctl": 333.0, "atl": 102.0, "tsb": 231.0, "acwr": 0.31, "day_load": 0.0}, {"date": "2026-09-22", "ctl": 309.0, "atl": 91.0, "tsb": 218.0, "acwr": 0.29, "day_load": 0.0}, {"date": "2026-09-23", "ctl": 347.0, "atl": 430.0, "tsb": -83.0, "acwr": 1.24, "day_load": 275.1}, {"date": "2026-09-24", "ctl": 327.0, "atl": 383.0, "tsb": -56.0, "acwr": 1.17, "day_load": 0.0}, {"date": "2026-09-25", "ctl": 340.0, "atl": 526.0, "tsb": -186.0, "acwr": 1.55, "day_load": 148.8}, {"date": "2026-09-26", "ctl": 329.0, "atl": 503.0, "tsb": -174.0, "acwr": 1.53, "day_load": 33.3}, {"date": "2026-09-27", "ctl": 352.0, "atl": 660.0, "tsb": -308.0, "acwr": 1.88, "day_load": 177.9}, {"date": "2026-09-28", "ctl": 342.0, "atl": 568.0, "tsb": -226.0, "acwr": 1.66, "day_load": 0.0}, {"date": "2026-09-29", "ctl": 332.0, "atl": 476.0, "tsb": -144.0, "acwr": 1.43, "day_load": 0.0}, {"date": "2026-09-30", "ctl": 385.0, "atl": 733.0, "tsb": -348.0, "acwr": 1.9, "day_load": 274.2}, {"date": "2026-10-01", "ctl": 378.0, "atl": 617.0, "tsb": -239.0, "acwr": 1.63, "day_load": 0.0}, {"date": "2026-10-02", "ctl": 419.0, "atl": 774.0, "tsb": -355.0, "acwr": 1.85, "day_load": 214.3}, {"date": "2026-10-03", "ctl": 417.0, "atl": 631.0, "tsb": -214.0, "acwr": 1.51, "day_load": 0.0}, {"date": "2026-10-04", "ctl": 440.0, "atl": 704.0, "tsb": -264.0, "acwr": 1.6, "day_load": 142.2}, {"date": "2026-10-05", "ctl": 434.0, "atl": 578.0, "tsb": -144.0, "acwr": 1.33, "day_load": 0.0}, {"date": "2026-10-06", "ctl": 425.0, "atl": 471.0, "tsb": -46.0, "acwr": 1.11, "day_load": 0.0}, {"date": "2026-10-07", "ctl": 468.0, "atl": 645.0, "tsb": -177.0, "acwr": 1.38, "day_load": 217.7}, {"date": "2026-10-08", "ctl": 460.0, "atl": 537.0, "tsb": -77.0, "acwr": 1.17, "day_load": 0.0}, {"date": "2026-10-09", "ctl": 509.0, "atl": 742.0, "tsb": -233.0, "acwr": 1.46, "day_load": 245.9}];
+  const RECOVERY_DATA = [{"date": "2026-09-11", "hrv": null, "rhr": 51, "sleep_hours": 9.38}, {"date": "2026-09-12", "hrv": null, "rhr": 56, "sleep_hours": null}, {"date": "2026-09-13", "hrv": null, "rhr": 52, "sleep_hours": 5.97}, {"date": "2026-09-14", "hrv": null, "rhr": 51, "sleep_hours": 6.73}, {"date": "2026-09-15", "hrv": null, "rhr": 55, "sleep_hours": 5.98}, {"date": "2026-09-16", "hrv": null, "rhr": 49, "sleep_hours": 8.3}, {"date": "2026-09-17", "hrv": null, "rhr": 51, "sleep_hours": 7.08}, {"date": "2026-09-18", "hrv": null, "rhr": 52, "sleep_hours": 8.18}, {"date": "2026-09-19", "hrv": null, "rhr": 51, "sleep_hours": 9.37}, {"date": "2026-09-20", "hrv": null, "rhr": 52, "sleep_hours": 6.83}, {"date": "2026-09-21", "hrv": null, "rhr": 55, "sleep_hours": 4.7}, {"date": "2026-09-22", "hrv": null, "rhr": 50, "sleep_hours": 5.58}, {"date": "2026-09-23", "hrv": null, "rhr": 54, "sleep_hours": 8.88}, {"date": "2026-09-24", "hrv": null, "rhr": 56, "sleep_hours": 6.93}, {"date": "2026-09-25", "hrv": null, "rhr": 52, "sleep_hours": 7.35}, {"date": "2026-09-26", "hrv": null, "rhr": 58, "sleep_hours": 6.74}, {"date": "2026-09-27", "hrv": null, "rhr": 53, "sleep_hours": 9.55}, {"date": "2026-09-28", "hrv": null, "rhr": 53, "sleep_hours": 5.87}, {"date": "2026-09-29", "hrv": null, "rhr": 49, "sleep_hours": 7.12}, {"date": "2026-09-30", "hrv": null, "rhr": 52, "sleep_hours": 7.25}, {"date": "2026-10-01", "hrv": null, "rhr": 51, "sleep_hours": 7.0}, {"date": "2026-10-02", "hrv": null, "rhr": 53, "sleep_hours": 7.42}, {"date": "2026-10-03", "hrv": null, "rhr": 53, "sleep_hours": 9.05}, {"date": "2026-10-04", "hrv": null, "rhr": 55, "sleep_hours": 8.87}, {"date": "2026-10-05", "hrv": null, "rhr": 53, "sleep_hours": 5.68}, {"date": "2026-10-06", "hrv": null, "rhr": 50, "sleep_hours": 6.1}, {"date": "2026-10-07", "hrv": null, "rhr": 52, "sleep_hours": 6.47}, {"date": "2026-10-08", "hrv": null, "rhr": 54, "sleep_hours": 6.24}, {"date": "2026-10-09", "hrv": null, "rhr": 51, "sleep_hours": 6.8}];
+  const ENDURANCE_INFO = {"score": 4322, "classification": "Avanzado / Entrenado", "vo2_component": 2385, "load_component": 1782, "z2_component": 156, "z2_hours_4w": 6.2};
+
+  let currentUnit = 'km';
+  let charts = {};
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderTable();
+    initCharts();
+  });
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    // Actualizar colores de los gráficos
+    setTimeout(() => {
+      Object.values(charts).forEach(c => c.update());
+    }, 50);
+  }
+
+  function setUnit(u) {
+    currentUnit = u;
+    document.getElementById('btn-u-km').classList.toggle('active', u === 'km');
+    document.getElementById('btn-u-mi').classList.toggle('active', u === 'mi');
+    renderTable();
+  }
+
+  function showTab(pageId) {
+    document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById(pageId).classList.add('active');
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('table-raw-body');
+    tbody.innerHTML = '';
+    ACTIVITIES.slice(0, 50).forEach(a => {
+      const tr = document.createElement('tr');
+      const dist = currentUnit === 'km' ? `${a.distance_km} km` : `${a.distance_mi} mi`;
+      let sportBadge = 'badge-run';
+      if (a.sport === 'Gimnasio / Fuerza') sportBadge = 'badge-gym';
+      else if (a.sport === 'Caminata') sportBadge = 'badge-walk';
+
+      const z2Tag = a.z2_pct >= 70 ? '<span class="badge badge-z2-pure">' + a.z2_pct + '%</span>' : 
+                   (a.z2_pct > 0 ? '<span class="badge badge-z2-drift">' + a.z2_pct + '%</span>' : '<span style="color:var(--text-muted);">-</span>');
+
+      tr.innerHTML = `
+        <td style="font-family:'JetBrains Mono'; font-size:12px;">${a.date}</td>
+        <td><strong>${a.name}</strong></td>
+        <td><span class="badge ${sportBadge}">${a.sport}</span></td>
+        <td>${a.intensity}</td>
+        <td style="font-family:'JetBrains Mono';">${a.distance_km > 0 ? dist : '-'}</td>
+        <td style="font-family:'JetBrains Mono';">${a.duration_min} min</td>
+        <td style="font-family:'JetBrains Mono';">${a.avg_hr > 0 ? a.avg_hr + ' ppm' : '-'}</td>
+        <td style="font-family:'JetBrains Mono';">${a.load}</td>
+        <td>${z2Tag}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function initCharts() {
+    // 1. PMC Chart
+    const ctxPMC = document.getElementById('chartPMC').getContext('2d');
+    charts.pmc = new Chart(ctxPMC, {
+      type: 'line',
+      data: {
+        labels: PMC_DATA.map(d => d.date.slice(5)),
+        datasets: [
+          { label: 'Fitness (CTL)', data: PMC_DATA.map(d => d.ctl), borderColor: '#3b82f6', tension: 0.2, pointRadius: 0 },
+          { label: 'Fatiga (ATL)', data: PMC_DATA.map(d => d.atl), borderColor: '#f59e0b', tension: 0.2, pointRadius: 0 },
+          { label: 'Forma (TSB)', data: PMC_DATA.map(d => d.tsb), borderColor: '#10b981', borderDash: [4, 4], pointRadius: 0 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#8492a6' } } },
+        scales: {
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8492a6' } },
+          x: { grid: { display: false }, ticks: { color: '#8492a6', maxTicksLimit: 10 } }
+        }
+      }
+    });
+
+    // 2. Sports Split Doughnut
+    const sportsCounts = { 'Carrera': 0, 'Gimnasio / Fuerza': 0, 'Caminata': 0, 'HIIT / Cardio': 0 };
+    ACTIVITIES.forEach(a => {
+      if (sportsCounts[a.sport] !== undefined) sportsCounts[a.sport] += a.duration_min;
+      else sportsCounts['Carrera'] += a.duration_min;
+    });
+
+    const ctxSports = document.getElementById('chartSportsSplit').getContext('2d');
+    charts.sports = new Chart(ctxSports, {
+      type: 'doughnut',
+      data: {
+        labels: ['Carrera', 'Gimnasio / Fuerza', 'Caminata', 'HIIT / Cardio'],
+        datasets: [{
+          data: Object.values(sportsCounts),
+          backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: '#8492a6' } } }
+      }
+    });
+
+    // 3. Weekly Sports Bar
+    const ctxWeeklySports = document.getElementById('chartWeeklySports').getContext('2d');
+    charts.weeklySports = new Chart(ctxWeeklySports, {
+      type: 'bar',
+      data: {
+        labels: ['Sem 38', 'Sem 39', 'Sem 40', 'Sem 41 (Esta)'],
+        datasets: [
+          { label: 'Carrera (h)', data: [4.2, 5.1, 4.8, 3.5], backgroundColor: '#3b82f6' },
+          { label: 'Gimnasio / Fuerza (h)', data: [2.0, 2.5, 2.0, 1.5], backgroundColor: '#8b5cf6' },
+          { label: 'Caminata (h)', data: [1.5, 2.0, 1.8, 1.2], backgroundColor: '#10b981' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { color: '#8492a6' } },
+          y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8492a6' } }
+        },
+        plugins: { legend: { position: 'bottom', labels: { color: '#8492a6' } } }
+      }
+    });
+
+    // 4. Dynamic Z2 Chart
+    const ctxZ2 = document.getElementById('chartZ2Dynamic').getContext('2d');
+    charts.z2 = new Chart(ctxZ2, {
+      type: 'bar',
+      data: {
+        labels: ['Sem 38', 'Sem 39', 'Sem 40', 'Sem 41'],
+        datasets: [{
+          label: 'Horas en Zona 2',
+          data: [3.8, 4.5, 4.2, 3.1],
+          backgroundColor: '#10b981',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8492a6' } },
+          x: { grid: { display: false }, ticks: { color: '#8492a6' } }
+        }
+      }
+    });
+
+    // 5. Polarization Doughnut
+    const ctxPol = document.getElementById('chartPolarization').getContext('2d');
+    charts.polarization = new Chart(ctxPol, {
+      type: 'doughnut',
+      data: {
+        labels: ['Zona 1-2 (Base Aeróbica)', 'Zona 3 (Tempo)', 'Zona 4-5 (Alta Intensidad)'],
+        datasets: [{
+          data: [79, 14, 7],
+          backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: '#8492a6' } } }
+      }
+    });
+
+    // 6. HRV Base Chart
+    const ctxHRV = document.getElementById('chartHRVBase').getContext('2d');
+    const validHRV = RECOVERY_DATA.filter(d => d.hrv);
+    charts.hrv = new Chart(ctxHRV, {
+      type: 'line',
+      data: {
+        labels: validHRV.map(d => d.date.slice(5)),
+        datasets: [
+          { label: 'VFC Nocturna (ms)', data: validHRV.map(d => d.hrv), borderColor: '#10b981', tension: 0.2 },
+          { label: 'Banda Superior (56 ms)', data: validHRV.map(() => 56), borderColor: 'rgba(255,255,255,0.2)', borderDash: [4, 4], pointRadius: 0 },
+          { label: 'Banda Inferior (43 ms)', data: validHRV.map(() => 43), borderColor: 'rgba(255,255,255,0.2)', borderDash: [4, 4], pointRadius: 0 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#8492a6' } } },
+        scales: {
+          y: { min: 35, max: 65, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8492a6' } },
+          x: { grid: { display: false }, ticks: { color: '#8492a6', maxTicksLimit: 8 } }
+        }
+      }
+    });
+
+    // 7. RHR Trend
+    const ctxRHR = document.getElementById('chartRHRTrend').getContext('2d');
+    const validRHR = RECOVERY_DATA.filter(d => d.rhr);
+    charts.rhr = new Chart(ctxRHR, {
+      type: 'line',
+      data: {
+        labels: validRHR.map(d => d.date.slice(5)),
+        datasets: [{
+          label: 'FC en Reposo (ppm)',
+          data: validRHR.map(d => d.rhr),
+          borderColor: '#ef4444',
+          tension: 0.2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { min: 48, max: 62, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8492a6' } },
+          x: { grid: { display: false }, ticks: { color: '#8492a6', maxTicksLimit: 8 } }
+        }
+      }
+    });
+  }
+
+  function filterZ2Granularity(mode) {
+    document.querySelectorAll('.filter-pills .filter-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    if (mode === 'session') {
+      charts.z2.data.labels = ['Carrera 04/10', 'Carrera 06/10', 'Carrera 07/10'];
+      charts.z2.data.datasets[0].data = [1.3, 0.8, 0.9];
+    } else if (mode === 'month') {
+      charts.z2.data.labels = ['Agosto', 'Septiembre', 'Octubre'];
+      charts.z2.data.datasets[0].data = [18.2, 16.5, 9.8];
+    } else {
+      charts.z2.data.labels = ['Sem 38', 'Sem 39', 'Sem 40', 'Sem 41'];
+      charts.z2.data.datasets[0].data = [3.8, 4.5, 4.2, 3.1];
+    }
+    charts.z2.update();
+  }
+</script>
+
+</body>
+</html>
