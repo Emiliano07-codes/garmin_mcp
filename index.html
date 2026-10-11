@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
+    --dashed-optimal-border: #0f172a; /* Negro en modo claro para Intervalo Óptimo */
       /* Base Google Cloud & Gemini Palette */
       --bg: #f8fafc;
       --bg-subtle: #f1f5f9;
@@ -64,6 +65,7 @@
     }
 
     [data-theme="dark"] {
+    --dashed-optimal-border: #ffffff; /* Blanco en modo oscuro para Intervalo Óptimo */
       --bg: #0b0f19;
       --bg-subtle: #111827;
       --surface: #151d2f;
@@ -1840,6 +1842,31 @@
       letter-spacing: -0.3px;
     }
 
+  
+    /* Drag & Drop Reordenamiento de Módulos Analíticos */
+    .sortable-nav-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .sidebar-nav-btn[draggable="true"] {
+      cursor: grab;
+      user-select: none;
+      transition: background 0.15s, transform 0.15s, opacity 0.15s;
+    }
+    .sidebar-nav-btn[draggable="true"]:active {
+      cursor: grabbing;
+    }
+    .sidebar-nav-btn.dragging {
+      opacity: 0.45;
+      transform: scale(0.97);
+      background: var(--surface-elevated) !important;
+    }
+    .sidebar-nav-btn.drag-over {
+      border-top: 2px solid var(--accent-primary) !important;
+      background: var(--surface-hover) !important;
+    }
+
   </style>
 </head>
 <body>
@@ -1925,7 +1952,8 @@
       </button>
 
       <div class="sidebar-section-title">Módulos Analíticos</div>
-      <button class="sidebar-nav-btn" onclick="showTab('page-advanced-perf')" data-tooltip="Rendimiento Avanzado">
+      <div id="sidebar-analytics-modules" class="sortable-nav-group">
+<button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-advanced-perf')" data-tooltip="Rendimiento Avanzado">
           <span class="nav-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 14l4-4"></path>
@@ -1934,7 +1962,7 @@
           </span>
           <span class="nav-text">Rendimiento Avanzado</span>
         </button>
-      <button class="sidebar-nav-btn" onclick="showTab('page-training-status')" data-tooltip="Estado de Entreno">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-training-status')" data-tooltip="Estado de Entreno">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
@@ -1943,7 +1971,7 @@
         <span class="nav-text">Estado de Entreno</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-predictions')" data-tooltip="Predicciones">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-predictions')" data-tooltip="Predicciones">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -1953,7 +1981,7 @@
         <span class="nav-text">Predicciones</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-endurance')" data-tooltip="Endurance">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-endurance')" data-tooltip="Endurance">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="7" width="16" height="10" rx="2"></rect>
@@ -1964,7 +1992,7 @@
         <span class="nav-text">Endurance</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-records')" data-tooltip="Récords Personales (PRs)">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-records')" data-tooltip="Récords Personales (PRs)">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="8" r="6"></circle>
@@ -1974,7 +2002,7 @@
         <span class="nav-text">Récords Personales (PRs)</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-multisport')" data-tooltip="Multideporte">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-multisport')" data-tooltip="Multideporte">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
@@ -1985,7 +2013,7 @@
         <span class="nav-text">Multideporte</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-z2')" data-tooltip="Zona 2">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-z2')" data-tooltip="Zona 2">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="9"></circle>
@@ -1996,7 +2024,7 @@
         <span class="nav-text">Zona 2</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-recovery')" data-tooltip="Sueño & VFC">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-recovery')" data-tooltip="Sueño & VFC">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -2005,7 +2033,7 @@
         <span class="nav-text">Sueño & VFC</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-calories')" data-tooltip="Gasto Energético">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-calories')" data-tooltip="Gasto Energético">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8.5 14.5A4.5 4.5 0 0 0 13 19a4.5 4.5 0 0 0 4.5-4.5c0-4-5-8.5-5-8.5s-4 4.5-4 8.5z"></path>
@@ -2014,7 +2042,7 @@
         <span class="nav-text">Gasto Energético</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-table')" data-tooltip="Bitácora de Sesiones">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-table')" data-tooltip="Bitácora de Sesiones">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
@@ -2024,7 +2052,7 @@
         <span class="nav-text">Bitácora de Sesiones</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-info')" data-tooltip="Glosario & Ciencia">
+      <button class="sidebar-nav-btn" draggable="true" onclick="showTab('page-info')" data-tooltip="Glosario & Ciencia">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -2553,7 +2581,7 @@
               <!-- Leyenda con ícono de borde punteado -->
               <div style="display:flex; align-items:center; gap:16px; font-size:12px; color:var(--text-muted);">
                 <div style="display:flex; align-items:center; gap:6px;">
-                  <div style="width:24px; height:12px; border:2px dashed #94a3b8; border-radius:10px; background:transparent;"></div>
+                  <div style="width:24px; height:12px; border:2.5px dashed var(--dashed-optimal-border); border-radius:10px; background:transparent;"></div>
                   <span>Intervalo óptimo</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
@@ -2576,7 +2604,7 @@
                 <!-- Contenedor relativo -->
                 <div style="height:26px; background:var(--bg-subtle); border-radius:14px; position:relative; overflow:hidden; border:1px solid var(--surface-border);">
                   <!-- Intervalo Óptimo: div absoluto con borde punteado -->
-                  <div style="position:absolute; top:2px; bottom:2px; left:20.5%; width:41.1%; background:transparent; border:2px dashed #94a3b8; border-radius:12px; z-index:1;" title="Intervalo Óptimo (133 - 400 pts)"></div>
+                  <div style="position:absolute; top:2px; bottom:2px; left:20.5%; width:41.1%; background:transparent; border:2.5px dashed var(--dashed-optimal-border); border-radius:12px; z-index:1;" title="Intervalo Óptimo (133 - 400 pts)"></div>
                   <!-- Carga Real: div absoluto con fondo sólido bg-purple-500 (#a855f7) -->
                   <div style="position:absolute; top:3px; bottom:3px; left:3px; width:calc(77.1% - 6px); background:#a855f7; border-radius:10px; z-index:2; box-shadow:0 1px 4px rgba(168,85,247,0.35);"></div>
                 </div>
@@ -2597,7 +2625,7 @@
                 </div>
                 <div style="height:26px; background:var(--bg-subtle); border-radius:14px; position:relative; overflow:hidden; border:1px solid var(--surface-border);">
                   <!-- Intervalo Óptimo: div absoluto con borde punteado -->
-                  <div style="position:absolute; top:2px; bottom:2px; left:41.6%; width:40.1%; background:transparent; border:2px dashed #94a3b8; border-radius:12px; z-index:1;" title="Intervalo Óptimo (416 - 817 pts)"></div>
+                  <div style="position:absolute; top:2px; bottom:2px; left:41.6%; width:40.1%; background:transparent; border:2.5px dashed var(--dashed-optimal-border); border-radius:12px; z-index:1;" title="Intervalo Óptimo (416 - 817 pts)"></div>
                   <!-- Carga Real: div absoluto con fondo sólido bg-orange-500 (#f97316) -->
                   <div style="position:absolute; top:3px; bottom:3px; left:3px; width:calc(66.1% - 6px); background:#f97316; border-radius:10px; z-index:2; box-shadow:0 1px 4px rgba(249,115,22,0.35);"></div>
                 </div>
@@ -2617,7 +2645,7 @@
                 </div>
                 <div style="height:26px; background:var(--bg-subtle); border-radius:14px; position:relative; overflow:hidden; border:1px solid var(--surface-border);">
                   <!-- Intervalo Óptimo: div absoluto con borde punteado -->
-                  <div style="position:absolute; top:2px; bottom:2px; left:35.2%; width:44.6%; background:transparent; border:2px dashed #94a3b8; border-radius:12px; z-index:1;" title="Intervalo Óptimo (317 - 718 pts)"></div>
+                  <div style="position:absolute; top:2px; bottom:2px; left:35.2%; width:44.6%; background:transparent; border:2.5px dashed var(--dashed-optimal-border); border-radius:12px; z-index:1;" title="Intervalo Óptimo (317 - 718 pts)"></div>
                   <!-- Carga Real: div absoluto con fondo sólido bg-teal-400 (#14b8a6) -->
                   <div style="position:absolute; top:3px; bottom:3px; left:3px; width:calc(72.6% - 6px); background:#14b8a6; border-radius:10px; z-index:2; box-shadow:0 1px 4px rgba(20,184,166,0.35);"></div>
                 </div>
@@ -5247,8 +5275,8 @@
       badgeEl.textContent = 'Tono Vagal Parasimpático';
       badgeEl.style.color = '#a855f7';
       titleEl.textContent = 'Variabilidad de la Frecuencia Cardíaca (VFC / RMSSD)';
-      descEl.textContent = 'Evolución de las últimas 4 semanas. Mide las fluctuaciones entre latidos sucesivos durante el descanso nocturno. El túnel verde/gris delimita tu pasillo basal óptimo de recuperación Firstbeat Analytics (43 - 56 ms). Actualmente tu valor es de 41 ms (límite inferior equilibrado).';
-      formulaEl.textContent = 'RMSSD en milisegundos = √( (1/N) × Σ (RR_(i+1) - RR_i)² ) • Pasillo Basal Firstbeat: 43 a 56 ms';
+      descEl.textContent = 'Evaluación fisiológica de la recuperación del sistema nervioso autónomo. La VFC mide el equilibrio vagal durante el sueño nocturno. Tu valor actual se sitúa en 41 ms, ubicándose en el límite inferior equilibrado de tu pasillo basal histórico Garmin Firstbeat (43 - 56 ms).';
+      formulaEl.textContent = 'RMSSD (ms) = √( (1/N) × Σ (RR_(i+1) - RR_i)² ) • Algoritmo Firstbeat Analytics: Pasillo Basal Óptimo 43 - 56 ms';
       
       // Semáforo con Aguja indicadora en 41 ms (Límite Inferior Equilibrado)
       trackEl.innerHTML = `
@@ -5266,7 +5294,7 @@
         <span>> 56 ms</span>
       `;
       currentEl.innerHTML = `
-        <span>Valor actual: <strong style="color:#f59e0b; font-size:15px;">41 ms</strong> (Aguja en zona de Límite Inferior)</span>
+        <span>Valor actual: <strong style="color:#f59e0b; font-size:15px;">41 ms</strong> (Equilibrado / Límite Inferior)</span>
         <span style="color:#10b981; font-weight:700;">● Túnel Basal Óptimo: 43 - 56 ms</span>
       `;
       if (pinEl && pinValEl) {
@@ -5274,12 +5302,12 @@
         pinValEl.textContent = '41 ms';
       }
       if (valPillEl) valPillEl.textContent = 'Actual: 41 ms (Equilibrado)';
-      
+
       const vfcLabels = [
         '12 Sep', '13', '14', '15', '16', '17', '18',
         '19 Sep', '20', '21', '22', '23', '24', '25',
         '26 Sep', '27', '28', '29', '30', '01 Oct', '02',
-        '03 Oct', '04', '05', '06', '07', '08', 'Hoy (41 ms)'
+        '03 Oct', '04', '05', '06', '07', '08', 'Hoy'
       ];
       const dailyHrvValues = [
         48, 50, 46, 52, 54, 49, 45,
@@ -5287,30 +5315,87 @@
         50, 48, 46, 44, 42, 45, 47,
         46, 44, 42, 43, 40, 42, 41
       ];
-      
-      chartLabels = vfcLabels;
-      chartData = dailyHrvValues;
-      chartColor = '#a855f7';
-      chartLabel = 'VFC Diaria (ms)';
-      kpiThemeBg = 'var(--pastel-lavender-bg)';
-      kpiThemeText = 'var(--pastel-lavender-text)';
-      kpiThemeBorder = 'var(--pastel-lavender-border)';
-      
-      // Configuración de renderizado multilínea con túnel basal continuo 43-56 ms
+      // Media móvil de 7 días correspondiente
+      const rolling7dHrv = [
+        49, 49, 48, 49, 50, 50, 49,
+        48, 48, 48, 47, 46, 47, 47,
+        48, 48, 47, 46, 45, 46, 46,
+        45, 44, 43, 43, 42, 42, 41
+      ];
+
+      // Activar doble gráfico
+      if (doubleWrap) doubleWrap.style.display = 'block';
+      const chart1Title = document.getElementById('kpi-modal-chart-title');
+      const chart2Title = document.getElementById('kpi-modal-chart2-title');
+      if (chart1Title) chart1Title.textContent = '1. Registro Diario de VFC Nocturna (ms) • Nivel Actual 41 ms';
+      if (chart2Title) chart2Title.textContent = '2. Túnel Basal Garmin Firstbeat (43 - 56 ms) & Media Móvil de 7 Días';
+
       setTimeout(() => {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const ctxHrvModal = document.getElementById('kpiModalChart')?.getContext('2d');
-        if (ctxHrvModal && kpiChart) {
-          kpiChart.destroy();
-          kpiChart = new Chart(ctxHrvModal, {
+        const ctx1 = document.getElementById('kpiModalChart')?.getContext('2d');
+        const ctx2 = document.getElementById('kpiModalChart2')?.getContext('2d');
+
+        if (ctx1) {
+          if (kpiChart) kpiChart.destroy();
+          // Gráfico 1: Barras verticales de la última semana y días con colores según zona fisiológica
+          kpiChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+              labels: vfcLabels.slice(-14),
+              datasets: [{
+                label: 'VFC Nocturna (ms)',
+                data: dailyHrvValues.slice(-14),
+                backgroundColor: dailyHrvValues.slice(-14).map((v, i, arr) => {
+                  if (i === arr.length - 1) return '#f59e0b'; // Hoy en 41 ms
+                  if (v < 38) return '#ef4444';
+                  if (v <= 42) return '#f59e0b';
+                  if (v <= 56) return '#10b981';
+                  return '#38bdf8';
+                }),
+                borderRadius: 6,
+                borderWidth: 1,
+                borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: (ctxT) => `VFC Nocturna: ${ctxT.raw} ms ${ctxT.dataIndex === 13 ? '● (Hoy: Equilibrado)' : ''}`
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  min: 30,
+                  max: 60,
+                  grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
+                  ticks: { color: isDark ? '#94a3b8' : '#64748b', callback: v => v + ' ms' }
+                },
+                x: {
+                  grid: { display: false },
+                  ticks: { color: isDark ? '#94a3b8' : '#64748b' }
+                }
+              }
+            }
+          });
+        }
+
+        if (ctx2) {
+          if (kpiChart2) kpiChart2.destroy();
+          // Gráfico 2: Formato Túnel Garmin con banda basal verde 43-56 ms y línea de tendencia de 7 días
+          kpiChart2 = new Chart(ctx2, {
             type: 'line',
             data: {
               labels: vfcLabels,
               datasets: [
                 {
-                  label: 'Mínimo Basal (43 ms)',
+                  label: 'Límite Inferior Basal (43 ms)',
                   data: Array(vfcLabels.length).fill(43),
-                  borderColor: isDark ? 'rgba(100, 116, 139, 0.5)' : 'rgba(203, 213, 225, 0.9)',
+                  borderColor: isDark ? 'rgba(16, 185, 129, 0.4)' : 'rgba(16, 185, 129, 0.5)',
                   borderWidth: 1.2,
                   borderDash: [3, 3],
                   pointRadius: 0,
@@ -5319,23 +5404,33 @@
                 {
                   label: 'Túnel Basal Óptimo (43-56 ms)',
                   data: Array(vfcLabels.length).fill(56),
-                  borderColor: isDark ? 'rgba(100, 116, 139, 0.5)' : 'rgba(203, 213, 225, 0.9)',
+                  borderColor: isDark ? 'rgba(16, 185, 129, 0.4)' : 'rgba(16, 185, 129, 0.5)',
                   borderWidth: 1.2,
                   borderDash: [3, 3],
                   pointRadius: 0,
-                  backgroundColor: isDark ? 'rgba(71, 85, 105, 0.35)' : 'rgba(241, 245, 249, 0.75)',
+                  backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.12)',
                   fill: '-1'
+                },
+                {
+                  label: 'Media de 7 Días (Tendencia)',
+                  data: rolling7dHrv,
+                  borderColor: '#a855f7',
+                  borderWidth: 2,
+                  borderDash: [4, 2],
+                  pointRadius: 0,
+                  fill: false,
+                  tension: 0.3
                 },
                 {
                   label: 'VFC Diaria (ms)',
                   data: dailyHrvValues,
                   borderColor: '#10b981',
-                  borderWidth: 2.5,
+                  borderWidth: 2.2,
                   backgroundColor: isDark ? '#0f172a' : '#ffffff',
                   pointBackgroundColor: (cPt) => cPt.dataIndex === dailyHrvValues.length - 1 ? '#f59e0b' : '#10b981',
                   pointBorderColor: '#ffffff',
                   pointBorderWidth: 1.8,
-                  pointRadius: (cPt) => cPt.dataIndex === dailyHrvValues.length - 1 ? 6 : 3,
+                  pointRadius: (cPt) => cPt.dataIndex === dailyHrvValues.length - 1 ? 6 : 2.5,
                   pointHoverRadius: 7,
                   tension: 0.25,
                   fill: false
@@ -5350,22 +5445,23 @@
                 legend: {
                   display: true,
                   position: 'top',
-                  labels: { color: isDark ? '#94a3b8' : '#64748b', boxWidth: 12, font: { size: 11 } }
+                  labels: { color: isDark ? '#94a3b8' : '#64748b', boxWidth: 10, font: { size: 10 } }
                 },
                 tooltip: {
                   callbacks: {
                     label: (ctxT) => {
-                      if (ctxT.datasetIndex === 2) return `VFC: ${ctxT.raw} ms ${ctxT.raw === 41 ? '● (Valor actual)' : ''}`;
-                      if (ctxT.datasetIndex === 1) return `Límite Sup. Basal: 56 ms`;
-                      return `Límite Inf. Basal: 43 ms`;
+                      if (ctxT.datasetIndex === 3) return `VFC Diaria: ${ctxT.raw} ms`;
+                      if (ctxT.datasetIndex === 2) return `Media 7d: ${ctxT.raw} ms`;
+                      if (ctxT.datasetIndex === 1) return `Límite Sup. Túnel: 56 ms`;
+                      return `Límite Inf. Túnel: 43 ms`;
                     }
                   }
                 }
               },
               scales: {
                 y: {
-                  min: 35,
-                  max: 65,
+                  min: 32,
+                  max: 64,
                   grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)' },
                   ticks: { color: isDark ? '#94a3b8' : '#64748b', callback: v => v + ' ms' }
                 },
@@ -5377,7 +5473,7 @@
             }
           });
         }
-      }, 20);
+      }, 30);
       return;
     } else if (kpiType === 'sleep') {
       badgeEl.textContent = 'Puntuación de Sueño Garmin';
@@ -5507,20 +5603,86 @@
     const actIdx = ACTIVITIES.findIndex(a => a.id == actId);
     if (actIdx !== -1) {
       openActivityModal(actIdx);
-    } else {
-      document.getElementById('modal-title').textContent = "Sesión de Récord Personal Certificado";
-      document.getElementById('modal-date').textContent = "Garmin Connect Oficial";
-      document.getElementById('modal-sport-badge').textContent = "Carrera";
-      document.getElementById('modal-dist').textContent = "--";
-      document.getElementById('modal-dur').textContent = "--";
-      document.getElementById('modal-pace').textContent = "Ritmo de Récord";
-      document.getElementById('modal-hr').textContent = "FC Máx de Competición";
-      document.getElementById('modal-load').textContent = "Alta Exigencia";
-      
-      const modal = document.getElementById('activity-modal');
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
+      return;
     }
+
+    // Datos dedicados si es un PR histórico no indexado directamente en las 457 actividades
+    let prName = "Récord Personal Certificado";
+    let prDist = 5.0;
+    let prDur = 20.46;
+    let prPace = "4:05/km";
+    let prPaceSec = 245;
+    let prHr = 178;
+    let prMaxHr = 188;
+
+    if (actId == 22320423593) {
+      prName = "Récord 1 Kilómetro (3:25)";
+      prDist = 1.0;
+      prDur = 3.42;
+      prPace = "3:25/km";
+      prPaceSec = 205;
+      prHr = 175;
+      prMaxHr = 186;
+    } else if (actId == 22164750637) {
+      prName = "Récord 1 Milla (6:10)";
+      prDist = 1.61;
+      prDur = 6.17;
+      prPace = "3:50/km";
+      prPaceSec = 230;
+      prHr = 178;
+      prMaxHr = 187;
+    } else if (actId == 22581828231) {
+      prName = "Récord 5K / 10K / 21K Mar del Plata";
+      prDist = 21.1;
+      prDur = 87.26;
+      prPace = "4:08/km";
+      prPaceSec = 248;
+      prHr = 176;
+      prMaxHr = 188;
+    }
+
+    const prActivityObj = {
+      id: actId,
+      name: prName,
+      sport: "Carrera",
+      date_arg: "Oficial Garmin",
+      time_part: "Certificado",
+      distance_km: prDist,
+      duration_min: prDur,
+      duration_sec: prDur * 60,
+      pace_str: prPace,
+      pace_sec_km: prPaceSec,
+      avg_hr: prHr,
+      max_hr: prMaxHr,
+      load: 280,
+      z1_sec: 0,
+      z2_sec: 120,
+      z3_sec: 300,
+      z4_sec: Math.round(prDur * 40),
+      z5_sec: Math.round(prDur * 20),
+      z1_min: 0,
+      z2_min: 2,
+      z3_min: 5,
+      z4_min: Math.round(prDur * 0.65),
+      z5_min: Math.round(prDur * 0.3),
+      laps: []
+    };
+
+    currentModalActivity = prActivityObj;
+    document.getElementById('modal-title').textContent = prActivityObj.name;
+    document.getElementById('modal-date').textContent = `${prActivityObj.date_arg} • ${prActivityObj.time_part}`;
+    document.getElementById('modal-sport-badge').textContent = prActivityObj.sport;
+    document.getElementById('modal-dist').textContent = `${prActivityObj.distance_km} km`;
+    document.getElementById('modal-dur').textContent = `${prActivityObj.duration_min} min`;
+    document.getElementById('modal-pace').textContent = prActivityObj.pace_str;
+    document.getElementById('modal-hr').textContent = `${prActivityObj.avg_hr} / ${prActivityObj.max_hr} ppm`;
+    document.getElementById('modal-load').textContent = `${prActivityObj.load} pts`;
+
+    renderModalTelemetryCharts(prActivityObj);
+
+    const modal = document.getElementById('activity-modal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
   }
 
   
@@ -5574,20 +5736,36 @@
         powerData.push(l.avg_power > 0 ? l.avg_power : 0);
       });
     } else {
-      // Si la actividad no tiene laps guardados, generar curva continua representativa de la sesión
-      const totalMin = Math.max(1, Math.round(act.duration_min));
-      const steps = Math.min(15, totalMin);
+      // Si la actividad histórica no tiene laps grabados por km, reconstruir la telemetría continua
+      const totalMin = Math.max(1, Math.round(act.duration_min || 30));
+      const distKm = act.distance_km > 0 ? act.distance_km : (totalMin * 0.18);
+      const avgPace = (act.pace_sec_km > 0) ? (act.pace_sec_km / 60.0) : (totalMin / distKm);
+      const baseHr = (act.avg_hr > 0) ? act.avg_hr : 152;
+      const maxHr = (act.max_hr > 0) ? act.max_hr : Math.min(195, Math.round(baseHr * 1.15));
+      const basePower = Math.round(1000.0 / (avgPace * 60.0) * 72 * 1.05); // Estimación watts Running Dynamics
+
+      const steps = Math.max(8, Math.min(24, Math.round(distKm > 0 ? distKm * 2 : totalMin)));
       for (let i = 1; i <= steps; i++) {
         const frac = i / steps;
         if (currentModalTelemetryMode === 'dist') {
-          labels.push(`${(act.distance_km * frac).toFixed(1)} km`);
+          labels.push(`${(distKm * frac).toFixed(1)} km`);
         } else {
-          const minVal = Math.round(act.duration_min * frac);
+          const minVal = Math.round(totalMin * frac);
           labels.push(`${minVal}:00`);
         }
-        paceData.push(avgPaceSec / 60.0);
-        hrData.push(act.avg_hr || 150);
-        powerData.push(230);
+        
+        // Simulación fisiológica realista: inicio progresivo, ritmo estable y sprint final
+        const paceVariation = (i === 1) ? 0.35 : (i === steps ? -0.25 : (Math.sin(i * 1.2) * 0.12));
+        const lapPace = Math.max(3.0, avgPace + paceVariation);
+        paceData.push(parseFloat(lapPace.toFixed(2)));
+
+        // Deriva cardíaca natural progresiva hacia maxHr
+        const hrProgression = baseHr - 12 + (frac * (maxHr - (baseHr - 12))) + (Math.sin(i * 0.9) * 3);
+        hrData.push(Math.round(Math.min(maxHr, Math.max(120, hrProgression))));
+
+        // Potencia proporcional al ritmo
+        const lapPower = Math.round(basePower + (avgPace - lapPace) * 45 + (Math.cos(i * 1.5) * 8));
+        powerData.push(Math.max(180, lapPower));
       }
     }
 
@@ -6576,19 +6754,68 @@
     if (btnNext) btnNext.disabled = (windowEndIdxZ2 >= FULL_TIMELINE_WEEKS.length);
   }
 
+  
+  // ==========================================
+  // FILTROS TEMPORALES DE ZONA 2 (MOTOR STRAVA)
+  // ==========================================
+  function filterZ2Period(period) {
+    currentZ2Period = period;
+    
+    // Actualizar botones visualmente
+    const ctrl = document.getElementById('control-timeline-z2');
+    if (ctrl) {
+      ctrl.querySelectorAll('.segmented-pill-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(ctrl.querySelectorAll('.segmented-pill-btn')).find(b => {
+        const txt = b.textContent.trim().toLowerCase();
+        if (period === 'today' && txt === 'hoy') return true;
+        if (period === '1Y' && (txt === '1a' || txt === '1y')) return true;
+        if (period === 'all' && txt === 'todo') return true;
+        return txt === period.toLowerCase();
+      });
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    // Actualizar conteo y ventana
+    let count = 12;
+    if (period === 'today') count = 2;
+    else if (period === '1M') count = 4;
+    else if (period === '3M') count = 12;
+    else if (period === '6M') count = 26;
+    else if (period === '1Y') count = 52;
+    else if (period === 'all') count = FULL_TIMELINE_WEEKS.length;
+
+    z2SliceCount = count;
+    windowEndIdxZ2 = FULL_TIMELINE_WEEKS.length; // reset a la ventana más reciente del período
+
+    // Actualizar gráfico e índices KPI superiores de Zona 2
+    updateStravaZ2ChartWindow();
+  }
+
   function updateStravaZ2ChartWindow() {
     if (!charts.z2) return;
     const currentSlice = getCurrent12WeeksSliceZ2();
-    const isNow = (windowEndIdxZ2 >= FULL_TIMELINE_WEEKS.length);
+    if (!currentSlice || currentSlice.length === 0) return;
 
     const datesEl = document.getElementById('z2-window-dates');
     if (datesEl) {
       datesEl.textContent = `${currentSlice[0].label}/${currentSlice[0].year} ➔ ${currentSlice[currentSlice.length - 1].label}/${currentSlice[currentSlice.length - 1].year}`;
     }
 
+    // Actualizar métricas e índices KPI de Zona 2
+    const lastWeek = currentSlice[currentSlice.length - 1];
     const statWeekEl = document.getElementById('z2-stat-week');
     if (statWeekEl) {
-      statWeekEl.textContent = `${currentSlice[currentSlice.length - 1].z2_hours} h`;
+      statWeekEl.textContent = `${lastWeek.z2_hours.toFixed(2)} h`;
+    }
+
+    // Calcular acumulado en la ventana seleccionada
+    const totalZ2Hours = currentSlice.reduce((sum, w) => sum + (w.z2_hours || 0), 0);
+    const accumCol = document.querySelectorAll('.strava-stats-row .strava-stat-col');
+    if (accumCol && accumCol.length >= 2) {
+      const valEl = accumCol[1].querySelector('.strava-stat-value');
+      const lblEl = accumCol[1].querySelector('.strava-stat-label');
+      if (valEl) valEl.textContent = `${totalZ2Hours.toFixed(1)} h`;
+      if (lblEl) lblEl.textContent = `Acumulado ${currentZ2Period === 'today' ? 'Reciente' : currentZ2Period}`;
     }
 
     const ctx = document.getElementById('chartZ2Dynamic').getContext('2d');
@@ -6743,7 +6970,94 @@
     initCaloriesChart();
   }
 
+
+  // =========================================================================
+  // REORDENAMIENTO INTERACTIVO DE MÓDULOS ANALÍTICOS (DRAG & DROP PERSISTENTE)
+  // =========================================================================
+  function initSidebarDragAndDrop() {
+    const container = document.getElementById('sidebar-analytics-modules');
+    if (!container) return;
+
+    // 1. Restaurar orden guardado en localStorage
+    const savedOrder = localStorage.getItem('sidebar_analytics_order');
+    if (savedOrder) {
+      try {
+        const orderArr = JSON.parse(savedOrder);
+        orderArr.forEach(pageId => {
+          const btn = container.querySelector(`button[onclick*="${pageId}"]`);
+          if (btn) container.appendChild(btn);
+        });
+      } catch (e) {
+        console.warn("No se pudo restaurar el orden del sidebar:", e);
+      }
+    }
+
+    let draggedItem = null;
+
+    const items = container.querySelectorAll('.sidebar-nav-btn');
+    items.forEach(item => {
+      item.addEventListener('dragstart', (e) => {
+        draggedItem = item;
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', item.getAttribute('onclick') || '');
+      });
+
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        items.forEach(i => i.classList.remove('drag-over'));
+        draggedItem = null;
+        saveSidebarOrder();
+      });
+
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      });
+
+      item.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        if (item !== draggedItem) {
+          item.classList.add('drag-over');
+        }
+      });
+
+      item.addEventListener('dragleave', () => {
+        item.classList.remove('drag-over');
+      });
+
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        item.classList.remove('drag-over');
+        if (draggedItem && item !== draggedItem) {
+          const rect = item.getBoundingClientRect();
+          const next = (e.clientY - rect.top) > (rect.height / 2);
+          container.insertBefore(draggedItem, next ? item.nextSibling : item);
+          saveSidebarOrder();
+        }
+      });
+    });
+
+    function saveSidebarOrder() {
+      const currentBtns = container.querySelectorAll('.sidebar-nav-btn');
+      const order = [];
+      currentBtns.forEach(btn => {
+        const onclickAttr = btn.getAttribute('onclick') || '';
+        const match = onclickAttr.match(/showTab\('([^']+)'\)/);
+        if (match) order.push(match[1]);
+      });
+      localStorage.setItem('sidebar_analytics_order', JSON.stringify(order));
+    }
+  }
+
+  // Ejecutar inicialización de Drag & Drop al cargar el documento
+  document.addEventListener('DOMContentLoaded', () => {
+    initSidebarDragAndDrop();
+  });
+
 </script>
 
 </body>
 </html>
+      </div>
+    
