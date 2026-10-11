@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Garmin Performance Lab • V5.2 | Google Cloud & Gemini Sports Intelligence</title>
+  <title>Garmin Performance Lab • V5.3 | Google Cloud & Gemini Sports Intelligence</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1419,28 +1419,45 @@
     :root:not([data-theme="dark"]) #theme-sun-icon { display: block; color: #f59e0b; }
     :root:not([data-theme="dark"]) #theme-moon-icon { display: none; }
 
-    /* Estructura Raíz */
+    /* Estructura Raíz Limpia y Totalmente Colapsable */
     .app-layout {
-      display: grid !important;
-      grid-template-columns: 260px minmax(0, 1fr) !important;
-      gap: 22px !important;
-      align-items: start !important;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+      transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    .sidebar {
-      width: 260px !important;
-      flex-shrink: 0 !important;
-      background: var(--surface) !important;
-      border: 1px solid var(--surface-border) !important;
-      border-radius: var(--radius-card) !important;
-      padding: 14px 10px !important;
-      position: sticky !important;
-      top: 18px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 4px !important;
-      box-shadow: var(--shadow-card) !important;
-      z-index: 100 !important;
+    .app-layout.sidebar-collapsed {
+      grid-template-columns: 72px minmax(0, 1fr) !important;
+    }
+    .app-layout.sidebar-collapsed .sidebar {
+      width: 72px !important;
+      padding: 14px 6px !important;
+      align-items: center !important;
+    }
+    .app-layout.sidebar-collapsed .nav-text {
+      display: none !important;
+      opacity: 0 !important;
+      width: 0 !important;
+    }
+    .app-layout.sidebar-collapsed .sidebar-section-title {
+      display: none !important;
+    }
+    .app-layout.sidebar-collapsed .sidebar-top-bar {
+      justify-content: center !important;
+      padding: 4px 0 10px 0 !important;
+    }
+    .app-layout.sidebar-collapsed .sidebar-top-bar > div {
+      display: none !important;
+    }
+    .app-layout.sidebar-collapsed .sidebar-nav-btn {
+      justify-content: center !important;
+      padding: 11px 0 !important;
+      gap: 0 !important;
+      width: 44px !important;
+      margin: 0 auto 3px auto !important;
+      border-radius: 10px !important;
+      position: relative !important;
     }
 
     /* En móviles (< 768px): ocultar sidebar y mostrar drawer con hamburguesa */
@@ -1704,8 +1721,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 16px 6px;
+      justify-content: flex-start;
+      padding: 12px 6px 14px 6px;
       box-sizing: border-box;
       flex-shrink: 0;
     }
@@ -1721,6 +1738,7 @@
       align-items: center;
       width: 100%;
       gap: 12px;
+      margin-top: 0;
     }
 
     .streak-check-circle {
@@ -1775,7 +1793,7 @@
   <header>
     <div>
       <div class="brand-title">
-        <span>Garmin Performance Lab • V5.2</span>
+        <span>Garmin Performance Lab • V5.3</span>
         <span class="athlete-chip">Atleta: Emiliano</span>
       </div>
       <div style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">
@@ -2235,7 +2253,10 @@
               <strong style="font-size:17px; color:var(--text-main);">Ciudad de Buenos Aires - 3x2000 (3:55)</strong>
               <span style="font-size:12px; color:var(--accent-strava, #fc5200); font-weight:700; display:inline-flex; align-items:center; gap:4px; margin-left:6px;">Ver telemetría ↗</span>
             </div>
-            <span style="font-size:12.5px; color:var(--text-muted); font-family:'JetBrains Mono';">28/09/2026 • 09:14</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="badge" style="background:var(--pastel-blue-bg); color:var(--pastel-blue-text); border:1px solid var(--pastel-blue-border); font-size:11px; font-weight:700; padding:2px 8px; border-radius:6px; letter-spacing:0.3px; text-transform:uppercase;">Última Actividad</span>
+              <span style="font-size:12.5px; color:var(--text-muted); font-family:'JetBrains Mono';">28/09/2026 • 09:14</span>
+            </div>
           </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:14px; text-align:center;">
             <div style="background:var(--bg-subtle); padding:12px; border-radius:12px; border:1px solid var(--surface-border);">
@@ -2265,7 +2286,6 @@
         <div class="strava-volume-card" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:18px; padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-card);">
           <div class="strava-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:14px;">
             <div class="strava-title" style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:22px;">📊</span>
               <span id="strava-week-title" style="font-size:20px; font-weight:800; letter-spacing:-0.4px; color:var(--text-main);">Últimos 3 Meses</span>
             </div>
             
@@ -2356,42 +2376,7 @@
 
       <div id="page-training-status" class="tab-page">
         
-        <!-- STORYTELLING FISIOLÓGICO: ESTADO DE ENTRENO -->
-        <div class="storytelling-banner" style="border-left-color: #10b981;">
-          <div class="storytelling-header">
-            <div class="storytelling-title-wrap">
-              <span class="storytelling-icon">📖</span>
-              <div>
-                <div class="storytelling-title">Diagnóstico Fisiológico & Guía de Adaptación Firstbeat</div>
-                <div class="storytelling-subtitle">Lectura clínica guiada de la relación entre estímulo agudo y respuesta cardiovascular</div>
-              </div>
-            </div>
-            <span class="badge" style="background:var(--pastel-mint-bg); color:var(--pastel-mint-text); border:1px solid var(--pastel-mint-border);">Diagnóstico: Productivo</span>
-          </div>
-
-          <div class="storytelling-grid">
-            <div class="story-card">
-              <span class="story-card-label">1. Diagnóstico Actual</span>
-              <span class="story-card-value" style="color:#10b981;">Sobrecarga Óptima Asimilada</span>
-              <span class="story-card-desc">Carga aguda de <strong>603 pts</strong> dentro del túnel saludable (404-758 pts). El estímulo es suficientemente alto para estimular adaptaciones sin cruzar al agotamiento.</span>
-            </div>
-            <div class="story-card">
-              <span class="story-card-label">2. La Historia de tus Datos</span>
-              <span class="story-card-value" style="color:#38bdf8;">Base Z2 Sólida + Sprints Clave</span>
-              <span class="story-card-desc">Lograste balancear 420 pts de base aeróbica con 200 pts anaeróbicos. Las mitocondrias aumentaron su densidad enzimática, lo que sostiene el VO₂ Máx en <strong>53.4 ml/kg/min</strong> en ascenso.</span>
-            </div>
-            <div class="story-card">
-              <span class="story-card-label">3. Conclusiones Clave</span>
-              <span class="story-card-value" style="color:#f59e0b;">Sin Brechas Fisiológicas</span>
-              <span class="story-card-desc">Tu cuerpo está metabolizando rápidamente los metabolitos de desecho. No se detectan señales de fatiga crónica ni desacople autonómico vagal.</span>
-            </div>
-            <div class="story-card">
-              <span class="story-card-label">4. Próximo Paso Estratégico</span>
-              <span class="story-card-value" style="color:#a855f7;">Mantener Rodajes Z2 Puros</span>
-              <span class="story-card-desc">Próximas 48h: 1 rodaje regenerativo Z2 (45-60 min a < 155 ppm) y descanso de calidad para consolidar el pico de forma antes del próximo bloque de tempo.</span>
-            </div>
-          </div>
-        </div>
+        
     
         <div class="panel" style="margin-bottom: 20px;">
           <div class="panel-header">
@@ -2570,6 +2555,43 @@
               <span>Algoritmo Firstbeat Analytics</span>
             </div>
           </div>
+
+          <!-- STORYTELLING FISIOLÓGICO: ESTADO DE ENTRENO -->
+        <div class="storytelling-banner" style="border-left-color: #10b981;">
+          <div class="storytelling-header">
+            <div class="storytelling-title-wrap">
+              <span class="storytelling-icon">📖</span>
+              <div>
+                <div class="storytelling-title">Diagnóstico Fisiológico & Guía de Adaptación Firstbeat</div>
+                <div class="storytelling-subtitle">Lectura clínica guiada de la relación entre estímulo agudo y respuesta cardiovascular</div>
+              </div>
+            </div>
+            <span class="badge" style="background:var(--pastel-mint-bg); color:var(--pastel-mint-text); border:1px solid var(--pastel-mint-border);">Diagnóstico: Productivo</span>
+          </div>
+
+          <div class="storytelling-grid">
+            <div class="story-card">
+              <span class="story-card-label">1. Diagnóstico Actual</span>
+              <span class="story-card-value" style="color:#10b981;">Sobrecarga Óptima Asimilada</span>
+              <span class="story-card-desc">Carga aguda de <strong>603 pts</strong> dentro del túnel saludable (404-758 pts). El estímulo es suficientemente alto para estimular adaptaciones sin cruzar al agotamiento.</span>
+            </div>
+            <div class="story-card">
+              <span class="story-card-label">2. La Historia de tus Datos</span>
+              <span class="story-card-value" style="color:#38bdf8;">Base Z2 Sólida + Sprints Clave</span>
+              <span class="story-card-desc">Lograste balancear 420 pts de base aeróbica con 200 pts anaeróbicos. Las mitocondrias aumentaron su densidad enzimática, lo que sostiene el VO₂ Máx en <strong>53.4 ml/kg/min</strong> en ascenso.</span>
+            </div>
+            <div class="story-card">
+              <span class="story-card-label">3. Conclusiones Clave</span>
+              <span class="story-card-value" style="color:#f59e0b;">Sin Brechas Fisiológicas</span>
+              <span class="story-card-desc">Tu cuerpo está metabolizando rápidamente los metabolitos de desecho. No se detectan señales de fatiga crónica ni desacople autonómico vagal.</span>
+            </div>
+            <div class="story-card">
+              <span class="story-card-label">4. Próximo Paso Estratégico</span>
+              <span class="story-card-value" style="color:#a855f7;">Mantener Rodajes Z2 Puros</span>
+              <span class="story-card-desc">Próximas 48h: 1 rodaje regenerativo Z2 (45-60 min a < 155 ppm) y descanso de calidad para consolidar el pico de forma antes del próximo bloque de tempo.</span>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
 
@@ -4368,6 +4390,8 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    updateDynamicGreeting();
+    renderTrainingStreakCalendar();
     renderTable();
     initCharts();
     initStravaChart();
@@ -4467,7 +4491,8 @@
       // Redimensionar / inicializar gráficos específicos al mostrar la pestaña
       setTimeout(() => {
         if (pageId === 'page-home') {
-          // VFC card moved to modal upon clicking HRV card
+          updateDynamicGreeting();
+          renderTrainingStreakCalendar();
         } else if (pageId === 'page-advanced-perf') {
           if (charts.strava) charts.strava.resize();
         } else if (pageId === 'page-z2') {
