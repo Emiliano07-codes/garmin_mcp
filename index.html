@@ -5274,16 +5274,14 @@
     } else if (kpiType === 'hrv') {
       badgeEl.textContent = 'Tono Vagal Parasimpático';
       badgeEl.style.color = '#a855f7';
-      titleEl.textContent = 'Variabilidad de la Frecuencia Cardíaca (VFC / RMSSD)';
-      descEl.textContent = 'Evaluación fisiológica de la recuperación del sistema nervioso autónomo. La VFC mide el equilibrio vagal durante el sueño nocturno. Tu valor actual se sitúa en 41 ms, ubicándose en el límite inferior equilibrado de tu pasillo basal histórico Garmin Firstbeat (43 - 56 ms).';
-      formulaEl.textContent = 'RMSSD (ms) = √( (1/N) × Σ (RR_(i+1) - RR_i)² ) • Algoritmo Firstbeat Analytics: Pasillo Basal Óptimo 43 - 56 ms';
+      titleEl.textContent = 'Variabilidad de la Frecuencia Cardíaca (VFC)';
+      descEl.textContent = 'La variabilidad de la frecuencia cardíaca refleja el equilibrio del sistema nervioso autónomo y la calidad de la recuperación nocturna. Tu estado actual está Equilibrado (media de 7 días: 46 ms, última noche: 41 ms) con respecto a tu valor de referencia basal histórico de Garmin (43 - 56 ms).';
+      formulaEl.textContent = 'RMSSD nocturno en milisegundos = √( (1/N) × Σ (RR_(i+1) - RR_i)² ) • Pasillo basal Firstbeat: 43 a 56 ms';
       
-      // Semáforo con Aguja indicadora en 41 ms (Límite Inferior Equilibrado)
+      // Semáforo con Aguja indicadora exacta
       trackEl.innerHTML = `
         <div class="spectrum-segment" style="width:25%; background:#ef4444;" title="Deprimido (< 38 ms)"></div>
-        <div class="spectrum-segment" style="width:18%; background:#f59e0b; position:relative;" title="Límite Inferior (38 - 42 ms)">
-          <div style="position:absolute; right:15%; top:-5px; bottom:-5px; width:3px; background:#ffffff; border-radius:2px; box-shadow:0 0 6px rgba(0,0,0,0.6); z-index:10;" title="Tu valor actual: 41 ms"></div>
-        </div>
+        <div class="spectrum-segment" style="width:18%; background:#f59e0b;" title="Límite Inferior (38 - 42 ms)"></div>
         <div class="spectrum-segment" style="width:37%; background:#10b981;" title="Pasillo Basal Óptimo (43 - 56 ms)"></div>
         <div class="spectrum-segment" style="width:20%; background:#38bdf8;" title="Elevado / Parasimpático (> 56 ms)"></div>
       `;
@@ -5294,145 +5292,77 @@
         <span>> 56 ms</span>
       `;
       currentEl.innerHTML = `
-        <span>Valor actual: <strong style="color:#f59e0b; font-size:15px;">41 ms</strong> (Equilibrado / Límite Inferior)</span>
-        <span style="color:#10b981; font-weight:700;">● Túnel Basal Óptimo: 43 - 56 ms</span>
+        <span>Última noche: <strong style="color:#f59e0b; font-size:15px;">41 ms</strong> • Media 7 días: <strong style="color:#10b981; font-size:15px;">46 ms (Equilibrado)</strong></span>
+        <span style="color:#10b981; font-weight:700;">● Rango Basal Óptimo: 43 - 56 ms</span>
       `;
       if (pinEl && pinValEl) {
-        pinEl.style.left = '39%';
+        pinEl.style.left = '38.5%';
         pinValEl.textContent = '41 ms';
       }
-      if (valPillEl) valPillEl.textContent = 'Actual: 41 ms (Equilibrado)';
+      if (valPillEl) valPillEl.textContent = 'Última noche: 41 ms • Media: 46 ms';
 
-      const vfcLabels = [
-        '12 Sep', '13', '14', '15', '16', '17', '18',
-        '19 Sep', '20', '21', '22', '23', '24', '25',
-        '26 Sep', '27', '28', '29', '30', '01 Oct', '02',
-        '03 Oct', '04', '05', '06', '07', '08', 'Hoy'
-      ];
-      const dailyHrvValues = [
-        48, 50, 46, 52, 54, 49, 45,
-        47, 51, 48, 44, 43, 49, 52,
-        50, 48, 46, 44, 42, 45, 47,
-        46, 44, 42, 43, 40, 42, 41
-      ];
-      // Media móvil de 7 días correspondiente
-      const rolling7dHrv = [
-        49, 49, 48, 49, 50, 50, 49,
-        48, 48, 48, 47, 46, 47, 47,
-        48, 48, 47, 46, 45, 46, 46,
-        45, 44, 43, 43, 42, 42, 41
-      ];
-
-      // Activar doble gráfico
+      // Activar contenedor de doble gráfico estilo oficial Garmin
       if (doubleWrap) doubleWrap.style.display = 'block';
       const chart1Title = document.getElementById('kpi-modal-chart-title');
       const chart2Title = document.getElementById('kpi-modal-chart2-title');
-      if (chart1Title) chart1Title.textContent = '1. Registro Diario de VFC Nocturna (ms) • Nivel Actual 41 ms';
-      if (chart2Title) chart2Title.textContent = '2. Túnel Basal Garmin Firstbeat (43 - 56 ms) & Media Móvil de 7 Días';
+      if (chart1Title) chart1Title.textContent = 'Valores diarios (4 oct - 10 oct)';
+      if (chart2Title) chart2Title.textContent = 'Medias de 7 días (4/10 - 10/10)';
+
+      // 1. Datos exactos de Valores diarios (media_1791684517177_ccfb4dba.png)
+      const dayLabels = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+      const minVals = [28, 27, 39, 20, 20, 18, 14];
+      const maxVals = [79, 71, 96, 80, 53, 88, 65];
+      const barRanges = minVals.map((min, idx) => [min, maxVals[idx]]);
+
+      // 2. Datos exactos de Medias de 7 días (media_1791684523455_11107229.png)
+      const tunnelLabels = ['4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'];
+      const rollingValues = [50, 49, 48, 47, 46, 45, 45];
+      const refLow = [43, 43, 43, 43, 43, 43, 43];
+      const refHigh = [53, 53, 55, 55, 55, 55, 55];
+
+      // Abrir el modal inmediatamente
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
 
       setTimeout(() => {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const ctx1 = document.getElementById('kpiModalChart')?.getContext('2d');
         const ctx2 = document.getElementById('kpiModalChart2')?.getContext('2d');
 
+        // GRÁFICO 1: VALORES DIARIOS (Líneas continuas para Máxima y Mínima del día)
         if (ctx1) {
           if (kpiChart) kpiChart.destroy();
-          // Gráfico 1: Barras verticales de la última semana y días con colores según zona fisiológica
           kpiChart = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-              labels: vfcLabels.slice(-14),
-              datasets: [{
-                label: 'VFC Nocturna (ms)',
-                data: dailyHrvValues.slice(-14),
-                backgroundColor: dailyHrvValues.slice(-14).map((v, i, arr) => {
-                  if (i === arr.length - 1) return '#f59e0b'; // Hoy en 41 ms
-                  if (v < 38) return '#ef4444';
-                  if (v <= 42) return '#f59e0b';
-                  if (v <= 56) return '#10b981';
-                  return '#38bdf8';
-                }),
-                borderRadius: 6,
-                borderWidth: 1,
-                borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  callbacks: {
-                    label: (ctxT) => `VFC Nocturna: ${ctxT.raw} ms ${ctxT.dataIndex === 13 ? '● (Hoy: Equilibrado)' : ''}`
-                  }
-                }
-              },
-              scales: {
-                y: {
-                  min: 30,
-                  max: 60,
-                  grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
-                  ticks: { color: isDark ? '#94a3b8' : '#64748b', callback: v => v + ' ms' }
-                },
-                x: {
-                  grid: { display: false },
-                  ticks: { color: isDark ? '#94a3b8' : '#64748b' }
-                }
-              }
-            }
-          });
-        }
-
-        if (ctx2) {
-          if (kpiChart2) kpiChart2.destroy();
-          // Gráfico 2: Formato Túnel Garmin con banda basal verde 43-56 ms y línea de tendencia de 7 días
-          kpiChart2 = new Chart(ctx2, {
             type: 'line',
             data: {
-              labels: vfcLabels,
+              labels: dayLabels,
               datasets: [
                 {
-                  label: 'Límite Inferior Basal (43 ms)',
-                  data: Array(vfcLabels.length).fill(43),
-                  borderColor: isDark ? 'rgba(16, 185, 129, 0.4)' : 'rgba(16, 185, 129, 0.5)',
-                  borderWidth: 1.2,
-                  borderDash: [3, 3],
-                  pointRadius: 0,
+                  label: 'Máxima del día',
+                  data: maxVals,
+                  borderColor: '#0284c7',
+                  backgroundColor: 'rgba(2, 132, 199, 0.08)',
+                  borderWidth: 2.5,
+                  pointBackgroundColor: '#0284c7',
+                  pointBorderColor: isDark ? '#151d2f' : '#ffffff',
+                  pointBorderWidth: 2,
+                  pointRadius: 5,
+                  pointHoverRadius: 7,
+                  tension: 0.35,
                   fill: false
                 },
                 {
-                  label: 'Túnel Basal Óptimo (43-56 ms)',
-                  data: Array(vfcLabels.length).fill(56),
-                  borderColor: isDark ? 'rgba(16, 185, 129, 0.4)' : 'rgba(16, 185, 129, 0.5)',
-                  borderWidth: 1.2,
-                  borderDash: [3, 3],
-                  pointRadius: 0,
-                  backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.12)',
-                  fill: '-1'
-                },
-                {
-                  label: 'Media de 7 Días (Tendencia)',
-                  data: rolling7dHrv,
-                  borderColor: '#a855f7',
-                  borderWidth: 2,
-                  borderDash: [4, 2],
-                  pointRadius: 0,
-                  fill: false,
-                  tension: 0.3
-                },
-                {
-                  label: 'VFC Diaria (ms)',
-                  data: dailyHrvValues,
-                  borderColor: '#10b981',
+                  label: 'Mínima del día',
+                  data: minVals,
+                  borderColor: isDark ? '#94a3b8' : '#334155',
+                  backgroundColor: 'transparent',
                   borderWidth: 2.2,
-                  backgroundColor: isDark ? '#0f172a' : '#ffffff',
-                  pointBackgroundColor: (cPt) => cPt.dataIndex === dailyHrvValues.length - 1 ? '#f59e0b' : '#10b981',
-                  pointBorderColor: '#ffffff',
-                  pointBorderWidth: 1.8,
-                  pointRadius: (cPt) => cPt.dataIndex === dailyHrvValues.length - 1 ? 6 : 2.5,
+                  pointBackgroundColor: isDark ? '#94a3b8' : '#334155',
+                  pointBorderColor: isDark ? '#151d2f' : '#ffffff',
+                  pointBorderWidth: 2,
+                  pointRadius: 5,
                   pointHoverRadius: 7,
-                  tension: 0.25,
+                  tension: 0.35,
                   fill: false
                 }
               ]
@@ -5440,40 +5370,127 @@
             options: {
               responsive: true,
               maintainAspectRatio: false,
-              interaction: { mode: 'index', intersect: false },
+              interaction: {
+                mode: 'index',
+                intersect: false
+              },
               plugins: {
                 legend: {
                   display: true,
-                  position: 'top',
-                  labels: { color: isDark ? '#94a3b8' : '#64748b', boxWidth: 10, font: { size: 10 } }
+                  position: 'bottom',
+                  labels: {
+                    boxWidth: 12,
+                    font: { size: 11, weight: '600' },
+                    color: isDark ? '#cbd5e1' : '#475569'
+                  }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (ctxT) => `${ctxT.dataset.label}: ${ctxT.raw} ms`
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  min: 0,
+                  max: 100,
+                  ticks: {
+                    stepSize: 25,
+                    color: isDark ? '#94a3b8' : '#64748b',
+                    font: { family: "'JetBrains Mono'" }
+                  },
+                  grid: { color: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)' }
+                },
+                x: {
+                  grid: { display: false },
+                  ticks: { color: isDark ? '#cbd5e1' : '#475569', font: { weight: '600' } }
+                }
+              }
+            }
+          });
+        }
+
+        // GRÁFICO 2: MEDIAS DE 7 DÍAS (Túnel gris 'Valor de referencia' con puntos verdes 'Equilibrado')
+        if (ctx2) {
+          if (kpiChart2) kpiChart2.destroy();
+          kpiChart2 = new Chart(ctx2, {
+            type: 'line',
+            data: {
+              labels: tunnelLabels,
+              datasets: [
+                {
+                  label: 'Límite Inferior Referencia',
+                  data: refLow,
+                  borderColor: 'transparent',
+                  pointRadius: 0,
+                  fill: false
+                },
+                {
+                  label: 'Valor de referencia',
+                  data: refHigh,
+                  borderColor: 'transparent',
+                  backgroundColor: isDark ? 'rgba(100, 116, 139, 0.45)' : 'rgba(148, 163, 184, 0.48)',
+                  fill: '-1',
+                  pointRadius: 0
+                },
+                {
+                  label: 'Equilibrado',
+                  data: rollingValues,
+                  borderColor: 'transparent',
+                  backgroundColor: '#10b981',
+                  pointRadius: 6,
+                  pointHoverRadius: 8,
+                  pointBackgroundColor: '#10b981',
+                  pointBorderColor: isDark ? '#151d2f' : '#ffffff',
+                  pointBorderWidth: 2,
+                  showLine: false
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'bottom',
+                  labels: {
+                    boxWidth: 12,
+                    font: { size: 11, weight: '600' },
+                    color: isDark ? '#cbd5e1' : '#475569',
+                    filter: (legendItem) => legendItem.text !== 'Límite Inferior Referencia'
+                  }
                 },
                 tooltip: {
                   callbacks: {
                     label: (ctxT) => {
-                      if (ctxT.datasetIndex === 3) return `VFC Diaria: ${ctxT.raw} ms`;
-                      if (ctxT.datasetIndex === 2) return `Media 7d: ${ctxT.raw} ms`;
-                      if (ctxT.datasetIndex === 1) return `Límite Sup. Túnel: 56 ms`;
-                      return `Límite Inf. Túnel: 43 ms`;
+                      if (ctxT.datasetIndex === 2) return `Media 7 días: ${ctxT.raw} ms (Equilibrado)`;
+                      return `Túnel Basal: 43 - 55 ms`;
                     }
                   }
                 }
               },
               scales: {
                 y: {
-                  min: 32,
-                  max: 64,
-                  grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)' },
-                  ticks: { color: isDark ? '#94a3b8' : '#64748b', callback: v => v + ' ms' }
+                  min: 36,
+                  max: 65,
+                  ticks: {
+                    values: [36, 45, 53, 62],
+                    color: isDark ? '#94a3b8' : '#64748b',
+                    font: { family: "'JetBrains Mono'" }
+                  },
+                  grid: { color: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)' }
                 },
                 x: {
                   grid: { display: false },
-                  ticks: { color: isDark ? '#94a3b8' : '#64748b', maxTicksLimit: 10 }
+                  ticks: { color: isDark ? '#cbd5e1' : '#475569', font: { weight: '600' } }
                 }
               }
             }
           });
         }
-      }, 30);
+      }, 50);
+
       return;
     } else if (kpiType === 'sleep') {
       badgeEl.textContent = 'Puntuación de Sueño Garmin';
