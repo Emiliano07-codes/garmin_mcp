@@ -1867,9 +1867,157 @@
       background: var(--surface-hover) !important;
     }
 
+  
+    /* PIN Security Screen Minimalist */
+    #pin-gate-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0b0f19 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #f8fafc;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .pin-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+    }
+    .pin-icon {
+      width: 52px;
+      height: 52px;
+      background: rgba(2, 132, 199, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin: 26px 0;
+    }
+    .pin-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #64748b;
+      background: transparent;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .pin-dot.filled {
+      background: #38bdf8;
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+      transform: scale(1.15);
+    }
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .pin-key {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      color: #f8fafc;
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 16px 0;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pin-key:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    .pin-key:active {
+      transform: scale(0.95);
+      background: rgba(56, 189, 248, 0.2);
+    }
+    .pin-key.ghost {
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+    .pin-key.ghost:hover {
+      background: transparent;
+      color: #f8fafc;
+      transform: none;
+    }
+    @keyframes pinShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .pin-shake {
+      animation: pinShake 0.4s ease-in-out;
+    }
+
   </style>
 </head>
 <body>
+
+  <!-- PIN Protection Gate -->
+  <div id="pin-gate-screen">
+    <div class="pin-card" id="pin-card-box">
+      <div class="pin-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </div>
+      <h2 style="font-size: 18px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 6px;">Garmin Performance Lab</h2>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">Ingresá el PIN de seguridad</p>
+      
+      <div class="pin-dots" id="pin-dots-container">
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+      </div>
+
+      <div id="pin-error-msg" style="height: 18px; font-size: 12px; color: #f43f5e; font-weight: 600; margin-bottom: 12px;"></div>
+
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="enterPinDigit('1')">1</button>
+        <button class="pin-key" onclick="enterPinDigit('2')">2</button>
+        <button class="pin-key" onclick="enterPinDigit('3')">3</button>
+        <button class="pin-key" onclick="enterPinDigit('4')">4</button>
+        <button class="pin-key" onclick="enterPinDigit('5')">5</button>
+        <button class="pin-key" onclick="enterPinDigit('6')">6</button>
+        <button class="pin-key" onclick="enterPinDigit('7')">7</button>
+        <button class="pin-key" onclick="enterPinDigit('8')">8</button>
+        <button class="pin-key" onclick="enterPinDigit('9')">9</button>
+        <button class="pin-key ghost" onclick="clearPin()">Borrar</button>
+        <button class="pin-key" onclick="enterPinDigit('0')">0</button>
+        <button class="pin-key ghost" onclick="deletePinDigit()">⌫</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="main-app-content" style="display: none;">
   <div id="mobile-backdrop" class="mobile-sidebar-backdrop" onclick="toggleMobileMenu()"></div>
 
 <div class="container">
@@ -7072,8 +7220,104 @@
     initSidebarDragAndDrop();
   });
 
+
+  // SEGURIDAD PIN GATE
+  const CORRECT_PIN = '1987';
+  let currentPin = '';
+
+  function updatePinDots() {
+    const dots = document.querySelectorAll('#pin-dots-container .pin-dot');
+    dots.forEach((dot, index) => {
+      if (index < currentPin.length) {
+        dot.classList.add('filled');
+      } else {
+        dot.classList.remove('filled');
+      }
+    });
+  }
+
+  function enterPinDigit(digit) {
+    if (currentPin.length >= 4) return;
+    currentPin += digit;
+    updatePinDots();
+    const errMsg = document.getElementById('pin-error-msg');
+    if (errMsg) errMsg.textContent = '';
+
+    if (currentPin.length === 4) {
+      setTimeout(verifyPin, 150);
+    }
+  }
+
+  function deletePinDigit() {
+    if (currentPin.length > 0) {
+      currentPin = currentPin.slice(0, -1);
+      updatePinDots();
+      const errMsg = document.getElementById('pin-error-msg');
+      if (errMsg) errMsg.textContent = '';
+    }
+  }
+
+  function clearPin() {
+    currentPin = '';
+    updatePinDots();
+    const errMsg = document.getElementById('pin-error-msg');
+    if (errMsg) errMsg.textContent = '';
+  }
+
+  function verifyPin() {
+    if (currentPin === CORRECT_PIN) {
+      sessionStorage.setItem('garmin_lab_auth', 'unlocked_' + CORRECT_PIN);
+      unlockDashboard();
+    } else {
+      const box = document.getElementById('pin-card-box');
+      const errMsg = document.getElementById('pin-error-msg');
+      if (box) box.classList.add('pin-shake');
+      if (errMsg) errMsg.textContent = 'PIN incorrecto. Reintentá.';
+      setTimeout(() => {
+        if (box) box.classList.remove('pin-shake');
+        clearPin();
+      }, 500);
+    }
+  }
+
+  function unlockDashboard() {
+    const gate = document.getElementById('pin-gate-screen');
+    const mainWrap = document.getElementById('main-app-content');
+    if (mainWrap) mainWrap.style.display = 'block';
+    if (gate) {
+      gate.style.opacity = '0';
+      setTimeout(() => {
+        gate.style.display = 'none';
+      }, 300);
+    }
+  }
+
+  window.addEventListener('keydown', (e) => {
+    const gate = document.getElementById('pin-gate-screen');
+    if (!gate || gate.style.display === 'none') return;
+    if (e.key >= '0' && e.key <= '9') {
+      enterPinDigit(e.key);
+    } else if (e.key === 'Backspace') {
+      deletePinDigit();
+    } else if (e.key === 'Escape') {
+      clearPin();
+    }
+  });
+
+  (function checkAuthAtStartup() {
+    if (sessionStorage.getItem('garmin_lab_auth') === 'unlocked_' + CORRECT_PIN) {
+      document.addEventListener('DOMContentLoaded', () => {
+        const gate = document.getElementById('pin-gate-screen');
+        const mainWrap = document.getElementById('main-app-content');
+        if (mainWrap) mainWrap.style.display = 'block';
+        if (gate) gate.style.display = 'none';
+      });
+    }
+  })();
+
 </script>
 
+  </div>
 </body>
 </html>
       </div>
