@@ -7325,6 +7325,93 @@
   function executeStrictUniversalUpdate() {
     if (typeof ACTIVITIES === 'undefined' || ACTIVITIES.length === 0) return;
 
+    const latest = ACTIVITIES[0];
+
+    // 1. HEADER & BRANDING
+    const headerDate = document.querySelector('header span[style*="font-family"]');
+    if (headerDate) headerDate.textContent = (latest.date_arg || latest.iso_date) + ' (Actualizado)';
+
+    // 2. RENDIMIENTO AVANZADO (page-advanced-perf)
+    const advCard = document.querySelector('#page-advanced-perf .interactive-activity-card');
+    if (advCard) {
+      const strongTitle = advCard.querySelector('strong');
+      if (strongTitle) strongTitle.textContent = latest.name;
+      const dateEl = advCard.querySelector('span[style*="font-family"]');
+      if (dateEl) dateEl.textContent = (latest.date_arg || latest.iso_date) + (latest.time_part ? ' • ' + latest.time_part : '');
+      
+      const grid = advCard.querySelector('div[style*="grid-template-columns"]');
+      if (grid && grid.children.length >= 5) {
+        grid.children[0].querySelector('div:last-child').textContent = latest.distance_km > 0 ? (latest.distance_km + ' km') : '-';
+        const m = Math.floor(latest.duration_min);
+        const s = Math.round((latest.duration_min - m) * 60);
+        grid.children[1].querySelector('div:last-child').textContent = m + 'm ' + (s > 0 ? s + 's' : '00s');
+        grid.children[2].querySelector('div:last-child').textContent = latest.pace_str || '-';
+        grid.children[3].querySelector('div:last-child').textContent = (latest.avg_hr || 0) + ' ppm';
+        grid.children[4].querySelector('div:last-child').textContent = (latest.anaerobic_te || '0.0');
+      }
+    }
+
+    // 3. SEMANA ACTUAL & METRICAS DE STRAVA VOLUME
+    if (typeof FULL_TIMELINE_WEEKS !== 'undefined' && FULL_TIMELINE_WEEKS.length > 0) {
+      const curW = FULL_TIMELINE_WEEKS[FULL_TIMELINE_WEEKS.length - 1];
+      const sDist = document.getElementById('strava-stat-dist');
+      if (sDist) sDist.textContent = curW.dist_km + ' km';
+      const sTime = document.getElementById('strava-stat-time');
+      if (sTime) sTime.textContent = curW.dur_str;
+      const sElev = document.getElementById('strava-stat-elev');
+      if (sElev) sElev.textContent = curW.elev_m + ' m';
+      const sZ2 = document.getElementById('strava-stat-z2');
+      if (sZ2) sZ2.textContent = curW.z2_hours + ' h';
+
+      // Actualizar gráfico Strava si existe
+      if (charts.strava) {
+        charts.strava.data.datasets[0].data[charts.strava.data.datasets[0].data.length - 1] = 
+          (currentStravaMode === 'km' ? curW.dist_km : (currentStravaMode === 'z2' ? curW.z2_hours : curW.load));
+        charts.strava.update();
+      }
+    }
+
+    // 4. ESTADO DE ENTRENO & PMC
+    if (typeof PMC_DATA !== 'undefined' && PMC_DATA.length > 0) {
+      const curPmc = PMC_DATA[PMC_DATA.length - 1];
+      
+      // Actualizar gráficos de Carga Aguda y PMC si están cargados
+      if (charts.acuteTunnel) charts.acuteTunnel.update();
+      if (charts.pmc) charts.pmc.update();
+
+      // Coach Storytelling
+      const coachP = document.querySelector('#page-advanced-perf p');
+      if (coachP) {
+        coachP.innerHTML = 'Has acumulado una carga de <strong>' + Math.round(curPmc.atl) + ' puntos</strong> en los últimos 7 días con un índice <strong>ACWR de ' + curPmc.acwr + '</strong>, situándote en la zona de óptimo estímulo adaptativo (Sweet Spot). Tras tu última sesión de carrera de ' + latest.distance_km + ' km y la fuerza complementaria, la condición fisiológica se mantiene en ascenso productivo.';
+      }
+    }
+
+    // 5. ZONA 2 (page-z2)
+    const z2Week = document.getElementById('z2-stat-week');
+    if (z2Week && typeof FULL_TIMELINE_WEEKS !== 'undefined') {
+      z2Week.textContent = FULL_TIMELINE_WEEKS[FULL_TIMELINE_WEEKS.length - 1].z2_hours + ' h';
+    }
+    if (charts.z2Dynamic) charts.z2Dynamic.update();
+
+    // 6. MULTIDEPORTE (page-multisport)
+    if (charts.sports) charts.sports.update();
+    if (charts.weeklySports) charts.weeklySports.update();
+
+    // 7. GASTO ENERGÉTICO & CALORÍAS (page-calories)
+    if (charts.calories) charts.calories.update();
+
+    // 8. PREDICCIONES (page-predictions)
+    if (charts.racePrediction) charts.racePrediction.update();
+
+    // 9. RECUPERACIÓN & SUEÑO (page-recovery)
+    if (charts.hrvBase) charts.hrvBase.update();
+    if (charts.sleepSteps) charts.sleepSteps.update();
+    if (charts.rhrTrend) charts.rhrTrend.update();
+  }
+
+  function executeStrictUniversalUpdate_Legacy() {
+    if (typeof ACTIVITIES === 'undefined' || ACTIVITIES.length === 0) return;
+
     // 1. Actividad más reciente (la número 0)
     const latest = ACTIVITIES[0];
     
