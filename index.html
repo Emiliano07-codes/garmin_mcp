@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Garmin Performance Lab • V5.1 | Google Cloud & Gemini Sports Intelligence</title>
+  <title>Garmin Performance Lab • V5.2 | Google Cloud & Gemini Sports Intelligence</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -147,11 +147,21 @@
       grid-template-columns: 260px minmax(0, 1fr);
       gap: 22px;
       align-items: start;
-      transition: grid-template-columns 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .app-layout.sidebar-collapsed {
-      grid-template-columns: 68px minmax(0, 1fr);
+      grid-template-columns: 72px minmax(0, 1fr);
+    }
+
+    @media (min-width: 1081px) and (max-width: 1280px) {
+      .app-layout {
+        grid-template-columns: 230px minmax(0, 1fr);
+        gap: 16px;
+      }
+      .app-layout.sidebar-collapsed {
+        grid-template-columns: 68px minmax(0, 1fr);
+      }
     }
 
     @media (max-width: 1080px) {
@@ -171,13 +181,14 @@
       flex-direction: column;
       gap: 4px;
       box-shadow: var(--shadow-card);
-      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), padding 0.25s ease;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
       z-index: 100;
     }
 
     .app-layout.sidebar-collapsed .sidebar {
       padding: 14px 6px;
+      align-items: center;
     }
 
     .sidebar-top-bar {
@@ -187,6 +198,9 @@
       padding: 4px 6px 12px 6px;
       border-bottom: 1px solid var(--surface-border);
       margin-bottom: 6px;
+      width: 100%;
+      box-sizing: border-box;
+      transition: all 0.25s ease;
     }
 
     .app-layout.sidebar-collapsed .sidebar-top-bar {
@@ -194,18 +208,22 @@
       padding: 4px 0 10px 0;
     }
 
+    .app-layout.sidebar-collapsed .sidebar-top-bar > div {
+      display: none !important;
+    }
+
     .sidebar-toggle-btn {
       background: var(--surface-hover);
       border: 1px solid var(--surface-border);
       color: var(--text-muted);
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
     }
 
@@ -285,6 +303,34 @@
       justify-content: center !important;
       padding: 11px 0 !important;
       gap: 0 !important;
+      width: 44px !important;
+      margin: 0 auto 3px auto !important;
+      border-radius: 10px !important;
+      position: relative !important;
+    }
+
+    .app-layout.sidebar-collapsed .sidebar-nav-btn:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 6px 12px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      z-index: 1000;
+      pointer-events: none;
+      animation: fadeInTooltip 0.15s ease-out;
+    }
+
+    @keyframes fadeInTooltip {
+      from { opacity: 0; transform: translateY(-50%) translateX(-4px); }
+      to { opacity: 1; transform: translateY(-50%) translateX(0); }
     }
 
     .sidebar-nav-btn:hover {
@@ -1399,7 +1445,7 @@
 
     /* En móviles (< 768px): ocultar sidebar y mostrar drawer con hamburguesa */
     @media (max-width: 768px) {
-      .app-layout {
+      .app-layout, .app-layout.sidebar-collapsed {
         grid-template-columns: 1fr !important;
       }
       .sidebar {
@@ -1411,6 +1457,8 @@
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         z-index: 1000 !important;
+        border-radius: 0 !important;
+        box-shadow: 0 0 30px rgba(0,0,0,0.3) !important;
       }
       .sidebar.mobile-open {
         transform: translateX(0) !important;
@@ -1671,13 +1719,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
       width: 100%;
+      gap: 12px;
     }
 
     .streak-check-circle {
-      width: 26px;
-      height: 26px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: #f97316; /* bg-orange-500 */
       color: #ffffff;
@@ -1686,6 +1734,12 @@
       justify-content: center;
       box-shadow: 0 2px 6px rgba(249, 115, 22, 0.4);
       flex-shrink: 0;
+    }
+
+    .streak-check-circle.incomplete {
+      background: rgba(249, 115, 22, 0.2);
+      border: 1.5px dashed #f97316;
+      box-shadow: none;
     }
 
     .streak-fire-bottom {
@@ -1721,7 +1775,7 @@
   <header>
     <div>
       <div class="brand-title">
-        <span>Garmin Performance Lab • V5.1</span>
+        <span>Garmin Performance Lab • V5.2</span>
         <span class="athlete-chip">Atleta: Emiliano</span>
       </div>
       <div style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">
@@ -2095,38 +2149,32 @@
           </div>
         </div>
 
-        <!-- 3. Módulo Exclusivo de VFC 4 Semanas en Home -->
-        <div style="background:var(--surface); border:1px solid var(--surface-border); border-radius:18px; padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-card);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
-            <div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:18px;">📈</span>
-                <h3 style="font-size:17px; font-weight:800; color:var(--text-main); margin:0;">Evolución de VFC (Últimas 4 Semanas)</h3>
-              </div>
-              <p style="font-size:12.5px; color:var(--text-muted); margin:4px 0 0 0;">Corredor basal continuo de recuperación Firstbeat Analytics (43 - 56 ms).</p>
-            </div>
-            <span class="badge" style="background:var(--pastel-mint-bg); color:var(--pastel-mint-text); border:1px solid var(--pastel-mint-border); font-weight:700; padding:4px 12px; border-radius:12px;">
-              ● Estado: Equilibrado (41 ms)
-            </span>
-          </div>
-          <div style="height:220px; width:100%; position:relative;">
-            <canvas id="chartWellnessHrv"></canvas>
-          </div>
-        </div>
-
         <!-- COMPONENTE: TrainingStreakCalendar (Estilo Oficial Strava) -->
         <div class="streak-calendar-card">
           <!-- 1. Cabecera del Componente -->
           <div class="streak-calendar-header">
-            <!-- Bloques de estadísticas a la izquierda -->
+            <!-- Bloques de estadísticas y selector de mes a la izquierda -->
             <div class="streak-stats-group">
               <div class="streak-stat-item">
                 <span class="streak-stat-title">Tu serie</span>
-                <span class="streak-stat-value">58 Semanas</span>
+                <span class="streak-stat-value" id="streak-stat-weeks-val">58 Semanas</span>
               </div>
               <div class="streak-stat-item">
                 <span class="streak-stat-title">Actividades en serie</span>
-                <span class="streak-stat-value">230</span>
+                <span class="streak-stat-value" id="streak-stat-acts-val">230</span>
+              </div>
+              <!-- Identificador de Período / Mes con controles interactivos -->
+              <div class="streak-month-picker" style="display:flex; align-items:center; gap:8px; background:var(--bg-subtle); padding:6px 14px; border-radius:12px; border:1px solid var(--surface-border);">
+                <button class="timeline-nav-btn" onclick="shiftStreakCalendarMonth(-1)" title="Mes o período anterior" style="width:28px; height:28px; border-radius:8px; border:1px solid var(--surface-border); background:var(--surface); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-size:15px;">📅</span>
+                  <span id="streak-calendar-month-label" style="font-size:14px; font-weight:800; color:var(--text-main); font-family:'Plus Jakarta Sans', sans-serif;">Octubre 2026</span>
+                </div>
+                <button class="timeline-nav-btn" onclick="shiftStreakCalendarMonth(1)" title="Mes o período siguiente" style="width:28px; height:28px; border-radius:8px; border:1px solid var(--surface-border); background:var(--surface); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-main);">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
               </div>
             </div>
 
@@ -2179,12 +2227,13 @@
 
       <!-- VISTA 2: RENDIMIENTO AVANZADO -->
       <div id="page-advanced-perf" class="tab-page">
-        <!-- 1. Tarjeta de Actividad Destacada -->
-        <div class="panel" style="margin-bottom: 24px; border:1px solid var(--surface-border); border-radius:18px; padding:22px 26px; background:var(--surface);">
+        <!-- 1. Tarjeta de Actividad Destacada (Interactiva: clic abre modal de telemetría) -->
+        <div class="panel interactive-activity-card" onclick="openActivityModal(0)" title="Haz clic para ver el análisis de telemetría completo (ritmo, FC, potencia y zonas)" style="margin-bottom: 24px; border:1px solid var(--surface-border); border-radius:18px; padding:22px 26px; background:var(--surface); cursor:pointer; transition:all 0.2s cubic-bezier(0.4,0,0.2,1); box-shadow:var(--shadow-card);">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
             <div style="display:flex; align-items:center; gap:10px;">
               <span class="badge badge-run" style="font-size:12px; padding:5px 12px;">Carrera</span>
               <strong style="font-size:17px; color:var(--text-main);">Ciudad de Buenos Aires - 3x2000 (3:55)</strong>
+              <span style="font-size:12px; color:var(--accent-strava, #fc5200); font-weight:700; display:inline-flex; align-items:center; gap:4px; margin-left:6px;">Ver telemetría ↗</span>
             </div>
             <span style="font-size:12.5px; color:var(--text-muted); font-family:'JetBrains Mono';">28/09/2026 • 09:14</span>
           </div>
@@ -2213,50 +2262,63 @@
         </div>
 
         <!-- 2. Gráfico de Área Naranja: Volumen y Carga Semanal Estilo Strava -->
-        <div class="strava-chart-container" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:18px; padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-card);">
-          <div class="strava-chart-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
-            <div style="display:flex; align-items:center; gap:16px;">
-              <div>
-                <span class="strava-title-badge">Volumen Semanal</span>
-                <h3 class="strava-section-title" id="strava-chart-main-title">Semana 28/09 - 04/10</h3>
-              </div>
-              <div class="timeline-nav-group">
-                <button class="timeline-nav-btn" id="btn-strava-prev" onclick="shiftStravaWindow(-1)" title="Retroceder 4 semanas">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                </button>
-                <button class="timeline-nav-btn" id="btn-strava-next" onclick="shiftStravaWindow(1)" title="Avanzar 4 semanas">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-              </div>
+        <div class="strava-volume-card" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:18px; padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-card);">
+          <div class="strava-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:14px;">
+            <div class="strava-title" style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:22px;">📊</span>
+              <span id="strava-week-title" style="font-size:20px; font-weight:800; letter-spacing:-0.4px; color:var(--text-main);">Últimos 3 Meses</span>
+            </div>
+            
+            <!-- Selector Temporal Rápido de Píldoras -->
+            <div class="timeline-segmented-control" id="control-timeline-strava">
+              <button class="segmented-pill-btn" onclick="filterStravaPeriod('today')">Hoy</button>
+              <button class="segmented-pill-btn" onclick="filterStravaPeriod('1M')">1M</button>
+              <button class="segmented-pill-btn active" onclick="filterStravaPeriod('3M')">3M</button>
+              <button class="segmented-pill-btn" onclick="filterStravaPeriod('6M')">6M</button>
+              <button class="segmented-pill-btn" onclick="filterStravaPeriod('1Y')">1A</button>
+              <button class="segmented-pill-btn" onclick="filterStravaPeriod('all')">Todo</button>
             </div>
 
-            <!-- Métricas Resumen de la Semana Seleccionada -->
-            <div class="strava-stats-row">
-              <div class="strava-stat-col">
-                <span class="strava-stat-label">Distancia</span>
-                <span class="strava-stat-value" id="strava-stat-dist">28.4 km</span>
-              </div>
-              <div class="strava-stat-col">
-                <span class="strava-stat-label">Tiempo</span>
-                <span class="strava-stat-value" id="strava-stat-time">2h 18m</span>
-              </div>
-              <div class="strava-stat-col">
-                <span class="strava-stat-label">Desnivel</span>
-                <span class="strava-stat-value" id="strava-stat-elev">184 m</span>
-              </div>
-              <div class="strava-stat-col" style="border-left: 1px solid var(--surface-border); padding-left: 20px;">
-                <span class="strava-stat-label">Carga Aguda</span>
-                <span class="strava-stat-value" id="strava-stat-load" style="color: #f59e0b;">603 pts</span>
-              </div>
+            <!-- Selector de Métrica a la Derecha -->
+            <div class="strava-toggle-group">
+              <button class="strava-toggle-btn active" id="btn-strava-km" onclick="switchStravaMode('km')">Distancia (km)</button>
+              <button class="strava-toggle-btn" id="btn-strava-z2" onclick="switchStravaMode('z2')">Volumen Zona 2 (h)</button>
+              <button class="strava-toggle-btn" id="btn-strava-load" onclick="switchStravaMode('load')">Carga Semanal</button>
             </div>
           </div>
 
-          <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
-            Ventana de 12 Semanas: <span id="strava-window-dates" style="color:var(--text-main); font-family:'JetBrains Mono';">Mostrando semanas recientes</span>
+          <!-- Métricas KPI de la Semana Seleccionada -->
+          <div class="strava-stats-row">
+            <div class="strava-stat-col">
+              <span class="strava-stat-label">Distancia</span>
+              <span class="strava-stat-value" id="strava-stat-dist">13.85 km</span>
+            </div>
+            <div class="strava-stat-col">
+              <span class="strava-stat-label">Tiempo</span>
+              <span class="strava-stat-value" id="strava-stat-time">1h 32m</span>
+            </div>
+            <div class="strava-stat-col">
+              <span class="strava-stat-label">Desnivel</span>
+              <span class="strava-stat-value" id="strava-stat-elev">132 m</span>
+            </div>
+            <div class="strava-stat-col" style="border-left: 1px solid var(--surface-border); padding-left: 20px;">
+              <span class="strava-stat-label" id="strava-stat-kpi4-label">Base Zona 2</span>
+              <span class="strava-stat-value" id="strava-stat-z2" style="color: #10b981;">0.84 h</span>
+            </div>
           </div>
 
-          <div style="height: 280px; width: 100%; position: relative;">
+          <div style="font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div>Ventana de Período: <span id="strava-window-dates" style="color:var(--text-main); font-family:'JetBrains Mono'; font-weight:700;">Mostrando semanas recientes</span></div>
+            <div id="strava-node-hint" style="color:var(--text-muted); font-size:11.5px;">● Toca o pasa el cursor sobre los nodos para inspeccionar las métricas de cada semana</div>
+          </div>
+
+          <div style="height: 260px; width: 100%; position: relative;">
             <canvas id="chartStravaVolume"></canvas>
+          </div>
+
+          <div class="strava-footer-text" style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono', monospace;">
+            <span>● Nodos interactivos: Actualización de métricas en vivo</span>
+            <span>Base histórica total: 228 semanas sincronizadas</span>
           </div>
         </div>
 
@@ -4087,8 +4149,17 @@
     return OBJECT_SVGS.shoe;
   }
 
+  // Estado de navegación del Calendario de Gamificación
+  let streakCalendarMonthOffset = 0; // 0 = Octubre 2026 (mes base actual)
+
+  function shiftStreakCalendarMonth(delta) {
+    streakCalendarMonthOffset += delta;
+    renderTrainingStreakCalendar();
+  }
+
   function setStreakCalendarTab(tabName, btnEl) {
     currentStreakTab = tabName;
+    streakCalendarMonthOffset = 0; // Reset offset al cambiar de escala
     document.querySelectorAll('.streak-tab-btn').forEach(b => b.classList.remove('active'));
     if (btnEl) btnEl.classList.add('active');
     renderTrainingStreakCalendar();
@@ -4097,6 +4168,7 @@
   function renderTrainingStreakCalendar() {
     const gridEl = document.getElementById('streak-calendar-grid');
     const checksCol = document.getElementById('streak-checks-column');
+    const monthLabelEl = document.getElementById('streak-calendar-month-label');
     if (!gridEl || typeof ACTIVITIES === 'undefined' || !ACTIVITIES) return;
 
     gridEl.innerHTML = '';
@@ -4112,91 +4184,185 @@
       }
     });
 
-    // Determinar rango según el Tab: 1M, 3M, 6M, 1A, Todo
-    const now = new Date(2026, 9, 10); // Octubre 2026 (mes activo de los entrenamientos más recientes)
-    let startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    let endMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const monthNames = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
 
-    if (currentStreakTab === '3M') {
-      startMonth = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-    } else if (currentStreakTab === '6M') {
-      startMonth = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-    } else if (currentStreakTab === '1A') {
-      startMonth = new Date(now.getFullYear(), now.getMonth() - 11, 1);
-    } else if (currentStreakTab === 'Todo') {
-      startMonth = new Date(2025, 9, 1);
-    }
+    // Fecha base: Octubre 2026 (mes activo más reciente)
+    const baseDate = new Date(2026, 9 + streakCalendarMonthOffset, 1);
+    const viewYear = baseDate.getFullYear();
+    const viewMonth = baseDate.getMonth();
 
-    // Para la vista de 1M (por defecto), renderizar la cuadrícula mensual real de Octubre 2026
-    const year = now.getFullYear();
-    const month = now.getMonth(); // 9 = Octubre
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-    // Primer día del mes: 0 es Domingo, 1 es Lunes ... 6 es Sábado
-    // Ajuste para Lunes = 0, Domingo = 6
-    const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
-
-    // Celdas vacías previas para alinear el primer día
-    for (let i = 0; i < firstDayIndex; i++) {
-      const emptyDiv = document.createElement('div');
-      emptyDiv.className = 'calendar-day-empty';
-      emptyDiv.style.opacity = '0.15';
-      emptyDiv.textContent = '';
-      gridEl.appendChild(emptyDiv);
-    }
-
-    let activeDaysThisMonth = 0;
-    let weeksWithTraining = new Set();
-
-    // Renderizar días del 1 al N
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const actsOnDay = activitiesByDate[dateStr] || [];
-      const hasActs = actsOnDay.length > 0;
-      const isToday = (day === 10); // 10 de Octubre de 2026
-
-      const cellIndex = firstDayIndex + (day - 1);
-      const weekIndex = Math.floor(cellIndex / 7);
-
-      if (hasActs) {
-        activeDaysThisMonth++;
-        weeksWithTraining.add(weekIndex);
-
-        const activeDiv = document.createElement('div');
-        activeDiv.className = 'calendar-day-active';
-        activeDiv.title = `${dateStr}: ${actsOnDay.map(a => a.name + ' (' + a.sport + ')').join(' | ')}`;
-        activeDiv.innerHTML = getObjectSportIcon(actsOnDay);
-
-        // Múltiples sesiones: añadir dot blanco superpuesto en borde superior derecho
-        if (actsOnDay.length > 1) {
-          const multiDot = document.createElement('div');
-          multiDot.className = 'calendar-multi-dot';
-          multiDot.title = `${actsOnDay.length} sesiones en este día`;
-          activeDiv.appendChild(multiDot);
-        }
-
-        gridEl.appendChild(activeDiv);
+    // Actualizar título del período / mes
+    if (monthLabelEl) {
+      if (currentStreakTab === '1M') {
+        monthLabelEl.textContent = `${monthNames[viewMonth]} ${viewYear}`;
+      } else if (currentStreakTab === '3M') {
+        const startM = new Date(viewYear, viewMonth - 2, 1);
+        monthLabelEl.textContent = `${monthNames[startM.getMonth()]} - ${monthNames[viewMonth]} ${viewYear}`;
+      } else if (currentStreakTab === '6M') {
+        const startM = new Date(viewYear, viewMonth - 5, 1);
+        monthLabelEl.textContent = `${monthNames[startM.getMonth()]} - ${monthNames[viewMonth]} ${viewYear}`;
+      } else if (currentStreakTab === '1A') {
+        monthLabelEl.textContent = `Año ${viewYear}`;
       } else {
-        const noActDiv = document.createElement('div');
-        noActDiv.className = `calendar-day-empty ${isToday ? 'is-today-empty' : ''}`;
-        noActDiv.textContent = day;
-        noActDiv.title = `${dateStr}: Sin actividad registrada`;
-        gridEl.appendChild(noActDiv);
+        monthLabelEl.textContent = 'Historial Completo (2022 - 2026)';
       }
     }
 
-    // Calcular número total de semanas en este mes
-    const totalWeeksInMonth = Math.ceil((firstDayIndex + daysInMonth) / 7);
+    if (currentStreakTab === '1M') {
+      // Vista mensual estándar: alineación estricta fila por fila
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      // Lunes = 0, Domingo = 6
+      const firstDayIndex = (new Date(viewYear, viewMonth, 1).getDay() + 6) % 7;
+      const totalCells = firstDayIndex + daysInMonth;
+      const totalWeeksInMonth = Math.ceil(totalCells / 7);
 
-    // Renderizar la columna lateral de racha (filas coincidentes con las semanas)
-    if (checksCol) {
-      for (let w = 0; w < totalWeeksInMonth; w++) {
-        const checkDiv = document.createElement('div');
-        checkDiv.className = 'streak-check-circle';
-        checkDiv.title = `Semana ${w + 1}: Completada`;
-        // Ícono de check blanco
-        checkDiv.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-        checksCol.appendChild(checkDiv);
+      let activeDaysCount = 0;
+      let weeksWithActs = {};
+
+      // Celdas previas vacías
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'calendar-day-empty';
+        emptyDiv.style.opacity = '0.15';
+        emptyDiv.textContent = '';
+        gridEl.appendChild(emptyDiv);
+      }
+
+      // Renderizar días del mes
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const actsOnDay = activitiesByDate[dateStr] || [];
+        const hasActs = actsOnDay.length > 0;
+        const isToday = (viewYear === 2026 && viewMonth === 9 && day === 10);
+
+        const cellIndex = firstDayIndex + (day - 1);
+        const weekIndex = Math.floor(cellIndex / 7);
+
+        if (hasActs) {
+          activeDaysCount++;
+          weeksWithActs[weekIndex] = true;
+
+          const activeDiv = document.createElement('div');
+          activeDiv.className = 'calendar-day-active';
+          activeDiv.title = `${dateStr}: ${actsOnDay.map(a => a.name + ' (' + a.sport + ')').join(' | ')}`;
+          activeDiv.innerHTML = getObjectSportIcon(actsOnDay);
+          activeDiv.onclick = () => {
+            const firstAct = actsOnDay[0];
+            const actIdx = ACTIVITIES.findIndex(a => a.id == firstAct.id);
+            if (actIdx !== -1) openActivityModal(actIdx);
+          };
+
+          if (actsOnDay.length > 1) {
+            const multiDot = document.createElement('div');
+            multiDot.className = 'calendar-multi-dot';
+            multiDot.title = `${actsOnDay.length} sesiones en este día`;
+            activeDiv.appendChild(multiDot);
+          }
+          gridEl.appendChild(activeDiv);
+        } else {
+          const noActDiv = document.createElement('div');
+          noActDiv.className = `calendar-day-empty ${isToday ? 'is-today-empty' : ''}`;
+          noActDiv.textContent = day;
+          noActDiv.title = `${dateStr}: Sin actividad`;
+          gridEl.appendChild(noActDiv);
+        }
+      }
+
+      // Rellenar celdas finales para completar la última semana
+      const remainingCells = (totalWeeksInMonth * 7) - totalCells;
+      for (let i = 0; i < remainingCells; i++) {
+        const trailingDiv = document.createElement('div');
+        trailingDiv.className = 'calendar-day-empty';
+        trailingDiv.style.opacity = '0.15';
+        trailingDiv.textContent = '';
+        gridEl.appendChild(trailingDiv);
+      }
+
+      // Sincronización real de la columna de racha:
+      // Exactamente una fila de check paralela a cada una de las totalWeeksInMonth filas
+      if (checksCol) {
+        for (let w = 0; w < totalWeeksInMonth; w++) {
+          const hasTrainingInWeek = !!weeksWithActs[w];
+          const checkDiv = document.createElement('div');
+          checkDiv.className = hasTrainingInWeek ? 'streak-check-circle' : 'streak-check-circle incomplete';
+          checkDiv.title = `Semana ${w + 1}: ${hasTrainingInWeek ? 'Completada (Entrenamiento registrado)' : 'Descanso / Sin registros'}`;
+          checkDiv.innerHTML = hasTrainingInWeek ?
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' :
+            '<span style="font-size:11px; font-weight:800; color:#f97316;">--</span>';
+          checksCol.appendChild(checkDiv);
+        }
+      }
+
+    } else {
+      // Vistas multimensuales continuas (3M, 6M, 1A, Todo)
+      let numMonths = 3;
+      if (currentStreakTab === '6M') numMonths = 6;
+      else if (currentStreakTab === '1A') numMonths = 12;
+      else if (currentStreakTab === 'Todo') numMonths = 24;
+
+      // Generar semanas continuas
+      let totalWeeksCount = numMonths * 4;
+      let weeksWithActs = {};
+
+      // Mostrar cuadrícula compacta de las últimas N semanas
+      const today = new Date(2026, 9, 10);
+      const daysToRender = totalWeeksCount * 7;
+      const startDate = new Date(today);
+      startDate.setDate(today.getDate() - daysToRender + 1);
+
+      // Ajustar startDate al lunes previo
+      const dayOfWeek = (startDate.getDay() + 6) % 7;
+      startDate.setDate(startDate.getDate() - dayOfWeek);
+
+      let currentD = new Date(startDate);
+      let dayIndex = 0;
+
+      while (currentD <= today || (dayIndex % 7 !== 0)) {
+        const y = currentD.getFullYear();
+        const m = currentD.getMonth();
+        const d = currentD.getDate();
+        const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const actsOnDay = activitiesByDate[dateStr] || [];
+        const hasActs = actsOnDay.length > 0;
+        const weekIdx = Math.floor(dayIndex / 7);
+
+        if (hasActs) {
+          weeksWithActs[weekIdx] = true;
+          const activeDiv = document.createElement('div');
+          activeDiv.className = 'calendar-day-active';
+          activeDiv.title = `${dateStr}: ${actsOnDay.map(a => a.name).join(' | ')}`;
+          activeDiv.innerHTML = getObjectSportIcon(actsOnDay);
+          activeDiv.onclick = () => {
+            const actIdx = ACTIVITIES.findIndex(a => a.id == actsOnDay[0].id);
+            if (actIdx !== -1) openActivityModal(actIdx);
+          };
+          gridEl.appendChild(activeDiv);
+        } else {
+          const noActDiv = document.createElement('div');
+          noActDiv.className = 'calendar-day-empty';
+          noActDiv.textContent = d;
+          gridEl.appendChild(noActDiv);
+        }
+
+        currentD.setDate(currentD.getDate() + 1);
+        dayIndex++;
+      }
+
+      const totalRenderedWeeks = Math.ceil(dayIndex / 7);
+      if (checksCol) {
+        for (let w = 0; w < totalRenderedWeeks; w++) {
+          const hasTraining = !!weeksWithActs[w];
+          const checkDiv = document.createElement('div');
+          checkDiv.className = hasTraining ? 'streak-check-circle' : 'streak-check-circle incomplete';
+          checkDiv.title = `Semana ${w + 1}: ${hasTraining ? 'Completada' : 'Sin registros'}`;
+          checkDiv.innerHTML = hasTraining ?
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' :
+            '<span style="font-size:11px; font-weight:800; color:#f97316;">--</span>';
+          checksCol.appendChild(checkDiv);
+        }
       }
     }
   }
@@ -4301,7 +4467,7 @@
       // Redimensionar / inicializar gráficos específicos al mostrar la pestaña
       setTimeout(() => {
         if (pageId === 'page-home') {
-          if (typeof initWellnessHrvChart === 'function') initWellnessHrvChart();
+          // VFC card moved to modal upon clicking HRV card
         } else if (pageId === 'page-advanced-perf') {
           if (charts.strava) charts.strava.resize();
         } else if (pageId === 'page-z2') {
@@ -4325,14 +4491,159 @@
     }
   }
 
-  function updateTimelineNavButtons() {
-    const btnPrev = document.getElementById('btn-timeline-prev');
-    const btnNext = document.getElementById('btn-timeline-next');
-    btnPrev.disabled = (windowEndIdx <= 12);
-    btnNext.disabled = (windowEndIdx >= FULL_TIMELINE_WEEKS.length);
+  let currentStravaPeriod = '3M';
+  let stravaSliceCount = 12;
+
+  function getCurrent12WeeksSlice() {
+    let count = 12;
+    if (currentStravaPeriod === 'today') count = 2;
+    else if (currentStravaPeriod === '1M') count = 4;
+    else if (currentStravaPeriod === '3M') count = 12;
+    else if (currentStravaPeriod === '6M') count = 26;
+    else if (currentStravaPeriod === '1Y') count = 52;
+    else if (currentStravaPeriod === 'all') count = FULL_TIMELINE_WEEKS.length;
+
+    stravaSliceCount = count;
+    const start = Math.max(0, windowEndIdx - count);
+    return FULL_TIMELINE_WEEKS.slice(start, windowEndIdx);
+  }
+
+  function filterStravaPeriod(period) {
+    currentStravaPeriod = period;
+    const ctrl = document.getElementById('control-timeline-strava');
+    if (ctrl) {
+      ctrl.querySelectorAll('.segmented-pill-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(ctrl.querySelectorAll('.segmented-pill-btn')).find(b => {
+        const txt = b.textContent.trim().toLowerCase();
+        if (period === '1Y' && txt === '1a') return true;
+        return txt === period.toLowerCase();
+      });
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    windowEndIdx = FULL_TIMELINE_WEEKS.length;
+    updateStravaChartWindow();
+  }
+
+  function initStravaChart() {
+    const canvas = document.getElementById('chartStravaVolume');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const currentSlice = getCurrent12WeeksSlice();
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+    gradient.addColorStop(0, 'rgba(252, 82, 0, 0.45)');
+    gradient.addColorStop(0.7, 'rgba(252, 82, 0, 0.12)');
+    gradient.addColorStop(1, 'rgba(252, 82, 0, 0.00)');
+
+    const labels = currentSlice.map(w => w.month + ' ' + w.label);
+    const dataVals = currentSlice.map(w => w.dist_km);
+
+    const pointRadii = currentSlice.map(w => w.is_current ? 7 : 4);
+    const pointBgColors = currentSlice.map(w => w.is_current ? '#fc5200' : (document.documentElement.getAttribute('data-theme') === 'dark' ? '#151d2f' : '#ffffff'));
+    const pointBorderColors = currentSlice.map(w => w.is_current ? '#ffffff' : '#fc5200');
+    const pointBorderWidths = currentSlice.map(w => w.is_current ? 3 : 2);
+
+    if (charts.strava) {
+      try { charts.strava.destroy(); } catch(e){}
+    }
+
+    charts.strava = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Kilómetros Semanales',
+          data: dataVals,
+          borderColor: '#fc5200',
+          borderWidth: 2.5,
+          backgroundColor: gradient,
+          fill: true,
+          tension: 0.25,
+          pointRadius: pointRadii,
+          pointBackgroundColor: pointBgColors,
+          pointBorderColor: pointBorderColors,
+          pointBorderWidth: pointBorderWidths,
+          pointHoverRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        onClick: (event, activeElements) => {
+          const slice = getCurrent12WeeksSlice();
+          if (activeElements && activeElements.length > 0) {
+            const idx = activeElements[0].index;
+            if (slice[idx]) {
+              updateStravaTopCard(slice[idx]);
+            }
+          }
+        },
+        onHover: (event, activeElements) => {
+          const slice = getCurrent12WeeksSlice();
+          if (activeElements && activeElements.length > 0) {
+            const idx = activeElements[0].index;
+            if (slice[idx]) {
+              const item = Object.assign({}, slice[idx], { is_hovered: true });
+              updateStravaTopCard(item);
+            }
+          } else {
+            updateStravaTopCard(slice[slice.length - 1]);
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0b111e',
+            borderColor: '#334155',
+            borderWidth: 1,
+            titleColor: '#f1f5f9',
+            bodyColor: '#cbd5e1',
+            callbacks: {
+              title: ctxT => {
+                const slice = getCurrent12WeeksSlice();
+                return 'Semana ' + slice[ctxT[0].dataIndex].label + ' (' + slice[ctxT[0].dataIndex].year + ')';
+              },
+              label: ctxT => {
+                const slice = getCurrent12WeeksSlice();
+                const item = slice[ctxT.dataIndex];
+                if (currentStravaMode === 'km') return `Distancia: ${item.dist_km} km (${item.dur_str})`;
+                if (currentStravaMode === 'z2') return `Zona 2 Base: ${item.z2_hours} h (${item.dist_km} km)`;
+                return `Carga Semanal: ${item.load} pts (${item.activities} sesiones)`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            min: 0,
+            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+            ticks: {
+              color: '#94a3b8',
+              callback: v => v + ' km',
+              stepSize: 25
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: '#94a3b8',
+              maxTicksLimit: 10
+            }
+          }
+        }
+      }
+    });
+
+    updateStravaTopCard(currentSlice[currentSlice.length - 1]);
   }
 
   function updateStravaChartWindow() {
+    if (!charts.strava) {
+      initStravaChart();
+      return;
+    }
     const currentSlice = getCurrent12WeeksSlice();
     const isNow = (windowEndIdx >= FULL_TIMELINE_WEEKS.length);
 
@@ -4349,10 +4660,14 @@
     if (titleEl) {
       titleEl.textContent = isNow ? activePeriodTitle : ('Semana de ' + currentSlice[currentSlice.length - 1].label + ' (' + currentSlice[currentSlice.length - 1].year + ')');
     }
-    document.getElementById('strava-window-dates').textContent = `${currentSlice[0].label}/${currentSlice[0].year} ➔ ${currentSlice[currentSlice.length - 1].label}/${currentSlice[currentSlice.length - 1].year}`;
-    document.getElementById('strava-node-hint').textContent = isNow ? '● Nodo naranja resaltado: Semana actual en curso' : '● Nodo naranja resaltado: Semana seleccionada de referencia';
+    const datesEl = document.getElementById('strava-window-dates');
+    if (datesEl && currentSlice.length > 0) {
+      datesEl.textContent = `${currentSlice[0].label}/${currentSlice[0].year} ➔ ${currentSlice[currentSlice.length - 1].label}/${currentSlice[currentSlice.length - 1].year}`;
+    }
 
-    const ctx = document.getElementById('chartStravaVolume').getContext('2d');
+    const canvas = document.getElementById('chartStravaVolume');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
     let color = '#fc5200';
     let label = 'Kilómetros Semanales';
     let dataVals = [];
@@ -4405,12 +4720,25 @@
     const timeEl = document.getElementById('strava-stat-time');
     const elevEl = document.getElementById('strava-stat-elev');
     const z2El = document.getElementById('strava-stat-z2');
+    const kpi4LabelEl = document.getElementById('strava-stat-kpi4-label');
     const titleEl = document.getElementById('strava-week-title');
 
     if (distEl) distEl.textContent = `${weekItem.dist_km} km`;
     if (timeEl) timeEl.textContent = weekItem.dur_str || '0m';
     if (elevEl) elevEl.textContent = `${weekItem.elev_m || 0} m`;
-    if (z2El) z2El.textContent = `${weekItem.z2_hours} h`;
+
+    if (z2El) {
+      if (currentStravaMode === 'load') {
+        if (kpi4LabelEl) kpi4LabelEl.textContent = 'Carga Semanal';
+        z2El.textContent = `${weekItem.load} pts`;
+        z2El.style.color = '#f59e0b';
+      } else {
+        if (kpi4LabelEl) kpi4LabelEl.textContent = 'Base Zona 2';
+        z2El.textContent = `${weekItem.z2_hours} h`;
+        z2El.style.color = '#10b981';
+      }
+    }
+
     if (titleEl) {
       const periodTitles = {
         'today': 'Hoy / Semana en curso',
@@ -4433,9 +4761,12 @@
 
   function switchStravaMode(mode) {
     currentStravaMode = mode;
-    document.getElementById('btn-strava-km').classList.toggle('active', mode === 'km');
-    document.getElementById('btn-strava-z2').classList.toggle('active', mode === 'z2');
-    document.getElementById('btn-strava-load').classList.toggle('active', mode === 'load');
+    const btnKm = document.getElementById('btn-strava-km');
+    const btnZ2 = document.getElementById('btn-strava-z2');
+    const btnLoad = document.getElementById('btn-strava-load');
+    if (btnKm) btnKm.classList.toggle('active', mode === 'km');
+    if (btnZ2) btnZ2.classList.toggle('active', mode === 'z2');
+    if (btnLoad) btnLoad.classList.toggle('active', mode === 'load');
     updateStravaChartWindow();
   }
 
@@ -4615,33 +4946,134 @@
     } else if (kpiType === 'hrv') {
       badgeEl.textContent = 'Tono Vagal Parasimpático';
       badgeEl.style.color = '#a855f7';
-      titleEl.textContent = 'Variabilidad de FC Nocturna (RMSSD)';
-      descEl.textContent = 'Mide las fluctuaciones entre latidos sucesivos durante el descanso nocturno. Una VFC en pasillo basal indica asimilación del estrés; caídas abruptas alertan sobre fatiga sistémica o enfermedad inminente.';
-      formulaEl.textContent = 'RMSSD en milisegundos = √( (1/N) × Σ (RR_(i+1) - RR_i)² )';
+      titleEl.textContent = 'Variabilidad de la Frecuencia Cardíaca (VFC / RMSSD)';
+      descEl.textContent = 'Evolución de las últimas 4 semanas. Mide las fluctuaciones entre latidos sucesivos durante el descanso nocturno. El túnel verde/gris delimita tu pasillo basal óptimo de recuperación Firstbeat Analytics (43 - 56 ms). Actualmente tu valor es de 41 ms (límite inferior equilibrado).';
+      formulaEl.textContent = 'RMSSD en milisegundos = √( (1/N) × Σ (RR_(i+1) - RR_i)² ) • Pasillo Basal Firstbeat: 43 a 56 ms';
       
+      // Semáforo con Aguja indicadora en 41 ms (Límite Inferior Equilibrado)
       trackEl.innerHTML = `
         <div class="spectrum-segment" style="width:25%; background:#ef4444;" title="Deprimido (< 38 ms)"></div>
-        <div class="spectrum-segment" style="width:20%; background:#f59e0b;" title="Bajo (38 - 42 ms)"></div>
-        <div class="spectrum-segment" style="width:35%; background:#10b981;" title="Pasillo Equilibrado (43 - 56 ms)"></div>
+        <div class="spectrum-segment" style="width:18%; background:#f59e0b; position:relative;" title="Límite Inferior (38 - 42 ms)">
+          <div style="position:absolute; right:15%; top:-5px; bottom:-5px; width:3px; background:#ffffff; border-radius:2px; box-shadow:0 0 6px rgba(0,0,0,0.6); z-index:10;" title="Tu valor actual: 41 ms"></div>
+        </div>
+        <div class="spectrum-segment" style="width:37%; background:#10b981;" title="Pasillo Basal Óptimo (43 - 56 ms)"></div>
         <div class="spectrum-segment" style="width:20%; background:#38bdf8;" title="Elevado / Parasimpático (> 56 ms)"></div>
       `;
       legendEl.innerHTML = `
         <span>< 38 ms (Alerta)</span>
-        <span>38 - 42 ms</span>
-        <span>43 - 56 ms (Basal)</span>
+        <span>38 - 42 ms (Límite Inf.)</span>
+        <span>43 - 56 ms (Túnel Basal)</span>
         <span>> 56 ms</span>
       `;
-      const currentHrv = RECOVERY_DATA[RECOVERY_DATA.length - 1].hrv || 42;
       currentEl.innerHTML = `
-        <span>Valor actual: <strong>${currentHrv} ms</strong></span>
-        <span style="color:${currentHrv >= 43 ? '#10b981' : '#f59e0b'}; font-weight:700;">● ${currentHrv >= 43 ? 'En Pasillo Basal' : 'En Límite Inferior'}</span>
+        <span>Valor actual: <strong style="color:#f59e0b; font-size:15px;">41 ms</strong> (Aguja en zona de Límite Inferior)</span>
+        <span style="color:#10b981; font-weight:700;">● Túnel Basal Óptimo: 43 - 56 ms</span>
       `;
       
-      chartLabels = RECOVERY_DATA.slice(-28).map(d => d.date_arg.slice(0, 5));
-      chartData = RECOVERY_DATA.slice(-28).map(d => d.hrv || 44);
+      const vfcLabels = [
+        '12 Sep', '13', '14', '15', '16', '17', '18',
+        '19 Sep', '20', '21', '22', '23', '24', '25',
+        '26 Sep', '27', '28', '29', '30', '01 Oct', '02',
+        '03 Oct', '04', '05', '06', '07', '08', 'Hoy (41 ms)'
+      ];
+      const dailyHrvValues = [
+        48, 50, 46, 52, 54, 49, 45,
+        47, 51, 48, 44, 43, 49, 52,
+        50, 48, 46, 44, 42, 45, 47,
+        46, 44, 42, 43, 40, 42, 41
+      ];
+      
+      chartLabels = vfcLabels;
+      chartData = dailyHrvValues;
       chartColor = '#a855f7';
-      chartLabel = 'VFC Nocturna (ms)';
-
+      chartLabel = 'VFC Diaria (ms)';
+      kpiThemeBg = 'var(--pastel-lavender-bg)';
+      kpiThemeText = 'var(--pastel-lavender-text)';
+      kpiThemeBorder = 'var(--pastel-lavender-border)';
+      
+      // Configuración de renderizado multilínea con túnel basal continuo 43-56 ms
+      setTimeout(() => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const ctxHrvModal = document.getElementById('kpiModalChart')?.getContext('2d');
+        if (ctxHrvModal && kpiChart) {
+          kpiChart.destroy();
+          kpiChart = new Chart(ctxHrvModal, {
+            type: 'line',
+            data: {
+              labels: vfcLabels,
+              datasets: [
+                {
+                  label: 'Mínimo Basal (43 ms)',
+                  data: Array(vfcLabels.length).fill(43),
+                  borderColor: isDark ? 'rgba(100, 116, 139, 0.5)' : 'rgba(203, 213, 225, 0.9)',
+                  borderWidth: 1.2,
+                  borderDash: [3, 3],
+                  pointRadius: 0,
+                  fill: false
+                },
+                {
+                  label: 'Túnel Basal Óptimo (43-56 ms)',
+                  data: Array(vfcLabels.length).fill(56),
+                  borderColor: isDark ? 'rgba(100, 116, 139, 0.5)' : 'rgba(203, 213, 225, 0.9)',
+                  borderWidth: 1.2,
+                  borderDash: [3, 3],
+                  pointRadius: 0,
+                  backgroundColor: isDark ? 'rgba(71, 85, 105, 0.35)' : 'rgba(241, 245, 249, 0.75)',
+                  fill: '-1'
+                },
+                {
+                  label: 'VFC Diaria (ms)',
+                  data: dailyHrvValues,
+                  borderColor: '#10b981',
+                  borderWidth: 2.5,
+                  backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                  pointBackgroundColor: (cPt) => cPt.dataIndex === dailyHrvValues.length - 1 ? '#f59e0b' : '#10b981',
+                  pointBorderColor: '#ffffff',
+                  pointBorderWidth: 1.8,
+                  pointRadius: (cPt) => cPt.dataIndex === dailyHrvValues.length - 1 ? 6 : 3,
+                  pointHoverRadius: 7,
+                  tension: 0.25,
+                  fill: false
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: { mode: 'index', intersect: false },
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'top',
+                  labels: { color: isDark ? '#94a3b8' : '#64748b', boxWidth: 12, font: { size: 11 } }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (ctxT) => {
+                      if (ctxT.datasetIndex === 2) return `VFC: ${ctxT.raw} ms ${ctxT.raw === 41 ? '● (Valor actual)' : ''}`;
+                      if (ctxT.datasetIndex === 1) return `Límite Sup. Basal: 56 ms`;
+                      return `Límite Inf. Basal: 43 ms`;
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  min: 35,
+                  max: 65,
+                  grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)' },
+                  ticks: { color: isDark ? '#94a3b8' : '#64748b', callback: v => v + ' ms' }
+                },
+                x: {
+                  grid: { display: false },
+                  ticks: { color: isDark ? '#94a3b8' : '#64748b', maxTicksLimit: 10 }
+                }
+              }
+            }
+          });
+        }
+      }, 20);
+      return;
     } else if (kpiType === 'sleep') {
       badgeEl.textContent = 'Recuperación Integral';
       badgeEl.style.color = '#38bdf8';
