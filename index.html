@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Garmin Performance Lab • V5.5 | Google Cloud & Gemini Sports Intelligence</title>
+  <title>Garmin Performance Lab • V5.6 | Google Cloud & Gemini Sports Intelligence</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1310,12 +1310,64 @@
       margin: 18px 0;
     }
 
+    .spectrum-track-container {
+      position: relative;
+      margin-top: 28px;
+      margin-bottom: 10px;
+    }
     .spectrum-track {
       display: flex;
-      height: 16px;
-      border-radius: 8px;
+      height: 18px;
+      border-radius: 9px;
       overflow: hidden;
-      margin-bottom: 8px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .spectrum-needle-pin {
+      position: absolute;
+      top: -26px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+      z-index: 20;
+      transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .spectrum-needle-badge {
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+      white-space: nowrap;
+    }
+    [data-theme="dark"] .spectrum-needle-badge {
+      background: #ffffff;
+      color: #0f172a;
+      border-color: rgba(0,0,0,0.2);
+    }
+    .spectrum-needle-arrow {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #0f172a;
+      margin-top: -1px;
+    }
+    [data-theme="dark"] .spectrum-needle-arrow {
+      border-top-color: #ffffff;
+    }
+    .spectrum-needle-line {
+      width: 2px;
+      height: 22px;
+      background: #ffffff;
+      box-shadow: 0 0 4px rgba(0,0,0,0.8);
+      border-radius: 1px;
+      margin-top: -1px;
     }
 
     .spectrum-segment {
@@ -1799,7 +1851,7 @@
   <header>
     <div>
       <div class="brand-title">
-        <span>Garmin Performance Lab • V5.5</span>
+        <span>Garmin Performance Lab • V5.6</span>
         <span class="athlete-chip">Atleta: Emiliano</span>
       </div>
       <div style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">
@@ -1874,13 +1926,14 @@
 
       <div class="sidebar-section-title">Módulos Analíticos</div>
       <button class="sidebar-nav-btn" onclick="showTab('page-advanced-perf')" data-tooltip="Rendimiento Avanzado">
-        <span class="nav-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-        </span>
-        <span class="nav-text">Rendimiento Avanzado</span>
-      </button>
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 14l4-4"></path>
+              <path d="M3.34 19a10 10 0 1 1 17.32 0"></path>
+            </svg>
+          </span>
+          <span class="nav-text">Rendimiento Avanzado</span>
+        </button>
       <button class="sidebar-nav-btn" onclick="showTab('page-training-status')" data-tooltip="Estado de Entreno">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1900,7 +1953,7 @@
         <span class="nav-text">Predicciones</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-endurance')" data-tooltip="Endurance & Carga">
+      <button class="sidebar-nav-btn" onclick="showTab('page-endurance')" data-tooltip="Endurance">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="7" width="16" height="10" rx="2"></rect>
@@ -1908,7 +1961,7 @@
             <polyline points="9 9 7 12 11 12 9 15"></polyline>
           </svg>
         </span>
-        <span class="nav-text">Endurance & Carga</span>
+        <span class="nav-text">Endurance</span>
       </button>
 
       <button class="sidebar-nav-btn" onclick="showTab('page-records')" data-tooltip="Récords Personales (PRs)">
@@ -1929,10 +1982,10 @@
             <polyline points="2 12 12 17 22 12"></polyline>
           </svg>
         </span>
-        <span class="nav-text">Multideporte (Gym/Run/Walk)</span>
+        <span class="nav-text">Multideporte</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-z2')" data-tooltip="Desglose Fisiológico Z2">
+      <button class="sidebar-nav-btn" onclick="showTab('page-z2')" data-tooltip="Zona 2">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="9"></circle>
@@ -1940,25 +1993,25 @@
             <circle cx="12" cy="12" r="1"></circle>
           </svg>
         </span>
-        <span class="nav-text">Desglose Fisiológico Z2</span>
+        <span class="nav-text">Zona 2</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-recovery')" data-tooltip="Sueño & VFC Autonómica">
+      <button class="sidebar-nav-btn" onclick="showTab('page-recovery')" data-tooltip="Sueño & VFC">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
         </span>
-        <span class="nav-text">Sueño & VFC Autonómica</span>
+        <span class="nav-text">Sueño & VFC</span>
       </button>
 
-      <button class="sidebar-nav-btn" onclick="showTab('page-calories')" data-tooltip="Calorías & Gasto Energético">
+      <button class="sidebar-nav-btn" onclick="showTab('page-calories')" data-tooltip="Gasto Energético">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8.5 14.5A4.5 4.5 0 0 0 13 19a4.5 4.5 0 0 0 4.5-4.5c0-4-5-8.5-5-8.5s-4 4.5-4 8.5z"></path>
           </svg>
         </span>
-        <span class="nav-text">Calorías & Gasto Energético</span>
+        <span class="nav-text">Gasto Energético</span>
       </button>
 
       <button class="sidebar-nav-btn" onclick="showTab('page-table')" data-tooltip="Bitácora de Sesiones">
@@ -2614,9 +2667,10 @@
               <span>Algoritmo Firstbeat Analytics</span>
             </div>
           </div>
+        </div>
 
-          <!-- STORYTELLING FISIOLÓGICO: ESTADO DE ENTRENO -->
-        <div class="storytelling-banner" style="border-left-color: #10b981; margin-top: 22px; margin-bottom: 22px;">
+      <!-- DIAGNÓSTICO FISIOLÓGICO: ESTADO DE ENTRENO (DEBAJO Y POR FUERA) -->
+      <div class="storytelling-banner" style="border-left-color: #10b981; margin-top: 22px; margin-bottom: 22px;">
           <div class="storytelling-header">
             <div class="storytelling-title-wrap">
               <span class="storytelling-icon">📖</span>
@@ -2651,11 +2705,10 @@
             </div>
           </div>
         </div>
-        </div>
       </div>
 
-      <!-- ================= TAB: PREDICCIONES DE CARRERA & READINESS ================= -->
-      <div id="page-predictions" class="tab-page">
+  <!-- ================= TAB: PREDICCIONES DE CARRERA & READINESS ================= -->
+  <div id="page-predictions" class="tab-page">
         
         
     
@@ -2683,7 +2736,7 @@
               <div class="pred-card-header">
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span class="pred-medal-icon">🥇</span>
-                  <span class="pred-dist-title">5 Kilómetros</span>
+                  <span class="pred-dist-title">5K</span>
                 </div>
                 <span class="pred-delta-badge desfavorable">▲ 6s</span>
               </div>
@@ -2699,7 +2752,7 @@
               <div class="pred-card-header">
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span class="pred-medal-icon" style="background:var(--pastel-mint-bg); color:#10b981;">🥈</span>
-                  <span class="pred-dist-title">10 Kilómetros</span>
+                  <span class="pred-dist-title">10K</span>
                 </div>
                 <span class="pred-delta-badge desfavorable">▲ 34s</span>
               </div>
@@ -2747,7 +2800,7 @@
           <div style="background:var(--surface-elevated); padding:24px; border-radius:18px; border:1px solid var(--surface-border); margin-bottom:24px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
               <div>
-                <span style="font-size:15px; font-weight:800; color:var(--text-main);" id="pred-chart-title">Evolución de Predicción: 5 Kilómetros</span>
+                <span style="font-size:15px; font-weight:800; color:var(--text-main);" id="pred-chart-title">Evolución de Predicción: 5K</span>
                 <span style="font-size:12px; color:var(--text-muted); margin-left:8px;" id="pred-chart-subtitle">Curva continua histórica con nodo final resaltado en halo azul</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
@@ -2889,44 +2942,7 @@
       </div>
 
       <!-- ================= TAB 1: ENDURANCE & CARGA ================= -->
-      <div id="page-endurance" class="tab-page">
-    
-    <!-- DIAGNÓSTICO FISIOLÓGICO: ENDURANCE & CARGA -->
-    <div class="storytelling-banner" style="border-left-color: #0284c7; margin-bottom: 22px;">
-      <div class="storytelling-header">
-        <div class="storytelling-title-wrap">
-          <span class="storytelling-icon">⚡</span>
-          <div>
-            <div class="storytelling-title">Dinámica de Carga Crónica & Modelo de Rendimiento (PMC)</div>
-            <div class="storytelling-subtitle">Relación matemática entre Fitness acumulado (CTL), Fatiga reciente (ATL) y Forma óptima (TSB)</div>
-          </div>
-        </div>
-        <span class="badge" style="background:var(--pastel-blue-bg); color:var(--pastel-blue-text); border:1px solid var(--pastel-blue-border);">Puntuación: 4308 pts</span>
-      </div>
-
-      <div class="storytelling-grid">
-        <div class="story-card">
-          <span class="story-card-label">1. Fitness Crónico (CTL 42d)</span>
-          <span class="story-card-value" style="color:#0284c7;">Adaptación Progresiva Estable</span>
-          <span class="story-card-desc">El fitness representa la memoria biológica de tus mitocondrias y red capilar. Tu curva muestra una base constante construida sin declives abruptos.</span>
-        </div>
-        <div class="story-card">
-          <span class="story-card-label">2. Fatiga Residual (ATL 7d)</span>
-          <span class="story-card-value" style="color:#f59e0b;">Asimilación de Esfuerzo Agudo</span>
-          <span class="story-card-desc">Mide el costo metabólico inmediato de los últimos entrenamientos intensos. Mientras no supere el umbral crítico de 1.35x respecto a CTL, la supercompensación está garantizada.</span>
-        </div>
-        <div class="story-card">
-          <span class="story-card-label">3. Estado de Forma (TSB)</span>
-          <span class="story-card-value" style="color:#10b981;">Equilibrio Productivo</span>
-          <span class="story-card-desc">Calculado como CTL menos ATL. Se encuentra en una ventana ideal para seguir acumulando kilómetros sin fatiga neuromuscular prematura.</span>
-        </div>
-        <div class="story-card">
-          <span class="story-card-label">4. Directiva de Periodización</span>
-          <span class="story-card-value" style="color:#a855f7;">Sobrecarga Escalonada</span>
-          <span class="story-card-desc">Aumentar no más del 8-10% de volumen semanal. Mantener una semana de descarga cada 3 o 4 semanas para regenerar reservas de glucógeno y tejidos conectivos.</span>
-        </div>
-      </div>
-    </div>
+        <div id="page-endurance" class="tab-page">
     
     <div class="layout-2">
       <!-- Estructura de Endurance Score -->
@@ -2987,47 +3003,47 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ================= TAB 2: RÉCORDS PERSONALES (PRs) ================= -->
-  <div id="page-records" class="tab-page">
-    
-    <!-- DIAGNÓSTICO FISIOLÓGICO: RÉCORDS PERSONALES -->
-    <div class="storytelling-banner" style="border-left-color: #10b981; margin-bottom: 22px;">
+    <!-- DIAGNÓSTICO FISIOLÓGICO: ENDURANCE & CARGA -->
+    <div class="storytelling-banner" style="border-left-color: #0284c7; margin-top: 22px; margin-bottom: 20px;">
       <div class="storytelling-header">
         <div class="storytelling-title-wrap">
-          <span class="storytelling-icon">🏆</span>
+          <span class="storytelling-icon">⚡</span>
           <div>
-            <div class="storytelling-title">Evolución de Ritmos Máximos & Umbrales de Competición</div>
-            <div class="storytelling-subtitle">Comparativa entre marcas históricas oficiales, ritmos por kilómetro y convergencia predictiva</div>
+            <div class="storytelling-title">Dinámica de Carga Crónica & Modelo de Rendimiento (PMC)</div>
+            <div class="storytelling-subtitle">Relación matemática entre Fitness acumulado (CTL), Fatiga reciente (ATL) y Forma óptima (TSB)</div>
           </div>
         </div>
-        <span class="badge" style="background:var(--pastel-mint-bg); color:var(--pastel-mint-text); border:1px solid var(--pastel-mint-border);">Mejoras Consolidadas</span>
+        <span class="badge" style="background:var(--pastel-blue-bg); color:var(--pastel-blue-text); border:1px solid var(--pastel-blue-border);">Puntuación: 4308 pts</span>
       </div>
 
       <div class="storytelling-grid">
         <div class="story-card">
-          <span class="story-card-label">Potencia en Distancias Cortas</span>
-          <span class="story-card-value" style="color:#10b981;">1K @ 3:25/km</span>
-          <span class="story-card-desc">Refleja la máxima velocidad aeróbica (vVO₂ Máx) y reclutamiento de fibras rápidas tipo IIa con excelente economía de zancada.</span>
+          <span class="story-card-label">1. Fitness Crónico (CTL 42d)</span>
+          <span class="story-card-value" style="color:#0284c7;">Adaptación Progresiva Estable</span>
+          <span class="story-card-desc">El fitness representa la memoria biológica de tus mitocondrias y red capilar. Tu curva muestra una base constante construida sin declives abruptos.</span>
         </div>
         <div class="story-card">
-          <span class="story-card-label">Segundo Umbral Ventilatorio</span>
-          <span class="story-card-value" style="color:#38bdf8;">10K @ 4:07/km</span>
-          <span class="story-card-desc">Tu ritmo de umbral anaeróbico demuestra un elevado aclaramiento de lactato sanguíneo, permitiendo mantener ritmos exigentes sin fatiga limitante.</span>
+          <span class="story-card-label">2. Fatiga Residual (ATL 7d)</span>
+          <span class="story-card-value" style="color:#f59e0b;">Asimilación de Esfuerzo Agudo</span>
+          <span class="story-card-desc">Mide el costo metabólico inmediato de los últimos entrenamientos intensos. Mientras no supere el umbral crítico de 1.35x respecto a CTL, la supercompensación está garantizada.</span>
         </div>
         <div class="story-card">
-          <span class="story-card-label">Resistencia de Media Distancia</span>
-          <span class="story-card-value" style="color:#f59e0b;">21.1K @ 4:08/km</span>
-          <span class="story-card-desc">La convergencia entre tu récord de 21K y la predicción actual confirma una sólida utilización de grasas como sustrato energético principal.</span>
+          <span class="story-card-label">3. Estado de Forma (TSB)</span>
+          <span class="story-card-value" style="color:#10b981;">Equilibrio Productivo</span>
+          <span class="story-card-desc">Calculado como CTL menos ATL. Se encuentra en una ventana ideal para seguir acumulando kilómetros sin fatiga neuromuscular prematura.</span>
         </div>
         <div class="story-card">
-          <span class="story-card-label">Objetivo Proyectado</span>
-          <span class="story-card-value" style="color:#a855f7;">Debut en Maratón 42.2K</span>
-          <span class="story-card-desc">El trabajo continuo de base en Zona 2 aporta la protección osteomuscular necesaria para proyectar la distancia reina con garantías.</span>
+          <span class="story-card-label">4. Directiva de Periodización</span>
+          <span class="story-card-value" style="color:#a855f7;">Sobrecarga Escalonada</span>
+          <span class="story-card-desc">Aumentar no más del 8-10% de volumen semanal. Mantener una semana de descarga cada 3 o 4 semanas para regenerar reservas de glucógeno y tejidos conectivos.</span>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ================= TAB 2: RÉCORDS PERSONALES (PRs) ================= -->
+  <div id="page-records" class="tab-page">
     
     <div class="panel" style="margin-bottom: 20px;">
       <div class="panel-header">
@@ -3134,13 +3150,78 @@
         </div>
       </div>
     </div>
+
+    <!-- DIAGNÓSTICO FISIOLÓGICO: RÉCORDS PERSONALES (DEBAJO Y POR FUERA) -->
+    <div class="storytelling-banner" style="border-left-color: #10b981; margin-top: 22px; margin-bottom: 20px;">
+      <div class="storytelling-header">
+        <div class="storytelling-title-wrap">
+          <span class="storytelling-icon">🏆</span>
+          <div>
+            <div class="storytelling-title">Evolución de Ritmos Máximos & Umbrales de Competición</div>
+            <div class="storytelling-subtitle">Comparativa entre marcas históricas oficiales, ritmos por kilómetro y convergencia predictiva</div>
+          </div>
+        </div>
+        <span class="badge" style="background:var(--pastel-mint-bg); color:var(--pastel-mint-text); border:1px solid var(--pastel-mint-border);">Mejoras Consolidadas</span>
+      </div>
+
+      <div class="storytelling-grid">
+        <div class="story-card">
+          <span class="story-card-label">Potencia en Distancias Cortas</span>
+          <span class="story-card-value" style="color:#10b981;">1K @ 3:25/km</span>
+          <span class="story-card-desc">Refleja la máxima velocidad aeróbica (vVO₂ Máx) y reclutamiento de fibras rápidas tipo IIa con excelente economía de zancada.</span>
+        </div>
+        <div class="story-card">
+          <span class="story-card-label">Segundo Umbral Ventilatorio</span>
+          <span class="story-card-value" style="color:#38bdf8;">10K @ 4:07/km</span>
+          <span class="story-card-desc">Tu ritmo de umbral anaeróbico demuestra un elevado aclaramiento de lactato sanguíneo, permitiendo mantener ritmos exigentes sin fatiga limitante.</span>
+        </div>
+        <div class="story-card">
+          <span class="story-card-label">Resistencia de Media Distancia</span>
+          <span class="story-card-value" style="color:#f59e0b;">21.1K @ 4:08/km</span>
+          <span class="story-card-desc">La convergencia entre tu récord de 21K y la predicción actual confirma una sólida utilización de grasas como sustrato energético principal.</span>
+        </div>
+        <div class="story-card">
+          <span class="story-card-label">Objetivo Proyectado</span>
+          <span class="story-card-value" style="color:#a855f7;">Debut en Maratón 42.2K</span>
+          <span class="story-card-desc">El trabajo continuo de base en Zona 2 aporta la protección osteomuscular necesaria para proyectar la distancia reina con garantías.</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ================= TAB 3: VOLUMEN MULTIDEPORTE ================= -->
   <div id="page-multisport" class="tab-page">
     
+    <div class="layout-2">
+      <!-- Torta Multideporte (Sin Crosshair) -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Distribución de Carga por Disciplina</div>
+            <div class="panel-subtitle">Horas exactas y porcentaje del volumen total</div>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartSportsSplit"></canvas>
+        </div>
+      </div>
+
+      <!-- Semanal Multideporte -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Horas Semanales por Disciplina</div>
+            <div class="panel-subtitle">Equilibrio entre carrera, fuerza en gimnasio y caminata</div>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartWeeklySports"></canvas>
+        </div>
+      </div>
+    </div>
+
     <!-- DIAGNÓSTICO FISIOLÓGICO: MULTIDEPORTE -->
-    <div class="storytelling-banner" style="border-left-color: #a855f7; margin-bottom: 22px;">
+    <div class="storytelling-banner" style="border-left-color: #a855f7; margin-top: 22px; margin-bottom: 20px;">
       <div class="storytelling-header">
         <div class="storytelling-title-wrap">
           <span class="storytelling-icon">🧬</span>
@@ -3175,75 +3256,10 @@
         </div>
       </div>
     </div>
-    
-    <div class="layout-2">
-      <!-- Torta Multideporte (Sin Crosshair) -->
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Distribución de Carga por Disciplina</div>
-            <div class="panel-subtitle">Horas exactas y porcentaje del volumen total</div>
-          </div>
-        </div>
-        <div class="chart-box">
-          <canvas id="chartSportsSplit"></canvas>
-        </div>
-      </div>
-
-      <!-- Semanal Multideporte -->
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Horas Semanales por Disciplina</div>
-            <div class="panel-subtitle">Equilibrio entre carrera, fuerza en gimnasio y caminata</div>
-          </div>
-        </div>
-        <div class="chart-box">
-          <canvas id="chartWeeklySports"></canvas>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ================= TAB 4: ZONA 2 DETALLADA (MOTOR ESTILO STRAVA) ================= -->
-  <div id="page-z2" class="tab-page">
-    
-    <!-- DIAGNÓSTICO FISIOLÓGICO: ZONA 2 -->
-    <div class="storytelling-banner" style="border-left-color: #10b981; margin-bottom: 22px;">
-      <div class="storytelling-header">
-        <div class="storytelling-title-wrap">
-          <span class="storytelling-icon">🔋</span>
-          <div>
-            <div class="storytelling-title">Fisiología Mitocondrial & Máxima Oxidación de Grasas (FatMax)</div>
-            <div class="storytelling-subtitle">Mecanismos celulares en Zona 2: aclaramiento de lactato por transportadores MCT-1 y densidad capilar</div>
-          </div>
-        </div>
-        <span class="badge" style="background:var(--pastel-mint-bg); color:var(--pastel-mint-text); border:1px solid var(--pastel-mint-border);">Base Aeróbica Élite</span>
-      </div>
-
-      <div class="storytelling-grid">
-        <div class="story-card">
-          <span class="story-card-label">1. Biogénesis Mitocondrial</span>
-          <span class="story-card-value" style="color:#10b981;">Proliferación Enzimática</span>
-          <span class="story-card-desc">El trabajo prolongado a 142-158 ppm activa la vía PGC-1α, multiplicando las mitocondrias que producen ATP de manera puramente aeróbica.</span>
-        </div>
-        <div class="story-card">
-          <span class="story-card-label">2. Transporte de Lactato MCT-1</span>
-          <span class="story-card-value" style="color:#38bdf8;">Reciclaje de Combustible</span>
-          <span class="story-card-desc">Las fibras lentas tipo I aprenden a captar el lactato generado por las fibras rápidas y usarlo como energía limpia, retrasando la acidificación muscular.</span>
-        </div>
-        <div class="story-card">
-          <span class="story-card-label">3. Preservación de Glucógeno</span>
-          <span class="story-card-value" style="color:#f59e0b;">Oxidación Lipídica Eficiente</span>
-          <span class="story-card-desc">Correr en Z2 entrena a tus músculos para ahorrar los limitados depósitos de glucógeno para el final de carreras de 10K, 21K o 42K.</span>
-        </div>
-        <div class="story-card">
-          <span class="story-card-label">4. Directiva de Ejecución</span>
-          <span class="story-card-value" style="color:#a855f7;">Regla de la Respiración Nasal</span>
-          <span class="story-card-desc">En los rodajes en Z2 debés poder mantener una conversación completa sin que se entrecorte la respiración. Si la FC supera 158 ppm, desacelerar de inmediato.</span>
-        </div>
-      </div>
-    </div>
+    <div id="page-z2" class="tab-page">
     
     <div class="strava-volume-card" style="border-color: rgba(16, 185, 129, 0.35);">
       <div class="strava-header">
@@ -3346,48 +3362,48 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ================= TAB 5: SUEÑO FISIOLÓGICO & VFC AUTONÓMICA ================= -->
-  <div id="page-recovery" class="tab-page">
-    <!-- Arquitectura de Sueño Puro Garmin -->
-    
-    <!-- DIAGNÓSTICO FISIOLÓGICO: SUEÑO & VFC -->
-    <div class="storytelling-banner" style="border-left-color: #8b5cf6; margin-bottom: 22px;">
+    <!-- DIAGNÓSTICO FISIOLÓGICO: ZONA 2 -->
+    <div class="storytelling-banner" style="border-left-color: #10b981; margin-top: 22px; margin-bottom: 20px;">
       <div class="storytelling-header">
         <div class="storytelling-title-wrap">
-          <span class="storytelling-icon">🌙</span>
+          <span class="storytelling-icon">🔋</span>
           <div>
-            <div class="storytelling-title">Equilibrio Autonómico & Arquitectura del Sueño Restaurador</div>
-            <div class="storytelling-subtitle">Modulación vagal parasimpática nocturna, sueño profundo reparador y liberación hormonal</div>
+            <div class="storytelling-title">Fisiología Mitocondrial & Máxima Oxidación de Grasas (FatMax)</div>
+            <div class="storytelling-subtitle">Mecanismos celulares en Zona 2: aclaramiento de lactato por transportadores MCT-1 y densidad capilar</div>
           </div>
         </div>
-        <span class="badge" style="background:var(--pastel-lavender-bg); color:var(--pastel-lavender-text); border:1px solid var(--pastel-lavender-border);">Sistema Nervioso Equilibrado</span>
+        <span class="badge" style="background:var(--pastel-mint-bg); color:var(--pastel-mint-text); border:1px solid var(--pastel-mint-border);">Base Aeróbica Élite</span>
       </div>
 
       <div class="storytelling-grid">
         <div class="story-card">
-          <span class="story-card-label">1. Tono Vagal Parasimpático</span>
-          <span class="story-card-value" style="color:#8b5cf6;">VFC Basal 41 ms</span>
-          <span class="story-card-desc">El nervio vago frena activamente el pulso nocturno. Una VFC equilibrada refleja un sistema nervioso preparado para absorber nuevos estímulos de entrenamiento.</span>
+          <span class="story-card-label">1. Biogénesis Mitocondrial</span>
+          <span class="story-card-value" style="color:#10b981;">Proliferación Enzimática</span>
+          <span class="story-card-desc">El trabajo prolongado a 142-158 ppm activa la vía PGC-1α, multiplicando las mitocondrias que producen ATP de manera puramente aeróbica.</span>
         </div>
         <div class="story-card">
-          <span class="story-card-label">2. Sueño Profundo (Ondas Delta)</span>
-          <span class="story-card-value" style="color:#38bdf8;">1.8h Regeneración Física</span>
-          <span class="story-card-desc">Durante esta fase la glándula pituitaria segrega la hormona de crecimiento (GH), reparando microtraumatismos musculares y reponiendo enzimas celulares.</span>
+          <span class="story-card-label">2. Transporte de Lactato MCT-1</span>
+          <span class="story-card-value" style="color:#38bdf8;">Reciclaje de Combustible</span>
+          <span class="story-card-desc">Las fibras lentas tipo I aprenden a captar el lactato generado por las fibras rápidas y usarlo como energía limpia, retrasando la acidificación muscular.</span>
         </div>
         <div class="story-card">
-          <span class="story-card-label">3. Sueño REM (Consolidación)</span>
-          <span class="story-card-value" style="color:#10b981;">1.0h Adaptación Neural</span>
-          <span class="story-card-desc">Fase clave para la consolidación de patrones motores y coordinación de zancada. Estabiliza el estado de ánimo y la resiliencia al esfuerzo.</span>
+          <span class="story-card-label">3. Preservación de Glucógeno</span>
+          <span class="story-card-value" style="color:#f59e0b;">Oxidación Lipídica Eficiente</span>
+          <span class="story-card-desc">Correr en Z2 entrena a tus músculos para ahorrar los limitados depósitos de glucógeno para el final de carreras de 10K, 21K o 42K.</span>
         </div>
         <div class="story-card">
-          <span class="story-card-label">4. Directiva de Higiene del Sueño</span>
-          <span class="story-card-value" style="color:#f59e0b;">Cena Temprana & Oscuridad</span>
-          <span class="story-card-desc">Cenar al menos 2.5h antes de acostarse para evitar que la digestión eleve el pulso basal durante el primer tercio de la noche.</span>
+          <span class="story-card-label">4. Directiva de Ejecución</span>
+          <span class="story-card-value" style="color:#a855f7;">Regla de la Respiración Nasal</span>
+          <span class="story-card-desc">En los rodajes en Z2 debés poder mantener una conversación completa sin que se entrecorte la respiración. Si la FC supera 158 ppm, desacelerar de inmediato.</span>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ================= TAB 5: SUEÑO FISIOLÓGICO & VFC AUTONÓMICA ================= -->
+    <div id="page-recovery" class="tab-page">
+    <!-- Arquitectura de Sueño Puro Garmin -->
     
     <div class="panel" style="margin-bottom: 20px;">
       <div class="panel-header">
@@ -3450,48 +3466,47 @@
         <canvas id="chartRHRTrend"></canvas>
       </div>
     </div>
-  </div>
 
-  
-  <!-- ================= TAB: CALORÍAS & GASTO ENERGÉTICO (OFICIAL GARMIN) ================= -->
-  <div id="page-calories" class="tab-page">
-    <!-- STORYTELLING METABÓLICO -->
-    <div class="storytelling-banner" style="border-left-color: #f59e0b;">
+    <!-- DIAGNÓSTICO FISIOLÓGICO: SUEÑO & VFC -->
+    <div class="storytelling-banner" style="border-left-color: #8b5cf6; margin-top: 22px; margin-bottom: 20px;">
       <div class="storytelling-header">
         <div class="storytelling-title-wrap">
-          <span class="storytelling-icon">🔥</span>
+          <span class="storytelling-icon">🌙</span>
           <div>
-            <div class="storytelling-title">Balance Metabólico & Disponibilidad Energética en Carrera</div>
-            <div class="storytelling-subtitle">Optimización del gasto diario, prevención de RED-S y combustible celular para rendir</div>
+            <div class="storytelling-title">Equilibrio Autonómico & Arquitectura del Sueño Restaurador</div>
+            <div class="storytelling-subtitle">Modulación vagal parasimpática nocturna, sueño profundo reparador y liberación hormonal</div>
           </div>
         </div>
-        <span class="badge" style="background:var(--pastel-amber-bg); color:var(--pastel-amber-text); border:1px solid var(--pastel-amber-border);">Metabolismo Activo & Saludable</span>
+        <span class="badge" style="background:var(--pastel-lavender-bg); color:var(--pastel-lavender-text); border:1px solid var(--pastel-lavender-border);">Sistema Nervioso Equilibrado</span>
       </div>
 
       <div class="storytelling-grid">
         <div class="story-card">
-          <span class="story-card-label">1. Tasa Metabólica Basal (BMR)</span>
-          <span class="story-card-value" style="color:#f59e0b;">1,750 kcal / día</span>
-          <span class="story-card-desc">Gasto de supervivencia biológica en reposo puro (función cardíaca, respiración, celular). Representa la base obligatoria innegociable de ingesta.</span>
+          <span class="story-card-label">1. Tono Vagal Parasimpático</span>
+          <span class="story-card-value" style="color:#8b5cf6;">VFC Basal 41 ms</span>
+          <span class="story-card-desc">El nervio vago frena activamente el pulso nocturno. Una VFC equilibrada refleja un sistema nervioso preparado para absorber nuevos estímulos de entrenamiento.</span>
         </div>
         <div class="story-card">
-          <span class="story-card-label">2. Gasto Activo Promedio</span>
-          <span class="story-card-value" style="color:#10b981;">479 kcal / sesión</span>
-          <span class="story-card-desc">Calorías consumidas en entrenamientos de carrera, gimnasio y caminata activa según telemetría cardíaca y potencia estimada de Firstbeat.</span>
+          <span class="story-card-label">2. Sueño Profundo (Ondas Delta)</span>
+          <span class="story-card-value" style="color:#38bdf8;">1.8h Regeneración Física</span>
+          <span class="story-card-desc">Durante esta fase la glándula pituitaria segrega la hormona de crecimiento (GH), reparando microtraumatismos musculares y reponiendo enzimas celulares.</span>
         </div>
         <div class="story-card">
-          <span class="story-card-label">3. Gasto Calórico Total (TDEE)</span>
-          <span class="story-card-value" style="color:#38bdf8;">2229 kcal / día</span>
-          <span class="story-card-desc">Demanda energética total promedio. Requiere una ingesta de soporte de 2,300 a 2,600 kcal en días de carga para evitar fatiga suprarrenal o déficit severo.</span>
+          <span class="story-card-label">3. Sueño REM (Consolidación)</span>
+          <span class="story-card-value" style="color:#10b981;">1.0h Adaptación Neural</span>
+          <span class="story-card-desc">Fase clave para la consolidación de patrones motores y coordinación de zancada. Estabiliza el estado de ánimo y la resiliencia al esfuerzo.</span>
         </div>
         <div class="story-card">
-          <span class="story-card-label">4. Directiva Nutricional Clave</span>
-          <span class="story-card-value" style="color:#a855f7;">Ventana de Recuperación 45 min</span>
-          <span class="story-card-desc">Tras rodajes exigentes o tiradas largas, reponer 1.0 - 1.2 g de hidratos por kg de peso y 25-30 g de proteína para acelerar la reposición de glucógeno.</span>
+          <span class="story-card-label">4. Directiva de Higiene del Sueño</span>
+          <span class="story-card-value" style="color:#f59e0b;">Cena Temprana & Oscuridad</span>
+          <span class="story-card-desc">Cenar al menos 2.5h antes de acostarse para evitar que la digestión eleve el pulso basal durante el primer tercio de la noche.</span>
         </div>
       </div>
     </div>
+  </div>
 
+  <!-- ================= TAB: CALORÍAS & GASTO ENERGÉTICO (OFICIAL GARMIN) ================= -->
+  <div id="page-calories" class="tab-page">
     <!-- CARDS SUPERIORES DE TELEMETRÍA CALÓRICA -->
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:20px;">
       <div class="panel" style="padding:18px 20px; border-left:4px solid #f59e0b;">
@@ -3537,6 +3552,43 @@
       <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted); margin-top:12px; font-family:'JetBrains Mono';">
         <span>● Línea naranja con nodos huecos: Gasto calórico total por día</span>
         <span>● Franja verde: Túnel de equilibrio para sostener la masa muscular</span>
+      </div>
+    </div>
+
+    <!-- STORYTELLING METABÓLICO -->
+    <div class="storytelling-banner" style="border-left-color: #f59e0b; margin-top:22px; margin-bottom:22px;">
+      <div class="storytelling-header">
+        <div class="storytelling-title-wrap">
+          <span class="storytelling-icon">🔥</span>
+          <div>
+            <div class="storytelling-title">Balance Metabólico & Disponibilidad Energética en Carrera</div>
+            <div class="storytelling-subtitle">Optimización del gasto diario, prevención de RED-S y combustible celular para rendir</div>
+          </div>
+        </div>
+        <span class="badge" style="background:var(--pastel-amber-bg); color:var(--pastel-amber-text); border:1px solid var(--pastel-amber-border);">Metabolismo Activo & Saludable</span>
+      </div>
+
+      <div class="storytelling-grid">
+        <div class="story-card">
+          <span class="story-card-label">1. Tasa Metabólica Basal (BMR)</span>
+          <span class="story-card-value" style="color:#f59e0b;">1,750 kcal / día</span>
+          <span class="story-card-desc">Gasto de supervivencia biológica en reposo puro (función cardíaca, respiración, celular). Representa la base obligatoria innegociable de ingesta.</span>
+        </div>
+        <div class="story-card">
+          <span class="story-card-label">2. Gasto Activo Promedio</span>
+          <span class="story-card-value" style="color:#10b981;">479 kcal / sesión</span>
+          <span class="story-card-desc">Calorías consumidas en entrenamientos de carrera, gimnasio y caminata activa según telemetría cardíaca y potencia estimada de Firstbeat.</span>
+        </div>
+        <div class="story-card">
+          <span class="story-card-label">3. Gasto Calórico Total (TDEE)</span>
+          <span class="story-card-value" style="color:#38bdf8;">2229 kcal / día</span>
+          <span class="story-card-desc">Demanda energética total promedio. Requiere una ingesta de soporte de 2,300 a 2,600 kcal en días de carga para evitar fatiga suprarrenal o déficit severo.</span>
+        </div>
+        <div class="story-card">
+          <span class="story-card-label">4. Directiva Nutricional Clave</span>
+          <span class="story-card-value" style="color:#a855f7;">Ventana de Recuperación 45 min</span>
+          <span class="story-card-desc">Tras rodajes exigentes o tiradas largas, reponer 1.0 - 1.2 g de hidratos por kg de peso y 25-30 g de proteína para acelerar la reposición de glucógeno.</span>
+        </div>
       </div>
     </div>
 
@@ -4018,10 +4070,21 @@
     <div id="kpi-modal-title" style="font-size:20px; font-weight:700; color:var(--text-main); margin-bottom:8px;">Título del Indicador</div>
     <div id="kpi-modal-desc" style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:14px;">Descripción</div>
 
-    <!-- Semáforo / Escala Visual Completa -->
+    <!-- Semáforo / Escala Visual Completa con Indicador Flotante Exacto -->
     <div class="spectrum-gauge">
-      <div style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:600; margin-bottom:6px;">Escala de Rangos & Estado Fisiológico</div>
-      <div class="spectrum-track" id="kpi-spectrum-track"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Escala de Rangos & Medición Fisiológica</span>
+        <span id="kpi-spectrum-val-pill" style="font-size:11px; font-weight:800; font-family:'JetBrains Mono'; color:var(--text-main); background:var(--surface-elevated); padding:2px 8px; border-radius:6px; border:1px solid var(--surface-border);">Valor actual</span>
+      </div>
+      <div class="spectrum-track-container">
+        <!-- Indicador con flecha y valor que se posiciona sobre el punto exacto -->
+        <div id="kpi-spectrum-pin" class="spectrum-needle-pin" style="left:50%;">
+          <div id="kpi-spectrum-pin-val" class="spectrum-needle-badge">--</div>
+          <div class="spectrum-needle-arrow"></div>
+          <div class="spectrum-needle-line"></div>
+        </div>
+        <div class="spectrum-track" id="kpi-spectrum-track"></div>
+      </div>
       <div class="spectrum-legend" id="kpi-spectrum-legend"></div>
       <div class="spectrum-current-marker" id="kpi-spectrum-current"></div>
     </div>
@@ -4545,13 +4608,13 @@
       p.style.display = 'none';
     });
 
-    // D. Control de KPIs superiores: visibles SOLO en módulos analíticos, nunca en Inicio
-    const kpiSection = document.getElementById('global-kpi-section');
-    if (kpiSection) {
-      kpiSection.style.display = (pageId === 'page-home') ? 'none' : 'block';
-    }
-    
-    // E. Activar botón del sidebar correspondiente
+          // D. Control de KPIs superiores: visible ÚNICAMENTE en Rendimiento Avanzado
+      const kpiSection = document.getElementById('global-kpi-section');
+      if (kpiSection) {
+        kpiSection.style.display = (pageId === 'page-advanced-perf') ? 'block' : 'none';
+      }
+      
+      // E. Activar botón del sidebar correspondiente
     const targetBtn = Array.from(document.querySelectorAll('.sidebar-nav-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(pageId));
     if (targetBtn) targetBtn.classList.add('active');
 
@@ -4883,6 +4946,9 @@
     const legendEl = document.getElementById('kpi-spectrum-legend');
     const currentEl = document.getElementById('kpi-spectrum-current');
     const doubleWrap = document.getElementById('kpi-modal-double-chart-wrap');
+    const pinEl = document.getElementById('kpi-spectrum-pin');
+    const pinValEl = document.getElementById('kpi-spectrum-pin-val');
+    const valPillEl = document.getElementById('kpi-spectrum-val-pill');
 
     if (doubleWrap) doubleWrap.style.display = 'none';
     if (kpiChart2) { kpiChart2.destroy(); kpiChart2 = null; }
@@ -4923,6 +4989,11 @@
         <span>Tu estado actual: <strong>${TRAINING_STATUS_INFO.status_title}</strong> (Carga aguda: ${TRAINING_STATUS_INFO.acute_load} pts)</span>
         <span style="color:#10b981; font-weight:700;">● ${TRAINING_STATUS_INFO.feedback_phrase}</span>
       `;
+      if (pinEl && pinValEl) {
+        pinEl.style.left = '51%';
+        pinValEl.textContent = 'Productivo (7)';
+      }
+      if (valPillEl) valPillEl.textContent = 'Productivo';
 
       chartLabels = TRAINING_STATUS_INFO.history.map(h => h.date_arg);
       chartData = TRAINING_STATUS_INFO.history.map(h => h.status_code);
@@ -4952,6 +5023,11 @@
         <span>Nivel actual: <strong style="color:#0284c7; font-size:15px;">41 / 100</strong></span>
         <span style="color:#0284c7; font-weight:700;">● Recarga: +53 pts • Gasto: -28 pts</span>
       `;
+      if (pinEl && pinValEl) {
+        pinEl.style.left = '41%';
+        pinValEl.textContent = '41 pts';
+      }
+      if (valPillEl) valPillEl.textContent = 'Hoy: 41/100';
 
       kpiThemeBg = 'var(--pastel-blue-bg)';
       kpiThemeText = 'var(--pastel-blue-text)';
@@ -5052,6 +5128,11 @@
         <span>Tu valor actual: <strong>${USER_VO2} ml/kg/min</strong></span>
         <span style="color:#38bdf8; font-weight:700;">● Rango: Superior (Percentil > 90)</span>
       `;
+      if (pinEl && pinValEl) {
+        pinEl.style.left = '88%';
+        pinValEl.textContent = '53.4 ml/kg';
+      }
+      if (valPillEl) valPillEl.textContent = 'Actual: 53.4 ml/kg/min';
 
       chartLabels = PMC_DATA.slice(-30).map(d => d.date_arg.slice(0, 5));
       chartData = PMC_DATA.slice(-30).map(() => USER_VO2);
@@ -5081,6 +5162,11 @@
         <span>Tu valor actual: <strong>${ENDURANCE_INFO.score} puntos</strong></span>
         <span style="color:#10b981; font-weight:700;">● Nivel: ${ENDURANCE_INFO.classification}</span>
       `;
+      if (pinEl && pinValEl) {
+        pinEl.style.left = '62%';
+        pinValEl.textContent = '4308 pts';
+      }
+      if (valPillEl) valPillEl.textContent = 'Actual: 4308 pts (Avanzado)';
       
       chartLabels = PMC_DATA.slice(-30).map(d => d.date_arg.slice(0, 5));
       chartData = PMC_DATA.slice(-30).map(d => d.endurance_score);
@@ -5111,6 +5197,11 @@
         <span>Tu ratio actual: <strong>${currentAcwr}</strong></span>
         <span style="color:${currentAcwr <= 1.30 ? '#10b981' : '#f59e0b'}; font-weight:700;">● ${currentAcwr <= 1.30 ? 'Dentro del Sweet Spot' : 'Zona de Sobrecarga'}</span>
       `;
+      if (pinEl && pinValEl) {
+        pinEl.style.left = '43%';
+        pinValEl.textContent = '1.19 ACWR';
+      }
+      if (valPillEl) valPillEl.textContent = 'Actual: 1.19 (Sweet Spot)';
       
       chartLabels = PMC_DATA.slice(-30).map(d => d.date_arg.slice(0, 5));
       chartData = PMC_DATA.slice(-30).map(d => d.acwr);
@@ -5140,6 +5231,11 @@
         <span>Horas en las últimas 4 semanas: <strong>${ENDURANCE_INFO.z2_hours_4w} h</strong></span>
         <span style="color:#10b981; font-weight:700;">● Rango Óptimo (79% de polarización)</span>
       `;
+      if (pinEl && pinValEl) {
+        pinEl.style.left = '38%';
+        pinValEl.textContent = '6.2 h';
+      }
+      if (valPillEl) valPillEl.textContent = 'Acumulado 4 Sem: 6.2 h';
       
       const slice12 = getCurrent12WeeksSlice();
       chartLabels = slice12.map(w => w.label);
@@ -5173,6 +5269,11 @@
         <span>Valor actual: <strong style="color:#f59e0b; font-size:15px;">41 ms</strong> (Aguja en zona de Límite Inferior)</span>
         <span style="color:#10b981; font-weight:700;">● Túnel Basal Óptimo: 43 - 56 ms</span>
       `;
+      if (pinEl && pinValEl) {
+        pinEl.style.left = '39%';
+        pinValEl.textContent = '41 ms';
+      }
+      if (valPillEl) valPillEl.textContent = 'Actual: 41 ms (Equilibrado)';
       
       const vfcLabels = [
         '12 Sep', '13', '14', '15', '16', '17', '18',
@@ -5302,6 +5403,11 @@
         <span>Score de Sueño: <strong>${lastSleep}/100</strong> (${RECOVERY_DATA[RECOVERY_DATA.length - 1].sleep_hours || 6.8}h)</span>
         <span style="color:${lastSleep >= 80 ? '#10b981' : '#f59e0b'}; font-weight:700;">● ${lastSleep >= 80 ? 'Descanso Óptimo' : 'Descanso Aceptable'}</span>
       `;
+      if (pinEl && pinValEl) {
+        pinEl.style.left = '49%';
+        pinValEl.textContent = '79 pts';
+      }
+      if (valPillEl) valPillEl.textContent = 'Score: 79 pts (Bueno)';
       
       chartLabels = RECOVERY_DATA.slice(-14).map(d => d.date_arg.slice(0, 5));
       chartData = RECOVERY_DATA.slice(-14).map(d => d.sleep_score || 72);
@@ -5387,7 +5493,7 @@
         <td style="font-family:'JetBrains Mono';">${a.avg_hr > 0 ? a.avg_hr + ' / ' + a.max_hr + ' ppm' : '-'}</td>
         <td style="font-family:'JetBrains Mono';">${a.load}</td>
         <td>${z2Tag}</td>
-        <td><button class="btn-action" style="padding:5px 10px; font-size:11.5px; display:inline-flex; align-items:center; gap:6px; font-weight:600; border-radius:8px; cursor:pointer;" onclick="event.stopPropagation(); openActivityModal(${index})" title="Ver telemetría, ritmo, frecuencia y zonas cardíacas"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Telemetría ↗</button></td>
+        <td><button class="btn-action" style="padding:5px 8px; font-size:12px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer;" onclick="event.stopPropagation(); openActivityModal(${index})" title="Ver telemetría, ritmo, frecuencia y zonas cardíacas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button></td>
       `;
       tbody.appendChild(tr);
     });
@@ -6259,7 +6365,7 @@
     const targetCard = document.getElementById(`pred-card-${distKey}`);
     if (targetCard) targetCard.classList.add('active');
 
-    const distTitles = { '5k': '5 Kilómetros', '10k': '10 Kilómetros', '21k': 'Medio Maratón (21.1k)', '42k': 'Maratón (42.2k)' };
+    const distTitles = { '5k': '5K', '10k': '10K', '21k': 'Medio Maratón (21.1k)', '42k': 'Maratón (42.2k)' };
     const titleEl = document.getElementById('pred-chart-title');
     if (titleEl) titleEl.textContent = `Evolución de Predicción: ${distTitles[distKey]}`;
 
