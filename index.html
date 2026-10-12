@@ -2261,7 +2261,7 @@
             <span class="kpi-label">Endurance</span>
             <span class="kpi-badge" style="background:var(--pastel-mint-bg); color:var(--pastel-mint-text); border:1px solid var(--pastel-mint-border);">Avanzado</span>
           </div>
-          <div class="kpi-value" style="color:var(--pastel-mint-text);">4308</div>
+          <div class="kpi-value" style="color:var(--pastel-mint-text);">4315</div>
           <div class="kpi-subtext">
             <span>Resistencia</span>
             <span class="kpi-hint">Fórmula ↗</span>
@@ -3145,6 +3145,40 @@
         </div>
       </div>
 
+      <!-- Barra de Escala de 6 Niveles Oficial Garmin Endurance Score -->
+      <div style="background:var(--bg-subtle); border:1px solid var(--surface-border); border-radius:14px; padding:14px 18px; margin-bottom:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim);">Escala Oficial Firstbeat:</span>
+            <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; font-weight:700; border:1px solid rgba(16,185,129,0.3); font-size:11px; padding:2px 8px;">Nivel Actual: Avanzado (4315 pts)</span>
+          </div>
+          <div style="font-size:11.5px; color:var(--text-muted); font-family:'JetBrains Mono';">
+            Próximo nivel (Élite): <strong style="color:var(--accent-primary);">5500 pts</strong> (faltan <strong style="color:#f59e0b;">1185 pts</strong>)
+          </div>
+        </div>
+
+        <!-- Barra Visual Segmentada de los 6 Niveles -->
+        <div style="position:relative; margin:10px 0 6px 0;">
+          <div style="display:grid; grid-template-columns:repeat(6, 1fr); gap:4px; height:10px; border-radius:6px; overflow:hidden;">
+            <div style="background:#64748b;" title="Iniciación: < 4500 (Base recreativa)"></div>
+            <div style="background:#38bdf8;" title="Intermedio: 4500 - 5200"></div>
+            <div style="background:#3b82f6;" title="Entrenado: 5200 - 6000"></div>
+            <div style="background:#10b981;" title="Avanzado: 6000 - 7000 (Tu zona)"></div>
+            <div style="background:#f59e0b;" title="Experto: 7000 - 8000"></div>
+            <div style="background:#8b5cf6;" title="Élite: > 8000"></div>
+          </div>
+          <!-- Marcador actual de posición (Cursor en 4315 pts) -->
+          <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:10px; font-family:'JetBrains Mono'; color:var(--text-dim);">
+            <span>Iniciación (&lt;4500)</span>
+            <span>Intermedio (4500)</span>
+            <span>Entrenado (5200)</span>
+            <span style="color:#10b981; font-weight:700;">● Avanzado (6000)</span>
+            <span>Experto (7000)</span>
+            <span>Élite (8000+)</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Métricas KPI de la Semana / Día Seleccionado -->
       <div class="strava-stats-row">
         <div class="strava-stat-col">
@@ -3185,7 +3219,7 @@
       <div class="panel">
         <div class="panel-header">
           <div>
-            <div class="panel-title">Estructura del Endurance (4308 pts)</div>
+            <div class="panel-title">Estructura del Endurance (4315 pts)</div>
             <div class="panel-subtitle">Descomposición factorial del modelo de resistencia</div>
           </div>
         </div>
@@ -3213,7 +3247,7 @@
           </div>
           <div>
             <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
-              <span>Horas Específicas en Zona 2 (6.2 h)</span>
+              <span>Horas Específicas en Zona 2 (7.1 h)</span>
               <strong>156 pts (8%)</strong>
             </div>
             <div style="height:8px; background:var(--surface-elevated); border-radius:4px; overflow:hidden;">
@@ -3250,7 +3284,7 @@
             <div class="storytelling-subtitle">Relación matemática entre Fitness acumulado (CTL), Fatiga reciente (ATL) y Forma óptima (TSB)</div>
           </div>
         </div>
-        <span class="badge" style="background:var(--pastel-blue-bg); color:var(--pastel-blue-text); border:1px solid var(--pastel-blue-border);">Puntuación: 4308 pts</span>
+        <span class="badge" style="background:var(--pastel-blue-bg); color:var(--pastel-blue-text); border:1px solid var(--pastel-blue-border);">Puntuación: 4315 pts</span>
       </div>
 
       <div class="storytelling-grid">
@@ -7715,6 +7749,11 @@
     const latestP = dataSlice[dataSlice.length - 1];
     if (latestP) {
       const elScore = document.getElementById('endurance-stat-score');
+      const curScore = latestP.endurance_score || 4315;
+      const titleP = document.querySelector('#page-endurance .panel-title');
+      if (titleP) titleP.textContent = 'Estructura del Endurance (' + curScore + ' pts)';
+      const badgeP = document.querySelector('#page-endurance .storytelling-header .badge');
+      if (badgeP) badgeP.textContent = 'Puntuación: ' + curScore + ' pts';
       if (elScore) elScore.textContent = (latestP.endurance_score || 4308) + ' pts';
       const elCtl = document.getElementById('endurance-stat-ctl');
       if (elCtl) elCtl.textContent = latestP.ctl + ' pts';
