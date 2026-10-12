@@ -2704,7 +2704,7 @@
                 <span style="font-size:11px; color:#f59e0b;">↗ Ver Historial</span>
               </div>
               <div style="font-size:24px; font-weight:800; color:#f59e0b; font-family:'JetBrains Mono'; margin:4px 0;">603 <span style="font-size:13px; font-weight:normal; color:var(--text-muted);">pts</span></div>
-              <div style="font-size:12px; color:var(--text-muted);">Túnel recomendado: <strong>404 a 758 pts</strong>. Estás en zona productiva.</div>
+              <div style="font-size:12px; color:var(--text-muted);">Túnel recomendado: <strong>438 a 821 pts</strong>. Estás en zona productiva.</div>
             </div>
 
             <!-- 4. Diagnóstico Firstbeat Bloque Interactivo -->
@@ -2745,8 +2745,8 @@
               <!-- 1. Anaeróbico -->
               <div>
                 <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:8px; flex-wrap:wrap; gap:4px;">
-                  <span><strong>Anaeróbico (Sprints / Z5):</strong> <strong style="color:#a855f7; font-family:'JetBrains Mono'; font-size:13.5px;">501 pts</strong></span>
-                  <span style="color:#a855f7; font-weight:700; font-family:'JetBrains Mono';">Óptimo: 133 a 400 pts (Sobrecarga estimulante)</span>
+                  <span><strong>Anaeróbico (Sprints / Z5):</strong> <strong id="focus-anaerobic-val" style="color:#a855f7; font-family:'JetBrains Mono'; font-size:13.5px;">515 pts</strong></span>
+                  <span style="color:#a855f7; font-weight:700; font-family:'JetBrains Mono';">Óptimo: 133 a 400 pts (Sobrecarga estimulante • Por encima del objetivo)</span>
                 </div>
                 <!-- Contenedor relativo -->
                 <div style="height:26px; background:var(--bg-subtle); border-radius:14px; position:relative; overflow:hidden; border:1px solid var(--surface-border);">
@@ -2767,7 +2767,7 @@
               <!-- 2. Aeróbico Alto -->
               <div>
                 <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:8px; flex-wrap:wrap; gap:4px;">
-                  <span><strong>Aeróbico Alto (Tempo / Z3-Z4):</strong> <strong style="color:#f97316; font-family:'JetBrains Mono'; font-size:13.5px;">661 pts</strong></span>
+                  <span><strong>Aeróbico Alto (Tempo / Z3-Z4):</strong> <strong id="focus-high-val" style="color:#f97316; font-family:'JetBrains Mono'; font-size:13.5px;">661 pts</strong></span>
                   <span style="color:#f97316; font-weight:700; font-family:'JetBrains Mono';">Óptimo: 416 a 817 pts (En rango óptimo)</span>
                 </div>
                 <div style="height:26px; background:var(--bg-subtle); border-radius:14px; position:relative; overflow:hidden; border:1px solid var(--surface-border);">
@@ -2787,14 +2787,14 @@
               <!-- 3. Aeróbico Bajo -->
               <div>
                 <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:8px; flex-wrap:wrap; gap:4px;">
-                  <span><strong>Aeróbico Bajo (Base / Zona 2):</strong> <strong style="color:#14b8a6; font-family:'JetBrains Mono'; font-size:13.5px;">871 pts</strong></span>
-                  <span style="color:#14b8a6; font-weight:700; font-family:'JetBrains Mono';">Óptimo: 317 a 718 pts (En rango óptimo)</span>
+                  <span><strong>Aeróbico Bajo (Base / Zona 2):</strong> <strong id="focus-low-val" style="color:#14b8a6; font-family:'JetBrains Mono'; font-size:13.5px;">871 pts</strong></span>
+                  <span style="color:#14b8a6; font-weight:700; font-family:'JetBrains Mono';">Óptimo: 317 a 718 pts (Por encima del objetivo • Base aeróbica sólida)</span>
                 </div>
                 <div style="height:26px; background:var(--bg-subtle); border-radius:14px; position:relative; overflow:hidden; border:1px solid var(--surface-border);">
                   <!-- Intervalo Óptimo: div absoluto con borde punteado -->
                   <div style="position:absolute; top:2px; bottom:2px; left:35.2%; width:44.6%; background:transparent; border:2.5px dashed var(--dashed-optimal-border); border-radius:12px; z-index:1;" title="Intervalo Óptimo (317 - 718 pts)"></div>
                   <!-- Carga Real: div absoluto con fondo sólido bg-teal-400 (#14b8a6) -->
-                  <div style="position:absolute; top:3px; bottom:3px; left:3px; width:calc(72.6% - 6px); background:#14b8a6; border-radius:10px; z-index:2; box-shadow:0 1px 4px rgba(20,184,166,0.35);"></div>
+                  <div style="position:absolute; top:3px; bottom:3px; left:3px; width:calc(96.8% - 6px); background:#14b8a6; border-radius:10px; z-index:2; box-shadow:0 1px 4px rgba(20,184,166,0.35);"></div>
                 </div>
                 <div style="position:relative; height:18px; font-size:11px; color:var(--text-dim); margin-top:4px; font-family:'JetBrains Mono';">
                   <span style="position:absolute; left:0;">0</span>
@@ -2811,7 +2811,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
               <div>
                 <div style="font-size:16px; font-weight:800; color:var(--text-main);">Carga Aguda Diaria & Túnel Óptimo Garmin (Firstbeat)</div>
-                <div style="font-size:12px; color:var(--text-muted);">Curva de fatiga aguda real (línea blanca con nodos) sobre el túnel verde de asimilación segura (404 a 758 pts)</div>
+                <div style="font-size:12px; color:var(--text-muted);">Curva de fatiga aguda real (línea blanca con nodos) sobre el túnel verde de asimilación segura (438 a 821 pts)</div>
               </div>
               <div class="timeline-segmented-control" id="control-timeline-acute">
                 <button class="segmented-pill-btn" onclick="filterAcuteChart('today')">Hoy</button>
@@ -2824,11 +2824,11 @@
             <div style="display:flex; gap:20px; font-size:12px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
               <span style="display:inline-flex; align-items:center; gap:6px;">
                 <span style="width:12px; height:12px; border-radius:50%; background:#ffffff; border:2px solid #0f172a; display:inline-block;"></span>
-                <strong>Carga Aguda Diaria (7d):</strong> <span id="acute-legend-val" style="font-family:'JetBrains Mono'; font-weight:700;">603 pts</span>
+                <strong>Carga Aguda Diaria (7d):</strong> <span id="acute-legend-val" style="font-family:'JetBrains Mono'; font-weight:700;">682 pts</span>
               </span>
               <span style="display:inline-flex; align-items:center; gap:6px;">
                 <span style="width:16px; height:10px; border-radius:3px; background:rgba(16, 185, 129, 0.4); border:1px solid #10b981; display:inline-block;"></span>
-                <span style="color:#047857; font-weight:700;">Rango Óptimo:</span> <span style="font-family:'JetBrains Mono';">404 - 758 pts</span>
+                <span style="color:#047857; font-weight:700;">Rango Óptimo:</span> <span style="font-family:'JetBrains Mono';">438 - 821 pts</span>
               </span>
               <span class="badge" style="background:var(--pastel-mint-bg); color:var(--pastel-mint-text); border:1px solid var(--pastel-mint-border);">Estado: Productivo</span>
             </div>
@@ -3138,9 +3138,7 @@
         </div>
 
         <!-- Selector de Métrica a la Derecha -->
-        <div class="strava-toggle-group">
-          <button class="strava-toggle-btn active" id="btn-endurance-score" style="cursor:default; pointer-events:none;">Puntuación de Resistencia</button>
-        </div>
+        
       </div>
 
       <!-- Barra de Escala de 6 Niveles Oficial Garmin con Cursor Calibrado -->
@@ -3175,13 +3173,31 @@
           </div>
 
           <!-- Etiquetas de Escala Inferiores -->
-          <div style="display:grid; grid-template-columns:repeat(6, 1fr); gap:4px; margin-top:8px; font-size:10px; font-family:'JetBrains Mono'; color:var(--text-dim); text-align:center;">
-            <span style="color:#0284c7; font-weight:700;">Iniciación<br>&lt;4500</span>
-            <span>Intermedio<br>4500</span>
-            <span>Entrenado<br>5200</span>
-            <span>Avanzado<br>6000</span>
-            <span>Experto<br>7000</span>
-            <span>Élite<br>8000+</span>
+          <div style="display:grid; grid-template-columns:repeat(6, 1fr); gap:4px; margin-top:10px; font-size:10.5px; font-family:'JetBrains Mono'; text-align:center;">
+            <div style="background:rgba(100,116,139,0.12); padding:4px 2px; border-radius:6px; border:1px solid rgba(100,116,139,0.25);">
+              <div style="color:#0284c7; font-weight:800;">INICIACIÓN</div>
+              <div style="color:var(--text-muted); font-size:9.5px; margin-top:2px;">0 a 4499</div>
+            </div>
+            <div style="background:rgba(56,189,248,0.1); padding:4px 2px; border-radius:6px; border:1px solid rgba(56,189,248,0.25);">
+              <div style="color:#0284c7; font-weight:700;">INTERMEDIO</div>
+              <div style="color:var(--text-muted); font-size:9.5px; margin-top:2px;">4500 a 5199</div>
+            </div>
+            <div style="background:rgba(59,130,246,0.1); padding:4px 2px; border-radius:6px; border:1px solid rgba(59,130,246,0.25);">
+              <div style="color:#3b82f6; font-weight:700;">ENTRENADO</div>
+              <div style="color:var(--text-muted); font-size:9.5px; margin-top:2px;">5200 a 5999</div>
+            </div>
+            <div style="background:rgba(16,185,129,0.1); padding:4px 2px; border-radius:6px; border:1px solid rgba(16,185,129,0.25);">
+              <div style="color:#10b981; font-weight:700;">AVANZADO</div>
+              <div style="color:var(--text-muted); font-size:9.5px; margin-top:2px;">6000 a 6999</div>
+            </div>
+            <div style="background:rgba(245,158,11,0.1); padding:4px 2px; border-radius:6px; border:1px solid rgba(245,158,11,0.25);">
+              <div style="color:#f59e0b; font-weight:700;">EXPERTO</div>
+              <div style="color:var(--text-muted); font-size:9.5px; margin-top:2px;">7000 a 7999</div>
+            </div>
+            <div style="background:rgba(139,92,246,0.1); padding:4px 2px; border-radius:6px; border:1px solid rgba(139,92,246,0.25);">
+              <div style="color:#8b5cf6; font-weight:700;">ÉLITE</div>
+              <div style="color:var(--text-muted); font-size:9.5px; margin-top:2px;">8000+</div>
+            </div>
           </div>
         </div>
       </div>
@@ -7479,6 +7495,15 @@
       
       // Actualizar gráficos de Carga Aguda y PMC si están cargados
       if (charts.acuteTunnel) charts.acuteTunnel.update();
+      // Actualizar Foco de Carga Firstbeat (4 semanas)
+      const elLow = document.getElementById('focus-low-val');
+      if (elLow) elLow.textContent = '871 pts';
+      const elHigh = document.getElementById('focus-high-val');
+      if (elHigh) elHigh.textContent = '661 pts';
+      const elAna = document.getElementById('focus-anaerobic-val');
+      if (elAna) elAna.textContent = '515 pts';
+      const elAcuteLegend = document.getElementById('acute-legend-val');
+      if (elAcuteLegend) elAcuteLegend.textContent = '682 pts';
       if (charts.pmc) charts.pmc.update();
       if (typeof initEnduranceVolumeChart === "function") initEnduranceVolumeChart();
 
