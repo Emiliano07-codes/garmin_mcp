@@ -3119,6 +3119,67 @@
       <!-- ================= TAB 1: ENDURANCE & CARGA ================= -->
         <div id="page-endurance" class="tab-page">
     
+    <!-- Tarjeta y Gráfico de Evolución del Endurance Score (Estilo Strava / Volumen Semanal) -->
+    <div class="strava-volume-card" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:18px; padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-card);">
+      <div class="strava-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:14px;">
+        <div class="strava-title" style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:24px;">⚡</span>
+          <span id="endurance-chart-title" style="font-size:20px; font-weight:800; letter-spacing:-0.4px; color:var(--text-main);">Evolución de Puntuación de Resistencia</span>
+        </div>
+        
+        <!-- Selector Temporal Rápido de Píldoras -->
+        <div class="timeline-segmented-control" id="control-timeline-endurance">
+          <button class="segmented-pill-btn" onclick="filterEndurancePeriod('today')">Hoy</button>
+          <button class="segmented-pill-btn" onclick="filterEndurancePeriod('1M')">1M</button>
+          <button class="segmented-pill-btn active" onclick="filterEndurancePeriod('3M')">3M</button>
+          <button class="segmented-pill-btn" onclick="filterEndurancePeriod('6M')">6M</button>
+          <button class="segmented-pill-btn" onclick="filterEndurancePeriod('1Y')">1A</button>
+          <button class="segmented-pill-btn" onclick="filterEndurancePeriod('all')">Todo</button>
+        </div>
+
+        <!-- Selector de Métrica a la Derecha -->
+        <div class="strava-toggle-group">
+          <button class="strava-toggle-btn active" id="btn-endurance-score" onclick="switchEnduranceMode('score')">Endurance Score</button>
+          <button class="strava-toggle-btn" id="btn-endurance-ctl" onclick="switchEnduranceMode('ctl')">Fitness Base (CTL)</button>
+          <button class="strava-toggle-btn" id="btn-endurance-z2" onclick="switchEnduranceMode('z2')">Volumen Z2 (h)</button>
+        </div>
+      </div>
+
+      <!-- Métricas KPI de la Semana / Día Seleccionado -->
+      <div class="strava-stats-row">
+        <div class="strava-stat-col">
+          <span class="strava-stat-label">Endurance Score</span>
+          <span class="strava-stat-value" id="endurance-stat-score" style="color:var(--accent-primary);">4308 pts</span>
+        </div>
+        <div class="strava-stat-col">
+          <span class="strava-stat-label">Clasificación</span>
+          <span class="strava-stat-value" id="endurance-stat-class" style="color:#10b981;">Avanzado</span>
+        </div>
+        <div class="strava-stat-col">
+          <span class="strava-stat-label">Fitness Base (CTL)</span>
+          <span class="strava-stat-value" id="endurance-stat-ctl">547 pts</span>
+        </div>
+        <div class="strava-stat-col" style="border-left: 1px solid var(--surface-border); padding-left: 20px;">
+          <span class="strava-stat-label" id="endurance-stat-kpi4-label">Acumulado Z2</span>
+          <span class="strava-stat-value" id="endurance-stat-z2" style="color:#10b981;">18.3 h</span>
+        </div>
+      </div>
+
+      <div style="font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>Ventana de Período: <span id="endurance-window-dates" style="color:var(--text-main); font-family:'JetBrains Mono'; font-weight:700;">Últimos 3 Meses</span></div>
+        <div style="color:var(--text-muted); font-size:11.5px;">● Toca o pasa el cursor sobre los nodos para inspeccionar la puntuación de cada fecha</div>
+      </div>
+
+      <div style="height: 260px; width: 100%; position: relative;">
+        <canvas id="chartEnduranceVolume"></canvas>
+      </div>
+
+      <div class="strava-footer-text" style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono', monospace;">
+        <span>● Modelo oficial Firstbeat: Capacidad de sostener esfuerzos prolongados</span>
+        <span>Base histórica continua sincronizada</span>
+      </div>
+    </div>
+
     <div class="layout-2">
       <!-- Estructura de Endurance Score -->
       <div class="panel">
@@ -4720,6 +4781,7 @@
     setTimeout(() => {
       if (charts.acuteTunnel) initGarminAcuteTunnelChart();
       if (charts.calories) initCaloriesChart();
+    initEnduranceVolumeChart();
       if (charts.strava) updateStravaChartWindow();
       if (charts.z2) updateStravaZ2ChartWindow();
       if (charts.predEvol) initRacePredictionEvolutionChart();
@@ -7377,6 +7439,7 @@
       // Actualizar gráficos de Carga Aguda y PMC si están cargados
       if (charts.acuteTunnel) charts.acuteTunnel.update();
       if (charts.pmc) charts.pmc.update();
+      if (typeof initEnduranceVolumeChart === "function") initEnduranceVolumeChart();
 
       // Coach Storytelling
       const coachP = document.querySelector('#page-advanced-perf p');
@@ -7508,6 +7571,157 @@
   document.addEventListener('DOMContentLoaded', () => {
     executeStrictUniversalUpdate();
   });
+
+
+
+  // ==========================================
+  // GRÁFICO DINÁMICO DE ENDURANCE (ESTILO STRAVA)
+  // ==========================================
+  let currentEndurancePeriod = '3M';
+  let currentEnduranceMode = 'score';
+
+  function getEnduranceDataSlice() {
+    if (typeof PMC_DATA === 'undefined' || PMC_DATA.length === 0) return [];
+    let count = 84; // 3M
+    if (currentEndurancePeriod === 'today') count = 7;
+    else if (currentEndurancePeriod === '1M') count = 28;
+    else if (currentEndurancePeriod === '3M') count = 84;
+    else if (currentEndurancePeriod === '6M') count = 180;
+    else if (currentEndurancePeriod === '1Y') count = 365;
+    else if (currentEndurancePeriod === 'all') count = PMC_DATA.length;
+
+    const start = Math.max(0, PMC_DATA.length - count);
+    return PMC_DATA.slice(start);
+  }
+
+  function filterEndurancePeriod(period) {
+    currentEndurancePeriod = period;
+    const ctrl = document.getElementById('control-timeline-endurance');
+    if (ctrl) {
+      ctrl.querySelectorAll('.segmented-pill-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(ctrl.querySelectorAll('.segmented-pill-btn')).find(b => {
+        const txt = b.textContent.trim().toLowerCase();
+        if (period === '1Y' && txt === '1a') return true;
+        return txt === period.toLowerCase();
+      });
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+    const datesEl = document.getElementById('endurance-window-dates');
+    if (datesEl) {
+      const labelsMap = { 'today': 'Últimos 7 Días', '1M': 'Último Mes (4 semanas)', '3M': 'Últimos 3 Meses', '6M': 'Últimos 6 Meses', '1Y': 'Último Año', 'all': 'Todo el Historial' };
+      datesEl.textContent = labelsMap[period] || period;
+    }
+    initEnduranceVolumeChart();
+  }
+
+  function switchEnduranceMode(mode) {
+    currentEnduranceMode = mode;
+    ['btn-endurance-score', 'btn-endurance-ctl', 'btn-endurance-z2'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.classList.remove('active');
+    });
+    const targetBtn = document.getElementById('btn-endurance-' + mode);
+    if (targetBtn) targetBtn.classList.add('active');
+    initEnduranceVolumeChart();
+  }
+
+  function initEnduranceVolumeChart() {
+    const canvas = document.getElementById('chartEnduranceVolume');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dataSlice = getEnduranceDataSlice();
+    if (dataSlice.length === 0) return;
+
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const primaryColor = currentEnduranceMode === 'score' ? '#0284c7' : (currentEnduranceMode === 'ctl' ? '#f59e0b' : '#10b981');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 240);
+    gradient.addColorStop(0, currentEnduranceMode === 'score' ? 'rgba(2, 132, 199, 0.40)' : (currentEnduranceMode === 'ctl' ? 'rgba(245, 158, 11, 0.40)' : 'rgba(16, 185, 129, 0.40)'));
+    gradient.addColorStop(0.7, 'rgba(2, 132, 199, 0.08)');
+    gradient.addColorStop(1, 'rgba(2, 132, 199, 0.00)');
+
+    const labels = dataSlice.map(d => d.date_arg ? d.date_arg.slice(0, 5) : d.iso_date.slice(5));
+    let dataVals = [];
+    let metricLabel = 'Endurance Score';
+
+    if (currentEnduranceMode === 'score') {
+      dataVals = dataSlice.map(d => d.endurance_score || 4308);
+      metricLabel = 'Puntuación de Resistencia';
+    } else if (currentEnduranceMode === 'ctl') {
+      dataVals = dataSlice.map(d => d.ctl);
+      metricLabel = 'Fitness Base (CTL)';
+    } else {
+      dataVals = dataSlice.map(d => d.z2_cum || (d.day_z2 ? d.day_z2 : 0));
+      metricLabel = 'Acumulado Z2 (h)';
+    }
+
+    const pointRadii = dataSlice.map((d, idx) => idx === dataSlice.length - 1 ? 6 : (dataSlice.length > 50 ? 0 : 3));
+    const pointBg = dataSlice.map((d, idx) => idx === dataSlice.length - 1 ? primaryColor : (isDark ? '#151d2f' : '#ffffff'));
+
+    if (charts.enduranceVolume) {
+      try { charts.enduranceVolume.destroy(); } catch(e){}
+    }
+
+    charts.enduranceVolume = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: metricLabel,
+          data: dataVals,
+          borderColor: primaryColor,
+          borderWidth: 2.5,
+          backgroundColor: gradient,
+          fill: true,
+          tension: 0.3,
+          pointRadius: pointRadii,
+          pointHoverRadius: 7,
+          pointBackgroundColor: pointBg,
+          pointBorderColor: primaryColor,
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (c) => metricLabel + ': ' + c.raw + (currentEnduranceMode === 'z2' ? ' h' : ' pts')
+            }
+          }
+        },
+        scales: {
+          y: {
+            grid: { color: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)' },
+            ticks: {
+              color: isDark ? '#94a3b8' : '#64748b',
+              font: { family: "'JetBrains Mono'" }
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: isDark ? '#94a3b8' : '#64748b',
+              maxTicksLimit: 12
+            }
+          }
+        }
+      }
+    });
+
+    // Actualizar tarjetas de KPI con el último punto del dataset
+    const latestP = dataSlice[dataSlice.length - 1];
+    if (latestP) {
+      const elScore = document.getElementById('endurance-stat-score');
+      if (elScore) elScore.textContent = (latestP.endurance_score || 4308) + ' pts';
+      const elCtl = document.getElementById('endurance-stat-ctl');
+      if (elCtl) elCtl.textContent = latestP.ctl + ' pts';
+      const elZ2 = document.getElementById('endurance-stat-z2');
+      if (elZ2) elZ2.textContent = (latestP.z2_cum || 18.3) + ' h';
+    }
+  }
 
 </script>
 
