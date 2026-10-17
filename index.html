@@ -2442,19 +2442,19 @@
                 <!-- Segmento 4: Azul extremo derecho (> 56 ms) -->
                 <path d="M 86.71 40.16 A 38 38 0 0 1 76.87 76.87" fill="none" stroke="#3b82f6" stroke-width="10" stroke-linecap="round"/>
                 
-                <!-- Indicador / Marcador: Punto verde con borde blanco posicionado exactamente en 41ms (inicio zona verde) -->
-                <circle cx="21.76" cy="24.57" r="5.5" fill="#10b981" stroke="#ffffff" stroke-width="2.5" style="filter:drop-shadow(0 2px 5px rgba(0,0,0,0.4));"/>
+                <!-- Indicador / Marcador: Punto verde con borde blanco posicionado dinámicamente en la media de 7 días (49ms) -->
+                <circle cx="51.14" cy="12.02" r="5.5" fill="#10b981" stroke="#ffffff" stroke-width="2.5" style="filter:drop-shadow(0 2px 5px rgba(0,0,0,0.4)); transition:all 0.35s ease;"/>
               </svg>
               <!-- Texto central -->
               <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;">
-                <span style="font-size:32px; font-weight:800; color:var(--text-main); font-family:'Plus Jakarta Sans', sans-serif; line-height:1;">47<span style="font-size:16px; font-weight:600; color:var(--text-muted);">ms</span></span>
+                <span style="font-size:32px; font-weight:800; color:var(--text-main); font-family:'Plus Jakarta Sans', sans-serif; line-height:1;">49<span style="font-size:16px; font-weight:600; color:var(--text-muted);">ms</span></span>
                 <span style="font-size:12px; color:var(--text-muted); font-weight:500; margin-top:2px;">Media de 7 días</span>
                 <span style="font-size:13px; font-weight:800; color:#10b981; margin-top:4px;">Equilibrado</span>
               </div>
             </div>
             
             <div style="width:100%; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--text-muted); border-top:1px solid var(--surface-border); padding-top:10px; margin-top:4px;">
-              <span>Nocturna: <strong style="color:var(--text-main);">61 ms</strong></span>
+              <span>Nocturna: <strong style="color:var(--text-main);">49 ms</strong></span>
               <span>Túnel Basal: <strong style="color:#10b981;">43 - 56 ms</strong></span>
             </div>
           </div>
@@ -8873,17 +8873,68 @@
           bbFootSpans[1].innerHTML = `Gasto: <strong style="color:#f59e0b;">-${curBb.drained} pts</strong>`;
         }
 
-        // 1C. Tarjeta VFC (Variabilidad)
+        // 1C. Tarjeta VFC (Variabilidad) - Indicador circular dinámico sobre el arco de 270°
         const hrvCard = wellnessCards[2];
+        const hrvVal = Number(curHrv7.weeklyAvg || curRec.hrv || 49);
+        const hrvNight = Number(curHrv7.lastNight || curRec.hrv || 49);
+
+        // Escala fisiológica sobre el arco de 270° (ángulo 135° izq inferior -> 270° tope -> 405° der inferior):
+        // - Rojo (Alerta < 38 ms): 135° a 195° (60°)
+        // - Naranja (Límite 38 - 42 ms): 195° a 225° (30°)
+        // - Verde (Túnel Basal 43 - 56 ms): 225° a 345° (120°)
+        // - Azul (Elevado > 56 ms): 345° a 405° (60°)
+        let hrvDeg = 270;
+        let hrvStatus = 'Equilibrado';
+        let hrvColor = '#10b981';
+        if (hrvVal < 38) {
+          const t = Math.max(0, Math.min(1, (hrvVal - 28) / 10));
+          hrvDeg = 135 + t * 60;
+          hrvStatus = 'Bajo / Alerta';
+          hrvColor = '#ef4444';
+        } else if (hrvVal < 43) {
+          const t = (hrvVal - 38) / 5;
+          hrvDeg = 195 + t * 30;
+          hrvStatus = 'Desequilibrado';
+          hrvColor = '#f97316';
+        } else if (hrvVal <= 56) {
+          const t = (hrvVal - 43) / 13;
+          hrvDeg = 225 + t * 120;
+          hrvStatus = 'Equilibrado';
+          hrvColor = '#10b981';
+        } else {
+          const t = Math.max(0, Math.min(1, (hrvVal - 56) / 12));
+          hrvDeg = 345 + t * 60;
+          hrvStatus = 'Óptimo / Alto';
+          hrvColor = '#3b82f6';
+        }
+        const hrvRad = (hrvDeg * Math.PI) / 180;
+        const dotCx = (50 + 38 * Math.cos(hrvRad)).toFixed(2);
+        const dotCy = (50 + 38 * Math.sin(hrvRad)).toFixed(2);
+
+        const hrvDot = hrvCard.querySelector('svg circle');
+        if (hrvDot) {
+          hrvDot.setAttribute('cx', dotCx);
+          hrvDot.setAttribute('cy', dotCy);
+          hrvDot.setAttribute('fill', hrvColor);
+        }
+
         const hrvBadge = hrvCard.querySelector('.badge');
-        if (hrvBadge) hrvBadge.textContent = 'Equilibrado ↗';
+        if (hrvBadge) {
+          hrvBadge.textContent = `${hrvStatus} ↗`;
+          hrvBadge.style.color = hrvColor;
+        }
         const hrvCenterSpans = hrvCard.querySelectorAll('div[style*="pointer-events:none"] span');
         if (hrvCenterSpans.length >= 1) {
-          hrvCenterSpans[0].innerHTML = `${curHrv7.weeklyAvg}<span style="font-size:16px; font-weight:600; color:var(--text-muted);">ms</span>`;
+          hrvCenterSpans[0].innerHTML = `${hrvVal}<span style="font-size:16px; font-weight:600; color:var(--text-muted);">ms</span>`;
+        }
+        const hrvStatusSpan = hrvCard.querySelector('div[style*="pointer-events:none"] > span:last-child');
+        if (hrvStatusSpan) {
+          hrvStatusSpan.textContent = hrvStatus;
+          hrvStatusSpan.style.color = hrvColor;
         }
         const hrvFootSpans = hrvCard.querySelectorAll('div[style*="border-top"] span');
         if (hrvFootSpans.length >= 2) {
-          hrvFootSpans[0].innerHTML = `Nocturna: <strong style="color:var(--text-main);">${curHrv7.lastNight} ms</strong>`;
+          hrvFootSpans[0].innerHTML = `Nocturna: <strong style="color:var(--text-main);">${hrvNight} ms</strong>`;
           hrvFootSpans[1].innerHTML = `Túnel Basal: <strong style="color:#10b981;">43 - 56 ms</strong>`;
         }
       }
@@ -9747,43 +9798,80 @@
       if (elZ2) elZ2.textContent = periodZ2Hours.toFixed(2) + ' h';
 
       // 2. Tarjeta Estructura del Endurance sincronizada con el período seleccionado
-      const vo2Val = (typeof TRAINING_STATUS_INFO !== 'undefined' && TRAINING_STATUS_INFO.vo2_precise)
+      //    Cada barra refleja el valor real y el ancho proporcional del período filtrado (Esta Semana, 1M, 3M, 6M, 1A, Todo)
+      const vo2Latest = (typeof TRAINING_STATUS_INFO !== 'undefined' && TRAINING_STATUS_INFO.vo2_precise)
         ? Number(TRAINING_STATUS_INFO.vo2_precise)
         : (typeof USER_VO2 !== 'undefined' ? Number(USER_VO2) : 53.7);
+      const vo2HistSlice = (typeof VO2_HISTORY !== 'undefined' && Array.isArray(VO2_HISTORY))
+        ? VO2_HISTORY.filter(v => v.iso_date >= firstP.iso_date && v.iso_date <= latestP.iso_date)
+        : [];
+      const vo2PeriodAvg = vo2HistSlice.length > 0
+        ? +(vo2HistSlice.reduce((s, v) => s + Number(v.precise || v.vo2 || vo2Latest), 0) / vo2HistSlice.length).toFixed(1)
+        : vo2Latest;
+
       const avgCtlSlice = Math.round(dataSlice.reduce((s, d) => s + Number(d.ctl || 0), 0) / dataSlice.length);
-      const vComp = Math.round(vo2Val * 45);
-      const lComp = Math.round(Number(latestP.ctl || 671) * 2.71);
-      const zComp = Math.max(25, curScore - vComp - lComp);
-      const totComp = Math.max(1, vComp + lComp + zComp);
-      const pVo2 = Math.round((vComp / totComp) * 100);
-      const pLoad = Math.round((lComp / totComp) * 100);
+      const avgScoreSlice = Math.round(dataSlice.reduce((s, d) => s + Number(d.endurance_score || curScore), 0) / dataSlice.length);
+
+      // Calcular días reales de la ventana para normalizar el ritmo semanal de Zona 2 y Carga
+      const dStartMs = new Date(firstP.iso_date + 'T00:00:00').getTime();
+      const dEndMs = new Date(latestP.iso_date + 'T23:59:59').getTime();
+      const windowDays = Math.max(1, Math.round((dEndMs - dStartMs) / 86400000));
+      const windowWeeks = Math.max(1, windowDays / 7);
+      const z2HoursPerWeek = +(periodZ2Hours / windowWeeks).toFixed(2);
+
+      // Puntos y barras dinámicas según el período seleccionado:
+      // - Barra 1 (VO2 Máx del período): aporte aeróbico pico y nivel sobre techo élite (65 ml/kg/min)
+      // - Barra 2 (Carga Crónica CTL media del período): puntos aportados por la media CTL del período (avgCtlSlice * 2.71) y % sobre techo de 750 CTL
+      // - Barra 3 (Volumen Zona 2 del período): puntos Z2 del período y % de cumplimiento frente a la meta de 3.5 h/semana en la ventana
+      const vComp = Math.round(vo2PeriodAvg * 45);
+      const lComp = Math.round(avgCtlSlice * 2.71);
+      const zComp = Math.max(25, Math.round(z2HoursPerWeek * 4 * 25));
+      const totPeriodScore = vComp + lComp + zComp;
+
+      const pVo2 = Math.round((vComp / Math.max(1, totPeriodScore)) * 100);
+      const pLoad = Math.round((lComp / Math.max(1, totPeriodScore)) * 100);
       const pZ2 = Math.max(1, 100 - pVo2 - pLoad);
 
+      // Anchos visuales de barra reactivos al período para que reflejen el cambio de ventana inmediatamente:
+      const barWidthVo2 = Math.min(98, Math.max(18, Math.round(((vo2PeriodAvg - 35) / 25) * 100)));
+      const barWidthLoad = Math.min(98, Math.max(12, Math.round((avgCtlSlice / 720) * 100)));
+      const targetZ2WindowHours = +(windowWeeks * 3.0).toFixed(1);
+      const barWidthZ2 = Math.min(98, Math.max(8, Math.round((periodZ2Hours / Math.max(0.5, targetZ2WindowHours)) * 100)));
+
       const structTitle = document.getElementById('endurance-structure-title');
-      if (structTitle) structTitle.textContent = `Estructura del Endurance (${curScore} pts • ${deltaStr} en ${periodLabel})`;
+      if (structTitle) structTitle.textContent = `Estructura del Endurance (${totPeriodScore} pts media • ${deltaStr} en ${periodLabel})`;
       const structSub = document.getElementById('endurance-structure-subtitle');
-      if (structSub) structSub.textContent = `Ventana activa: ${periodLabel} (${startArg} al ${endArg} • ${periodActs.length} sesiones)`;
+      if (structSub) structSub.textContent = `Ventana activa: ${periodLabel} (${startArg} al ${endArg} • ${periodActs.length} ${periodActs.length === 1 ? 'sesión' : 'sesiones'} • Hoy: ${curScore} pts)`;
 
       const lblVo2 = document.getElementById('end-struct-lbl-vo2');
-      if (lblVo2) lblVo2.textContent = `Potencia Aeróbica Pico (VO₂ Máx: ${vo2Val.toFixed(1)} ml/kg/min)`;
+      if (lblVo2) lblVo2.textContent = `Potencia Aeróbica Pico (VO₂ Máx período: ${vo2PeriodAvg.toFixed(1)} ml/kg/min)`;
       const valVo2 = document.getElementById('end-struct-val-vo2');
-      if (valVo2) valVo2.textContent = `${vComp} pts (${pVo2}%)`;
+      if (valVo2) valVo2.textContent = `${vComp} pts (${pVo2}% del score • Nivel ${barWidthVo2}%)`;
       const barVo2 = document.getElementById('end-struct-bar-vo2');
-      if (barVo2) barVo2.style.width = `${pVo2}%`;
+      if (barVo2) {
+        barVo2.style.transition = 'width 0.35s ease';
+        barVo2.style.width = `${barWidthVo2}%`;
+      }
 
       const lblLoad = document.getElementById('end-struct-lbl-load');
-      if (lblLoad) lblLoad.textContent = `Carga Crónica CTL: ${Math.round(latestP.ctl)} pts (Media ${periodLabel}: ${avgCtlSlice} pts • Carga: ${periodTotalLoad} pts)`;
+      if (lblLoad) lblLoad.textContent = `Carga Crónica CTL Media (${periodLabel}): ${avgCtlSlice} pts (Actual: ${Math.round(latestP.ctl)} pts • Carga acum.: ${periodTotalLoad} pts)`;
       const valLoad = document.getElementById('end-struct-val-load');
-      if (valLoad) valLoad.textContent = `${lComp} pts (${pLoad}%)`;
+      if (valLoad) valLoad.textContent = `${lComp} pts (${pLoad}% del score • Base ${barWidthLoad}%)`;
       const barLoad = document.getElementById('end-struct-bar-load');
-      if (barLoad) barLoad.style.width = `${pLoad}%`;
+      if (barLoad) {
+        barLoad.style.transition = 'width 0.35s ease';
+        barLoad.style.width = `${barWidthLoad}%`;
+      }
 
       const lblZ2 = document.getElementById('end-struct-lbl-z2');
-      if (lblZ2) lblZ2.textContent = `Horas Específicas en Zona 2 (${periodZ2Hours.toFixed(2)} h en ${periodLabel})`;
+      if (lblZ2) lblZ2.textContent = `Horas Específicas en Zona 2 (${periodZ2Hours.toFixed(2)} h totales • ${z2HoursPerWeek} h/sem en ${periodLabel})`;
       const valZ2 = document.getElementById('end-struct-val-z2');
-      if (valZ2) valZ2.textContent = `${zComp} pts (${pZ2}%)`;
+      if (valZ2) valZ2.textContent = `${zComp} pts (${pZ2}% del score • Meta Z2 ${barWidthZ2}%)`;
       const barZ2 = document.getElementById('end-struct-bar-z2');
-      if (barZ2) barZ2.style.width = `${pZ2}%`;
+      if (barZ2) {
+        barZ2.style.transition = 'width 0.35s ease';
+        barZ2.style.width = `${barWidthZ2}%`;
+      }
 
       // 3. Gráfico Curva de Gestión de Rendimiento (PMC) sincronizado exactamente al mismo período
       const pmcTitle = document.getElementById('endurance-pmc-title');
