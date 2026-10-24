@@ -5885,124 +5885,105 @@
 
 
         <!-- 2. Gráfico de Área Naranja: Volumen y Carga Semanal Estilo Strava -->
-
         <div class="strava-volume-card" style="background:var(--surface); border:1px solid var(--surface-border); border-radius:18px; padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow-card);">
-
-          <div class="strava-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:14px;">
-
+          <div class="strava-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:14px;">
             <div class="strava-title" style="display:flex; align-items:center; gap:10px;">
-
               <span id="strava-week-title" style="font-size:20px; font-weight:800; letter-spacing:-0.4px; color:var(--text-main);">Últimos 3 Meses</span>
-
+              <span id="strava-active-sport-badge" style="font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:999px; background:rgba(252,82,0,0.12); color:#fc5200; border:1px solid rgba(252,82,0,0.28);">Todas las disciplinas</span>
             </div>
-
-            
 
             <!-- Selector Temporal Rápido de Píldoras -->
-
             <div class="timeline-segmented-control" id="control-timeline-strava">
-
               <button class="segmented-pill-btn" onclick="filterStravaPeriod('today')">Hoy</button>
-
               <button class="segmented-pill-btn" onclick="filterStravaPeriod('1M')">1M</button>
-
               <button class="segmented-pill-btn active" onclick="filterStravaPeriod('3M')">3M</button>
-
               <button class="segmented-pill-btn" onclick="filterStravaPeriod('6M')">6M</button>
-
               <button class="segmented-pill-btn" onclick="filterStravaPeriod('1Y')">1A</button>
-
               <button class="segmented-pill-btn" onclick="filterStravaPeriod('all')">Todo</button>
-
             </div>
-
-
 
             <!-- Selector de Métrica a la Derecha -->
-
             <div class="strava-toggle-group">
-
               <button class="strava-toggle-btn active" id="btn-strava-km" onclick="switchStravaMode('km')">Distancia (km)</button>
-
               <button class="strava-toggle-btn" id="btn-strava-z2" onclick="switchStravaMode('z2')">Volumen Zona 2 (h)</button>
-
               <button class="strava-toggle-btn" id="btn-strava-load" onclick="switchStravaMode('load')">Carga Semanal</button>
-
             </div>
-
           </div>
 
+          <!-- FILTRO POR DEPORTE / ACTIVIDAD -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--surface-border);">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;" id="control-sport-strava">
+              <span style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-right:4px;">Filtrar actividad:</span>
+              <button class="segmented-pill-btn active" data-sport="all" onclick="filterStravaSport('all')" style="padding:5px 12px; font-size:12px;">🔥 Todas</button>
+              <button class="segmented-pill-btn" data-sport="Carrera" onclick="filterStravaSport('Carrera')" style="padding:5px 12px; font-size:12px;">🏃 Correr</button>
+              <button class="segmented-pill-btn" data-sport="Ciclismo" onclick="filterStravaSport('Ciclismo')" style="padding:5px 12px; font-size:12px;">🚴 Bici</button>
+              <button class="segmented-pill-btn" data-sport="Caminata" onclick="filterStravaSport('Caminata')" style="padding:5px 12px; font-size:12px;">🚶 Caminata</button>
+              <button class="segmented-pill-btn" data-sport="Fuerza" onclick="filterStravaSport('Fuerza')" style="padding:5px 12px; font-size:12px;">🏋️ Fuerza / Gym</button>
+              <button class="segmented-pill-btn" data-sport="Otros" onclick="filterStravaSport('Otros')" style="padding:5px 12px; font-size:12px;">🌊 Otros</button>
+            </div>
+          </div>
 
+          <!-- RESUMEN ACUMULADO DEL PERÍODO SELECCIONADO (COMPARATIVA CORRER VS BICI EN VIVO) -->
+          <div id="strava-period-totals-banner" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(185px, 1fr)); gap:12px; margin-bottom:18px; background:var(--bg-subtle); border:1px solid var(--surface-border); border-radius:14px; padding:12px 16px;">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);" id="strava-period-tot-label">Total Acumulado (3M)</span>
+              <span style="font-size:20px; font-weight:800; font-family:'JetBrains Mono', monospace; color:var(--text-main);" id="strava-period-tot-km">-- km</span>
+              <span style="font-size:11px; color:var(--text-muted);" id="strava-period-tot-sub">-- sesiones • --h</span>
+            </div>
+            <div onclick="filterStravaSport('Carrera')" title="Toca para filtrar el gráfico solo por Correr" style="display:flex; flex-direction:column; gap:2px; cursor:pointer; padding:4px 10px; border-radius:10px; border-left:3px solid #38bdf8; background:rgba(56,189,248,0.06); transition:background 0.15s;">
+              <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#38bdf8;">🏃 Acumulado Correr</span>
+              <span style="font-size:19px; font-weight:800; font-family:'JetBrains Mono', monospace; color:var(--text-main);" id="strava-period-run-km">-- km</span>
+              <span style="font-size:11px; color:var(--text-muted);" id="strava-period-run-sub">-- salidas • --h</span>
+            </div>
+            <div onclick="filterStravaSport('Ciclismo')" title="Toca para filtrar el gráfico solo por Ciclismo" style="display:flex; flex-direction:column; gap:2px; cursor:pointer; padding:4px 10px; border-radius:10px; border-left:3px solid #10b981; background:rgba(16,185,129,0.06); transition:background 0.15s;">
+              <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#10b981;">🚴 Acumulado Bici</span>
+              <span style="font-size:19px; font-weight:800; font-family:'JetBrains Mono', monospace; color:var(--text-main);" id="strava-period-bike-km">-- km</span>
+              <span style="font-size:11px; color:var(--text-muted);" id="strava-period-bike-sub">-- salidas • --h</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:2px; border-left:1px solid var(--surface-border); padding-left:12px;">
+              <span style="font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">Promedio Semanal</span>
+              <span style="font-size:19px; font-weight:800; font-family:'JetBrains Mono', monospace; color:#f59e0b;" id="strava-period-avg-km">-- km/sem</span>
+              <span style="font-size:11px; color:var(--text-muted);" id="strava-period-avg-sub">En la ventana activa</span>
+            </div>
+          </div>
 
-          <!-- Métricas KPI de la Semana Seleccionada -->
-
+          <!-- Métricas KPI de la Semana Seleccionada (Nodo en foco) -->
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); margin-bottom:6px;" id="strava-selected-week-caption">
+            Detalle de la Semana en Foco (Última Semana):
+          </div>
           <div class="strava-stats-row">
-
             <div class="strava-stat-col">
-
-              <span class="strava-stat-label">Distancia</span>
-
-              <span class="strava-stat-value" id="strava-stat-dist">29.57 km</span>
-
+              <span class="strava-stat-label">Distancia Semanal</span>
+              <span class="strava-stat-value" id="strava-stat-dist">66.05 km</span>
             </div>
-
             <div class="strava-stat-col">
-
-              <span class="strava-stat-label">Tiempo</span>
-
-              <span class="strava-stat-value" id="strava-stat-time">4h 16m</span>
-
+              <span class="strava-stat-label">Tiempo Semanal</span>
+              <span class="strava-stat-value" id="strava-stat-time">4h 06m</span>
             </div>
-
             <div class="strava-stat-col">
-
-              <span class="strava-stat-label">Desnivel</span>
-
-              <span class="strava-stat-value" id="strava-stat-elev">163 m</span>
-
+              <span class="strava-stat-label">Desnivel Semanal</span>
+              <span class="strava-stat-value" id="strava-stat-elev">210 m</span>
             </div>
-
             <div class="strava-stat-col" style="border-left: 1px solid var(--surface-border); padding-left: 20px;">
-
               <span class="strava-stat-label" id="strava-stat-kpi4-label">Base Zona 2</span>
-
-              <span class="strava-stat-value" id="strava-stat-z2" style="color: #10b981;">2.03 h</span>
-
+              <span class="strava-stat-value" id="strava-stat-z2" style="color: #10b981;">1.13 h</span>
             </div>
-
           </div>
-
-
 
           <div style="font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-
             <div>Ventana de Período: <span id="strava-window-dates" style="color:var(--text-main); font-family:'JetBrains Mono'; font-weight:700;">Mostrando semanas recientes</span></div>
-
             <div id="strava-node-hint" style="color:var(--text-muted); font-size:11.5px;">● Toca o pasa el cursor sobre los nodos para inspeccionar las métricas de cada semana</div>
-
           </div>
-
-
 
           <div style="height: 260px; width: 100%; position: relative;">
-
             <canvas id="chartStravaVolume"></canvas>
-
           </div>
-
-
 
           <div class="strava-footer-text" style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono', monospace;">
-
-            <span>● Nodos interactivos: Actualización de métricas en vivo</span>
-
-            <span>Base histórica total: 228 semanas sincronizadas</span>
-
+            <span>● Nodos interactivos: Actualización de métricas en vivo por disciplina</span>
+            <span>Base histórica total: 230 semanas sincronizadas</span>
           </div>
-
         </div>
-
-
 
         <!-- 3. Resumen Fisiológico del Coach Deportivo (Al pie de Rendimiento Avanzado) -->
 
@@ -11785,565 +11766,498 @@
 
 
   let currentStravaPeriod = '3M';
-
+  let currentStravaSport = 'all';
   let stravaSliceCount = 12;
 
-
-
-  function getCurrent12WeeksSlice() {
-
-    let count = 12;
-
-    if (currentStravaPeriod === 'today') count = 2;
-
-    else if (currentStravaPeriod === '1M') count = 4;
-
-    else if (currentStravaPeriod === '3M') count = 12;
-
-    else if (currentStravaPeriod === '6M') count = 26;
-
-    else if (currentStravaPeriod === '1Y') count = 52;
-
-    else if (currentStravaPeriod === 'all') count = FULL_TIMELINE_WEEKS.length;
-
-
-
-    stravaSliceCount = count;
-
-    const start = Math.max(0, windowEndIdx - count);
-
-    return FULL_TIMELINE_WEEKS.slice(start, windowEndIdx);
-
+  function classifyActivitySportForStrava(a) {
+    const sp = (a.sport || '').toLowerCase();
+    const nm = (a.name || '').toLowerCase();
+    if (sp.includes('cicl') || sp.includes('bici') || nm.includes('cicl') || nm.includes('bici')) return 'Ciclismo';
+    if (sp.includes('carr') || sp.includes('run') || nm.includes('6x200') || nm.includes('8x250') || nm.includes('sub aerobico')) return 'Carrera';
+    if (sp.includes('camin') || sp.includes('walk') || sp.includes('trek')) return 'Caminata';
+    if (sp.includes('fuerza') || sp.includes('gimnasio') || sp.includes('muscul') || sp.includes('hiit') || sp.includes('cardio')) return 'Fuerza';
+    return 'Otros';
   }
 
-
-
-  function filterStravaPeriod(period) {
-
-    currentStravaPeriod = period;
-
-    const ctrl = document.getElementById('control-timeline-strava');
-
-    if (ctrl) {
-
-      ctrl.querySelectorAll('.segmented-pill-btn').forEach(b => b.classList.remove('active'));
-
-      const activeBtn = Array.from(ctrl.querySelectorAll('.segmented-pill-btn')).find(b => {
-
-        const txt = b.textContent.trim().toLowerCase();
-
-        if (period === '1Y' && txt === '1a') return true;
-
-        return txt === period.toLowerCase();
-
-      });
-
-      if (activeBtn) activeBtn.classList.add('active');
-
-    }
-
-
-
-    windowEndIdx = FULL_TIMELINE_WEEKS.length;
-
-    updateStravaChartWindow();
-
-  }
-
-
-
-  function initStravaChart() {
-
-    const canvas = document.getElementById('chartStravaVolume');
-
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-
-    const currentSlice = getCurrent12WeeksSlice();
-
-
-
-    const gradient = ctx.createLinearGradient(0, 0, 0, 220);
-
-    gradient.addColorStop(0, 'rgba(252, 82, 0, 0.45)');
-
-    gradient.addColorStop(0.7, 'rgba(252, 82, 0, 0.12)');
-
-    gradient.addColorStop(1, 'rgba(252, 82, 0, 0.00)');
-
-
-
-    const labels = currentSlice.map(w => w.month + ' ' + w.label);
-
-    const dataVals = currentSlice.map(w => w.dist_km);
-
-
-
-    const pointRadii = currentSlice.map(w => w.is_current ? 7 : 4);
-
-    const pointBgColors = currentSlice.map(w => w.is_current ? '#fc5200' : (document.documentElement.getAttribute('data-theme') === 'dark' ? '#151d2f' : '#ffffff'));
-
-    const pointBorderColors = currentSlice.map(w => w.is_current ? '#ffffff' : '#fc5200');
-
-    const pointBorderWidths = currentSlice.map(w => w.is_current ? 3 : 2);
-
-
-
-    if (charts.strava) {
-
-      try { charts.strava.destroy(); } catch(e){}
-
-    }
-
-
-
-    charts.strava = new Chart(ctx, {
-
-      type: 'line',
-
-      data: {
-
-        labels: labels,
-
-        datasets: [{
-
-          label: 'Kilómetros Semanales',
-
-          data: dataVals,
-
-          borderColor: '#fc5200',
-
-          borderWidth: 2.5,
-
-          backgroundColor: gradient,
-
-          fill: true,
-
-          tension: 0.25,
-
-          pointRadius: pointRadii,
-
-          pointBackgroundColor: pointBgColors,
-
-          pointBorderColor: pointBorderColors,
-
-          pointBorderWidth: pointBorderWidths,
-
-          pointHoverRadius: 8
-
-        }]
-
-      },
-
-      options: {
-
-        responsive: true,
-
-        maintainAspectRatio: false,
-
-        interaction: { mode: 'index', intersect: false },
-
-        onClick: (event, activeElements) => {
-
-          const slice = getCurrent12WeeksSlice();
-
-          if (activeElements && activeElements.length > 0) {
-
-            const idx = activeElements[0].index;
-
-            if (slice[idx]) {
-
-              updateStravaTopCard(slice[idx]);
-
-            }
-
-          }
-
-        },
-
-        onHover: (event, activeElements) => {
-
-          const slice = getCurrent12WeeksSlice();
-
-          if (activeElements && activeElements.length > 0) {
-
-            const idx = activeElements[0].index;
-
-            if (slice[idx]) {
-
-              const item = Object.assign({}, slice[idx], { is_hovered: true });
-
-              updateStravaTopCard(item);
-
-            }
-
-          } else {
-
-            updateStravaTopCard(slice[slice.length - 1]);
-
-          }
-
-        },
-
-        plugins: {
-
-          legend: { display: false },
-
-          tooltip: {
-
-            backgroundColor: '#0b111e',
-
-            borderColor: '#334155',
-
-            borderWidth: 1,
-
-            titleColor: '#f1f5f9',
-
-            bodyColor: '#cbd5e1',
-
-            callbacks: {
-
-              title: ctxT => {
-
-                const slice = getCurrent12WeeksSlice();
-
-                return 'Semana ' + slice[ctxT[0].dataIndex].label + ' (' + slice[ctxT[0].dataIndex].year + ')';
-
-              },
-
-              label: ctxT => {
-
-                const slice = getCurrent12WeeksSlice();
-
-                const item = slice[ctxT.dataIndex];
-
-                if (currentStravaMode === 'km') return `Distancia: ${item.dist_km} km (${item.dur_str})`;
-
-                if (currentStravaMode === 'z2') return `Zona 2 Base: ${item.z2_hours} h (${item.dist_km} km)`;
-
-                return `Carga Semanal: ${item.load} pts (${item.activities} sesiones)`;
-
-              }
-
-            }
-
-          }
-
-        },
-
-        scales: {
-
-          y: {
-
-            min: 0,
-
-            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-
-            ticks: {
-
-              color: '#94a3b8',
-
-              callback: v => v + ' km',
-
-              stepSize: 25
-
-            }
-
-          },
-
-          x: {
-
-            grid: { display: false },
-
-            ticks: {
-
-              color: '#94a3b8',
-
-              maxTicksLimit: 10
-
-            }
-
-          }
-
-        }
-
-      }
-
+  function buildStravaWeeksTimeline(sportFilter) {
+    if (!FULL_TIMELINE_WEEKS || FULL_TIMELINE_WEEKS.length === 0) return [];
+    const weekMap = {};
+    FULL_TIMELINE_WEEKS.forEach(w => {
+      weekMap[w.week_key] = {
+        week_key: w.week_key,
+        year: w.year,
+        label: w.label,
+        month: w.month,
+        dist_km: 0,
+        dur_sec: 0,
+        dur_hours: 0,
+        dur_str: '0m',
+        elev_m: 0,
+        z2_sec: 0,
+        z2_hours: 0,
+        load: 0,
+        activities: 0,
+        run_km: 0,
+        run_sec: 0,
+        run_acts: 0,
+        bike_km: 0,
+        bike_sec: 0,
+        bike_acts: 0,
+        walk_km: 0,
+        other_km: 0,
+        is_current: w.is_current
+      };
     });
 
+    if (typeof ACTIVITIES !== 'undefined' && Array.isArray(ACTIVITIES)) {
+      ACTIVITIES.forEach(a => {
+        if (!a.iso_date) return;
+        const dt = new Date(a.iso_date + 'T12:00:00');
+        const day = dt.getDay(); // 0=Sun, 1=Mon...
+        const diffToMon = (day === 0 ? -6 : 1 - day);
+        const monDt = new Date(dt.getTime() + diffToMon * 86400000);
+        const wkKey = monDt.toISOString().slice(0, 10);
+        const bucket = weekMap[wkKey];
+        if (!bucket) return;
 
+        const cat = classifyActivitySportForStrava(a);
+        const km = Number(a.distance_km || 0);
+        const durSec = Number(a.duration_sec || (Number(a.duration_min || 0) * 60));
+        const elev = Number(a.elevation_m || 0);
+        const z2Sec = Number(a.z2_sec || (Number(a.z2_hours || 0) * 3600));
+        const ld = Number(a.load || 0);
 
-    updateStravaTopCard(currentSlice[currentSlice.length - 1]);
+        // Acumular siempre el desglose por disciplina para el banner comparativo
+        if (cat === 'Carrera') {
+          bucket.run_km += km;
+          bucket.run_sec += durSec;
+          bucket.run_acts += 1;
+        } else if (cat === 'Ciclismo') {
+          bucket.bike_km += km;
+          bucket.bike_sec += durSec;
+          bucket.bike_acts += 1;
+        } else if (cat === 'Caminata') {
+          bucket.walk_km += km;
+        } else {
+          bucket.other_km += km;
+        }
 
-  }
-
-
-
-  function updateStravaChartWindow() {
-
-    if (!charts.strava) {
-
-      initStravaChart();
-
-      return;
-
+        // Acumular en la serie principal según el filtro activo
+        if (sportFilter === 'all' || sportFilter === cat) {
+          bucket.dist_km += km;
+          bucket.dur_sec += durSec;
+          bucket.elev_m += elev;
+          bucket.z2_sec += z2Sec;
+          bucket.load += ld;
+          bucket.activities += 1;
+        }
+      });
     }
 
-    const currentSlice = getCurrent12WeeksSlice();
+    return FULL_TIMELINE_WEEKS.map(origW => {
+      const b = weekMap[origW.week_key];
+      // Si es 'all' y la semana es histórica previa al detalle individual o coincide, usar valores precisos
+      const totMin = Math.round(b.dur_sec / 60);
+      const h = Math.floor(totMin / 60);
+      const m = totMin % 60;
+      b.dist_km = +b.dist_km.toFixed(2);
+      b.dur_hours = +(b.dur_sec / 3600).toFixed(2);
+      b.dur_str = h > 0 ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`;
+      b.elev_m = Math.round(b.elev_m);
+      b.z2_hours = +(b.z2_sec / 3600).toFixed(2);
+      b.load = +b.load.toFixed(1);
+      b.run_km = +b.run_km.toFixed(2);
+      b.bike_km = +b.bike_km.toFixed(2);
+      b.walk_km = +b.walk_km.toFixed(2);
+      b.other_km = +b.other_km.toFixed(2);
+      return b;
+    });
+  }
 
-    const isNow = (windowEndIdx >= FULL_TIMELINE_WEEKS.length);
+  function getCurrent12WeeksSlice() {
+    const timeline = buildStravaWeeksTimeline(currentStravaSport);
+    let count = 12;
+    if (currentStravaPeriod === 'today') count = 2;
+    else if (currentStravaPeriod === '1M') count = 4;
+    else if (currentStravaPeriod === '3M') count = 12;
+    else if (currentStravaPeriod === '6M') count = 26;
+    else if (currentStravaPeriod === '1Y') count = 52;
+    else if (currentStravaPeriod === 'all') count = timeline.length;
 
+    stravaSliceCount = count;
+    const endIdx = Math.min(timeline.length, windowEndIdx);
+    const start = Math.max(0, endIdx - count);
+    return timeline.slice(start, endIdx);
+  }
 
+  function filterStravaSport(sport) {
+    currentStravaSport = sport || 'all';
+    const ctrl = document.getElementById('control-sport-strava');
+    if (ctrl) {
+      ctrl.querySelectorAll('.segmented-pill-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-sport') === currentStravaSport);
+      });
+    }
+    const badge = document.getElementById('strava-active-sport-badge');
+    if (badge) {
+      const meta = {
+        'all': { text: 'Todas las disciplinas', color: '#fc5200', bg: 'rgba(252,82,0,0.12)', border: 'rgba(252,82,0,0.28)' },
+        'Carrera': { text: '🏃 Solo Correr (Running)', color: '#38bdf8', bg: 'rgba(56,189,248,0.14)', border: 'rgba(56,189,248,0.32)' },
+        'Ciclismo': { text: '🚴 Solo Bici (Ciclismo)', color: '#10b981', bg: 'rgba(16,185,129,0.14)', border: 'rgba(16,185,129,0.32)' },
+        'Caminata': { text: '🚶 Solo Caminata', color: '#f59e0b', bg: 'rgba(245,158,11,0.14)', border: 'rgba(245,158,11,0.32)' },
+        'Fuerza': { text: '🏋️ Solo Fuerza / Gym', color: '#a855f7', bg: 'rgba(168,85,247,0.14)', border: 'rgba(168,85,247,0.32)' },
+        'Otros': { text: '🌊 Otros Deportes (Natación / Surf / Snow)', color: '#06b6d4', bg: 'rgba(6,182,212,0.14)', border: 'rgba(6,182,212,0.32)' }
+      }[currentStravaSport] || { text: 'Todas las disciplinas', color: '#fc5200', bg: 'rgba(252,82,0,0.12)', border: 'rgba(252,82,0,0.28)' };
+      badge.textContent = meta.text;
+      badge.style.color = meta.color;
+      badge.style.background = meta.bg;
+      badge.style.borderColor = meta.border;
+    }
+    updateStravaChartWindow();
+  }
 
-    const periodTitles = {
+  function updateStravaPeriodSummaryBanner(slice) {
+    if (!slice || slice.length === 0) return;
+    const periodLabels = { 'today': '2 Sem', '1M': '1 Mes', '3M': '3 Meses', '6M': '6 Meses', '1Y': '1 Año', 'all': 'Histórico Total' };
+    const pLbl = periodLabels[currentStravaPeriod] || 'Período';
+    const sportNames = { 'all': 'Todas', 'Carrera': 'Correr', 'Ciclismo': 'Bici', 'Caminata': 'Caminata', 'Fuerza': 'Fuerza', 'Otros': 'Otros' };
+    const sLbl = sportNames[currentStravaSport] || 'Todas';
 
-      'today': 'Hoy / Semana en curso',
+    let totKm = 0, totSec = 0, totActs = 0;
+    let runKm = 0, runSec = 0, runActs = 0;
+    let bikeKm = 0, bikeSec = 0, bikeActs = 0;
 
-      '1M': 'Último Mes (4 Semanas)',
+    slice.forEach(w => {
+      totKm += Number(w.dist_km || 0);
+      totSec += Number(w.dur_sec || 0);
+      totActs += Number(w.activities || 0);
+      runKm += Number(w.run_km || 0);
+      runSec += Number(w.run_sec || 0);
+      runActs += Number(w.run_acts || 0);
+      bikeKm += Number(w.bike_km || 0);
+      bikeSec += Number(w.bike_sec || 0);
+      bikeActs += Number(w.bike_acts || 0);
+    });
 
-      '3M': 'Últimos 3 Meses',
-
-      '6M': 'Últimos 6 Meses',
-
-      '1Y': 'Último Año Completo',
-
-      'all': 'Historial Completo'
-
+    const fmtH = (sec) => {
+      const h = Math.floor(sec / 3600);
+      const m = Math.round((sec % 3600) / 60);
+      return h > 0 ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`;
     };
 
+    const elTotLbl = document.getElementById('strava-period-tot-label');
+    if (elTotLbl) elTotLbl.textContent = `Acumulado ${pLbl} (${sLbl})`;
+    const elTotKm = document.getElementById('strava-period-tot-km');
+    if (elTotKm) elTotKm.textContent = `${totKm.toFixed(1)} km`;
+    const elTotSub = document.getElementById('strava-period-tot-sub');
+    if (elTotSub) elTotSub.textContent = `${totActs} sesiones • ${fmtH(totSec)}`;
+
+    const elRunKm = document.getElementById('strava-period-run-km');
+    if (elRunKm) elRunKm.textContent = `${runKm.toFixed(1)} km`;
+    const elRunSub = document.getElementById('strava-period-run-sub');
+    if (elRunSub) elRunSub.textContent = `${runActs} salidas • ${fmtH(runSec)}`;
+
+    const elBikeKm = document.getElementById('strava-period-bike-km');
+    if (elBikeKm) elBikeKm.textContent = `${bikeKm.toFixed(1)} km`;
+    const elBikeSub = document.getElementById('strava-period-bike-sub');
+    if (elBikeSub) elBikeSub.textContent = `${bikeActs} salidas • ${fmtH(bikeSec)}`;
+
+    const avgKm = totKm / Math.max(1, slice.length);
+    const elAvgKm = document.getElementById('strava-period-avg-km');
+    if (elAvgKm) elAvgKm.textContent = `${avgKm.toFixed(1)} km/sem`;
+    const elAvgSub = document.getElementById('strava-period-avg-sub');
+    if (elAvgSub) elAvgSub.textContent = `Promedio en ${slice.length} semanas`;
+  }
+
+  function filterStravaPeriod(period) {
+    currentStravaPeriod = period;
+    const ctrl = document.getElementById('control-timeline-strava');
+    if (ctrl) {
+      ctrl.querySelectorAll('.segmented-pill-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(ctrl.querySelectorAll('.segmented-pill-btn')).find(b => {
+        const txt = b.textContent.trim().toLowerCase();
+        if (period === 'today' && txt === 'hoy') return true;
+        if (period === '1Y' && txt === '1a') return true;
+        if (period === 'all' && txt === 'todo') return true;
+        return txt === period.toLowerCase();
+      });
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    windowEndIdx = FULL_TIMELINE_WEEKS.length;
+    updateStravaChartWindow();
+  }
+
+  function getStravaActiveColor() {
+    if (currentStravaMode === 'z2') return '#10b981';
+    if (currentStravaMode === 'load') return '#f59e0b';
+    if (currentStravaSport === 'Carrera') return '#38bdf8';
+    if (currentStravaSport === 'Ciclismo') return '#10b981';
+    if (currentStravaSport === 'Caminata') return '#f59e0b';
+    if (currentStravaSport === 'Fuerza') return '#a855f7';
+    return '#fc5200';
+  }
+
+  function initStravaChart() {
+    const canvas = document.getElementById('chartStravaVolume');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const currentSlice = getCurrent12WeeksSlice();
+    updateStravaPeriodSummaryBanner(currentSlice);
+
+    const color = getStravaActiveColor();
+    const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+    gradient.addColorStop(0, color + '66');
+    gradient.addColorStop(0.7, color + '18');
+    gradient.addColorStop(1, color + '00');
+
+    const labels = currentSlice.map(w => w.month + ' ' + w.label);
+    const dataVals = currentSlice.map(w => w.dist_km);
+
+    const pointRadii = currentSlice.map(w => w.is_current ? 7 : 4);
+    const pointBgColors = currentSlice.map(w => w.is_current ? color : (document.documentElement.getAttribute('data-theme') === 'dark' ? '#151d2f' : '#ffffff'));
+    const pointBorderColors = currentSlice.map(w => w.is_current ? '#ffffff' : color);
+    const pointBorderWidths = currentSlice.map(w => w.is_current ? 3 : 2);
+
+    if (charts.strava) {
+      try { charts.strava.destroy(); } catch(e){}
+    }
+
+    charts.strava = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Kilómetros Semanales',
+          data: dataVals,
+          borderColor: color,
+          borderWidth: 2.5,
+          backgroundColor: gradient,
+          fill: true,
+          tension: 0.25,
+          pointRadius: pointRadii,
+          pointBackgroundColor: pointBgColors,
+          pointBorderColor: pointBorderColors,
+          pointBorderWidth: pointBorderWidths,
+          pointHoverRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        onClick: (event, activeElements) => {
+          const slice = getCurrent12WeeksSlice();
+          if (activeElements && activeElements.length > 0) {
+            const idx = activeElements[0].index;
+            if (slice[idx]) {
+              updateStravaTopCard(Object.assign({}, slice[idx], { is_hovered: true }));
+            }
+          }
+        },
+        onHover: (event, activeElements) => {
+          const slice = getCurrent12WeeksSlice();
+          if (activeElements && activeElements.length > 0) {
+            const idx = activeElements[0].index;
+            if (slice[idx]) {
+              const item = Object.assign({}, slice[idx], { is_hovered: true });
+              updateStravaTopCard(item);
+            }
+          } else if (slice.length > 0) {
+            updateStravaTopCard(slice[slice.length - 1]);
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0b111e',
+            borderColor: '#334155',
+            borderWidth: 1,
+            titleColor: '#f1f5f9',
+            bodyColor: '#cbd5e1',
+            callbacks: {
+              title: ctxT => {
+                const slice = getCurrent12WeeksSlice();
+                const item = slice[ctxT[0].dataIndex];
+                return `Semana ${item.label} (${item.year}) • ${item.activities} ses.`;
+              },
+              label: ctxT => {
+                const slice = getCurrent12WeeksSlice();
+                const item = slice[ctxT.dataIndex];
+                if (currentStravaMode === 'km') return `Distancia (${currentStravaSport === 'all' ? 'Total' : currentStravaSport}): ${item.dist_km} km (${item.dur_str})`;
+                if (currentStravaMode === 'z2') return `Zona 2 Base: ${item.z2_hours} h (${item.dist_km} km)`;
+                return `Carga Semanal: ${item.load} pts (${item.activities} sesiones)`;
+              },
+              afterBody: ctxT => {
+                const slice = getCurrent12WeeksSlice();
+                const item = slice[ctxT[0].dataIndex];
+                if (currentStravaSport === 'all' && (item.run_km > 0 || item.bike_km > 0)) {
+                  return `🏃 Correr: ${item.run_km} km  |  🚴 Bici: ${item.bike_km} km`;
+                }
+                return '';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            min: 0,
+            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+            ticks: {
+              color: '#94a3b8',
+              callback: v => v + ' km'
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: '#94a3b8',
+              maxTicksLimit: 10
+            }
+          }
+        }
+      }
+    });
+
+    if (currentSlice.length > 0) {
+      updateStravaTopCard(currentSlice[currentSlice.length - 1]);
+    }
+  }
+
+  function updateStravaChartWindow() {
+    if (!charts.strava) {
+      initStravaChart();
+      return;
+    }
+    const currentSlice = getCurrent12WeeksSlice();
+    updateStravaPeriodSummaryBanner(currentSlice);
+
+    const isNow = (windowEndIdx >= FULL_TIMELINE_WEEKS.length);
+    const periodTitles = {
+      'today': 'Hoy / Semana en curso',
+      '1M': 'Último Mes (4 Semanas)',
+      '3M': 'Últimos 3 Meses',
+      '6M': 'Últimos 6 Meses',
+      '1Y': 'Último Año Completo',
+      'all': 'Historial Completo'
+    };
     const activePeriodTitle = periodTitles[currentStravaPeriod] || 'Últimos 3 Meses';
-
     const titleEl = document.getElementById('strava-week-title');
-
-    if (titleEl) {
-
+    if (titleEl && currentSlice.length > 0) {
       titleEl.textContent = isNow ? activePeriodTitle : ('Semana de ' + currentSlice[currentSlice.length - 1].label + ' (' + currentSlice[currentSlice.length - 1].year + ')');
-
     }
-
     const datesEl = document.getElementById('strava-window-dates');
-
     if (datesEl && currentSlice.length > 0) {
-
       datesEl.textContent = `${currentSlice[0].label}/${currentSlice[0].year} ➔ ${currentSlice[currentSlice.length - 1].label}/${currentSlice[currentSlice.length - 1].year}`;
-
     }
-
-
 
     const canvas = document.getElementById('chartStravaVolume');
-
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
-
-    let color = '#fc5200';
-
+    const color = getStravaActiveColor();
     let label = 'Kilómetros Semanales';
-
     let dataVals = [];
-
     let tickUnit = ' km';
 
-    let step = 25;
-
-
-
     if (currentStravaMode === 'z2') {
-
-      color = '#10b981';
-
       label = 'Horas en Zona 2';
-
       dataVals = currentSlice.map(w => w.z2_hours);
-
       tickUnit = ' h';
-
-      step = 2;
-
     } else if (currentStravaMode === 'load') {
-
-      color = '#f59e0b';
-
       label = 'Carga de Entrenamiento';
-
       dataVals = currentSlice.map(w => w.load);
-
       tickUnit = ' pts';
-
-      step = 150;
-
     } else {
-
-      color = '#fc5200';
-
       label = 'Kilómetros Semanales';
-
       dataVals = currentSlice.map(w => w.dist_km);
-
       tickUnit = ' km';
-
-      step = 25;
-
     }
-
-
 
     const grad = ctx.createLinearGradient(0, 0, 0, 220);
-
     grad.addColorStop(0, color + '66');
-
     grad.addColorStop(0.7, color + '18');
-
     grad.addColorStop(1, color + '00');
 
-
-
     charts.strava.data.labels = currentSlice.map(w => w.month + ' ' + w.label);
-
     charts.strava.data.datasets[0].label = label;
-
     charts.strava.data.datasets[0].data = dataVals;
-
     charts.strava.data.datasets[0].borderColor = color;
-
     charts.strava.data.datasets[0].backgroundColor = grad;
-
     charts.strava.data.datasets[0].pointRadius = currentSlice.map(w => (w.is_current || w === currentSlice[currentSlice.length - 1]) ? 7 : 4);
-
     charts.strava.data.datasets[0].pointBorderColor = currentSlice.map(w => (w.is_current || w === currentSlice[currentSlice.length - 1]) ? '#ffffff' : color);
-
     charts.strava.data.datasets[0].pointBackgroundColor = currentSlice.map(w => (w.is_current || w === currentSlice[currentSlice.length - 1]) ? color : (document.documentElement.getAttribute('data-theme') === 'dark' ? '#151d2f' : '#ffffff'));
-
     charts.strava.options.scales.y.ticks.callback = v => v + tickUnit;
-
-    charts.strava.options.scales.y.ticks.stepSize = step;
-
+    delete charts.strava.options.scales.y.ticks.stepSize;
     charts.strava.update();
 
-
-
-    updateStravaTopCard(currentSlice[currentSlice.length - 1]);
-
+    if (currentSlice.length > 0) {
+      updateStravaTopCard(currentSlice[currentSlice.length - 1]);
+    }
   }
-
-
 
   function updateStravaTopCard(weekItem) {
-
     if (!weekItem) return;
-
     const distEl = document.getElementById('strava-stat-dist');
-
     const timeEl = document.getElementById('strava-stat-time');
-
     const elevEl = document.getElementById('strava-stat-elev');
-
     const z2El = document.getElementById('strava-stat-z2');
-
     const kpi4LabelEl = document.getElementById('strava-stat-kpi4-label');
-
     const titleEl = document.getElementById('strava-week-title');
-
-
+    const captionEl = document.getElementById('strava-selected-week-caption');
 
     if (distEl) distEl.textContent = `${weekItem.dist_km} km`;
-
     if (timeEl) timeEl.textContent = weekItem.dur_str || '0m';
-
     if (elevEl) elevEl.textContent = `${weekItem.elev_m || 0} m`;
 
-
+    if (captionEl) {
+      const spSuffix = currentStravaSport === 'all' ? 'Todas las actividades' : `Filtro: ${currentStravaSport}`;
+      captionEl.textContent = `Detalle de la Semana ${weekItem.label}/${weekItem.year} (${spSuffix} • ${weekItem.activities || 0} ses.):`;
+    }
 
     if (z2El) {
-
       if (currentStravaMode === 'load') {
-
         if (kpi4LabelEl) kpi4LabelEl.textContent = 'Carga Semanal';
-
         z2El.textContent = `${weekItem.load} pts`;
-
         z2El.style.color = '#f59e0b';
-
       } else {
-
         if (kpi4LabelEl) kpi4LabelEl.textContent = 'Base Zona 2';
-
         z2El.textContent = `${weekItem.z2_hours} h`;
-
         z2El.style.color = '#10b981';
-
       }
-
     }
-
-
 
     if (titleEl) {
-
       const periodTitles = {
-
         'today': 'Hoy / Semana en curso',
-
         '1M': 'Último Mes (4 Semanas)',
-
         '3M': 'Últimos 3 Meses',
-
         '6M': 'Últimos 6 Meses',
-
         '1Y': 'Último Año Completo',
-
         'all': 'Historial Completo'
-
       };
-
       const activePeriodTitle = periodTitles[currentStravaPeriod] || 'Últimos 3 Meses';
-
       if (weekItem.is_hovered) {
-
         titleEl.textContent = 'Semana ' + weekItem.label + ' (' + weekItem.year + ')';
-
       } else if (weekItem.is_current) {
-
         titleEl.textContent = activePeriodTitle;
-
       } else {
-
         titleEl.textContent = 'Semana ' + weekItem.label + ' (' + weekItem.year + ')';
-
       }
-
     }
-
   }
-
-
 
   function switchStravaMode(mode) {
-
     currentStravaMode = mode;
-
     const btnKm = document.getElementById('btn-strava-km');
-
     const btnZ2 = document.getElementById('btn-strava-z2');
-
     const btnLoad = document.getElementById('btn-strava-load');
-
     if (btnKm) btnKm.classList.toggle('active', mode === 'km');
-
     if (btnZ2) btnZ2.classList.toggle('active', mode === 'z2');
-
     if (btnLoad) btnLoad.classList.toggle('active', mode === 'load');
-
     updateStravaChartWindow();
-
   }
 
-
-
   // ==========================================
-
   // MODALES ANALITICOS CON SEMAFOROS Y MATRIX
 
   // ==========================================
