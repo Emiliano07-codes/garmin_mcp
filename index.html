@@ -4419,7 +4419,7 @@
 
         </span>
 
-        <span id="cockpit-sync-label" style="font-size:11px; color:var(--text-dim); font-family:'JetBrains Mono';">Sincronizado al 16/10/2026</span>
+        <span id="cockpit-sync-label" style="font-size:11px; color:var(--text-dim); font-family:'JetBrains Mono';">Sincronizado al 28/10/2026 (Tiempo Real)</span>
 
       </div>
 
@@ -4822,7 +4822,7 @@
                 </svg>
                 <!-- Número de Semanas Seguidas adentro de la llama -->
                 <div style="position:absolute; top:24px; left:0; width:100%; height:calc(100% - 24px); display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;">
-                  <span id="home-card-val-streak" style="font-size:38px; font-weight:900; font-family:'JetBrains Mono',monospace; color:#ffffff; text-shadow:0 2px 10px rgba(124, 45, 18, 0.85), 0 0 2px rgba(0,0,0,0.6); line-height:1; letter-spacing:-1px;">60</span>
+                  <span id="home-card-val-streak" style="font-size:38px; font-weight:900; font-family:'JetBrains Mono',monospace; color:#ffffff; text-shadow:0 2px 10px rgba(124, 45, 18, 0.85), 0 0 2px rgba(0,0,0,0.6); line-height:1; letter-spacing:-1px;">61</span>
                   <span style="font-size:9.5px; font-weight:900; text-transform:uppercase; letter-spacing:0.9px; color:#fef08a; text-shadow:0 1px 5px rgba(124, 45, 18, 0.9); margin-top:2px;">Semanas</span>
                 </div>
               </div>
@@ -5100,7 +5100,7 @@
             <span style="font-size:24px;">🔥</span>
             <div>
               <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#f59e0b; letter-spacing:0.5px;">Racha en curso</div>
-              <div style="font-size:15px; font-weight:800; color:var(--text-main);" id="calendar-header-streak-badge">60 Semanas Consecutivas</div>
+              <div style="font-size:15px; font-weight:800; color:var(--text-main);" id="calendar-header-streak-badge">61 Semanas Consecutivas</div>
             </div>
           </div>
         </div>
@@ -5121,7 +5121,7 @@
 
                 <span class="streak-stat-title">Tu serie</span>
 
-                <span class="streak-stat-value" id="streak-stat-weeks-val">60 Semanas</span>
+                <span class="streak-stat-value" id="streak-stat-weeks-val">61 Semanas</span>
 
               </div>
 
@@ -5129,7 +5129,7 @@
 
                 <span class="streak-stat-title">Actividades en serie</span>
 
-                <span class="streak-stat-value" id="streak-stat-acts-val">230</span>
+                <span class="streak-stat-value" id="streak-stat-acts-val">470</span>
 
               </div>
 
@@ -5245,7 +5245,7 @@
 
                 </svg>
 
-                <span class="streak-fire-num" id="streak-fire-badge-num">60</span>
+                <span class="streak-fire-num" id="streak-fire-badge-num">61</span>
 
               </div>
 
@@ -5290,11 +5290,7 @@
 
           <div style="display:flex; align-items:center; gap:10px;">
 
-            <span class="badge" id="briefing-header-date" style="background:var(--bg-subtle); color:var(--text-dim); font-family:'JetBrains Mono'; font-size:12px; padding:6px 14px; border:1px solid var(--surface-border);">
-
-              16/10/2026 • Sincronizado Hoy
-
-            </span>
+            <span class="badge" id="briefing-header-date" style="background:var(--bg-subtle); color:var(--text-dim); font-family:'JetBrains Mono'; font-size:12px; padding:6px 14px; border:1px solid var(--surface-border);">28/10/2026 • Sincronizado Hoy</span>
 
             <span class="badge" id="briefing-status-badge" style="background:rgba(16,185,129,0.15); color:#10b981; font-weight:800; border:1px solid rgba(16,185,129,0.3); font-size:12px; padding:6px 14px;">
 
@@ -11136,6 +11132,30 @@
 
 
   function renderTrainingStreakCalendar() {
+    try {
+      let sw = window.ACTIVE_STREAK_WEEKS;
+      if (!sw && typeof FULL_TIMELINE_WEEKS !== 'undefined' && FULL_TIMELINE_WEEKS.length > 0) {
+        let cnt = 0;
+        for (let i = FULL_TIMELINE_WEEKS.length - 1; i >= 0; i--) {
+          const w = FULL_TIMELINE_WEEKS[i];
+          if ((w.activities && w.activities > 0) || (w.dur_hours && w.dur_hours > 0) || (w.load && w.load > 0)) cnt++;
+          else break;
+        }
+        sw = cnt || 61;
+        window.ACTIVE_STREAK_WEEKS = sw;
+      }
+      if (!sw) sw = 61;
+      const totActs = (typeof ACTIVITIES !== 'undefined') ? ACTIVITIES.length : 470;
+      const hdrBadge = document.getElementById('calendar-header-streak-badge');
+      if (hdrBadge) hdrBadge.textContent = `${sw} Semanas Consecutivas`;
+      const statWeeks = document.getElementById('streak-stat-weeks-val');
+      if (statWeeks) statWeeks.textContent = `${sw} Semanas`;
+      const statActs = document.getElementById('streak-stat-acts-val');
+      if (statActs) statActs.textContent = String(totActs);
+      const fireNum = document.getElementById('streak-fire-badge-num');
+      if (fireNum) fireNum.textContent = String(sw);
+    } catch (e) {}
+
 
     const gridEl = document.getElementById('streak-calendar-grid');
 
@@ -11755,7 +11775,8 @@
 
           updateDynamicGreeting();
 
-          if (typeof updateHomeCockpitV6 === 'function') updateHomeCockpitV6();
+          if (typeof recomputeAllDerivedData === 'function') recomputeAllDerivedData();
+  if (typeof updateHomeCockpitV6 === 'function') updateHomeCockpitV6();
         } else if (pageId === 'page-calendar') {
           if (typeof renderTrainingStreakCalendar === 'function') renderTrainingStreakCalendar();
 
@@ -12521,25 +12542,29 @@
 
     } else if (kpiType === 'hrv') {
       accentColor = '#10b981';
+      const hrvLow = Number(curHrv.balLow || 44);
+      const hrvHigh = Number(curHrv.balHigh || 56);
+      const isBal = (curHrv.weeklyAvg >= hrvLow && curHrv.weeklyAvg <= hrvHigh && curHrv.status !== 'UNBALANCED');
+      const statusTxt = isBal ? 'Equilibrado' : 'Desequilibrado';
       badgeEl.textContent = 'Tono Vagal Parasimpático';
       titleEl.textContent = `Variabilidad de la Frecuencia Cardíaca (VFC: ${curHrv.weeklyAvg} ms)`;
-      descEl.textContent = `Refleja el equilibrio del sistema nervioso autónomo. Abajo se muestran los dos gráficos oficiales de la pestaña Sueño & VFC: Valores diarios (Máxima 5 min vs Media Nocturna) y Medias de 7 días dentro del Túnel Basal (43 - 56 ms).`;
-      formulaEl.textContent = 'RMSSD nocturno en milisegundos • Pasillo basal personal Firstbeat: 43 a 56 ms.';
+      descEl.textContent = `Refleja el equilibrio del sistema nervioso autónomo. Abajo se muestran los dos gráficos oficiales de la pestaña Sueño & VFC: Valores diarios (Máxima 5 min vs Media Nocturna) y Medias de 7 días dentro del Túnel Basal (${hrvLow} - ${hrvHigh} ms).`;
+      formulaEl.textContent = `RMSSD nocturno en milisegundos • Pasillo basal personal Firstbeat: ${hrvLow} a ${hrvHigh} ms.`;
 
       trackEl.innerHTML = `
         <div class="spectrum-segment" style="width:25%; background:#ef4444;" title="Deprimido (< 38 ms)"></div>
-        <div class="spectrum-segment" style="width:18%; background:#f59e0b;" title="Límite Inferior (38 - 42 ms)"></div>
-        <div class="spectrum-segment" style="width:37%; background:#10b981;" title="Pasillo Basal Óptimo (43 - 56 ms)"></div>
-        <div class="spectrum-segment" style="width:20%; background:#38bdf8;" title="Elevado (> 56 ms)"></div>
+        <div class="spectrum-segment" style="width:18%; background:#f59e0b;" title="Límite Inferior (38 - ${hrvLow - 1} ms)"></div>
+        <div class="spectrum-segment" style="width:37%; background:#10b981;" title="Pasillo Basal Óptimo (${hrvLow} - ${hrvHigh} ms)"></div>
+        <div class="spectrum-segment" style="width:20%; background:#38bdf8;" title="Elevado (> ${hrvHigh} ms)"></div>
       `;
       legendEl.innerHTML = `
         <span>&lt; 38 ms (Alerta)</span>
-        <span>38 - 42 ms (Límite)</span>
-        <span>43 - 56 ms (Túnel Basal)</span>
-        <span>&gt; 56 ms</span>
+        <span>38 - ${hrvLow - 1} ms (Límite)</span>
+        <span>${hrvLow} - ${hrvHigh} ms (Túnel Basal)</span>
+        <span>&gt; ${hrvHigh} ms</span>
       `;
       currentEl.innerHTML = `
-        <span>Anoche: <strong style="color:#10b981;">${curHrv.lastNight} ms</strong> • Media 7d: <strong style="color:#10b981;">${curHrv.weeklyAvg} ms (Equilibrado)</strong></span>
+        <span>Anoche: <strong style="color:#10b981;">${curHrv.lastNight} ms</strong> • Media 7d: <strong style="color:#10b981;">${curHrv.weeklyAvg} ms (${statusTxt})</strong></span>
         <button onclick="closeKpiModalDirect(); showTab('page-recovery');" style="background:#10b981; color:#0f172a; border:none; padding:5px 12px; border-radius:8px; font-weight:800; cursor:pointer; font-size:11.5px;">↗ Ir a Sueño &amp; VFC</button>
       `;
       if (pinEl && pinValEl) {
@@ -12549,11 +12574,11 @@
       }
       if (valPillEl) valPillEl.textContent = `Anoche: ${curHrv.lastNight} ms • Media 7d: ${curHrv.weeklyAvg} ms`;
 
-      const firstD = HRV_7DAYS[0]?.date_arg || '17/10';
-      const lastD = HRV_7DAYS[HRV_7DAYS.length - 1]?.date_arg || '23/10';
+      const firstD = HRV_7DAYS[0]?.date_arg || '22/10';
+      const lastD = HRV_7DAYS[HRV_7DAYS.length - 1]?.date_arg || '28/10';
       if (chart1Title) chart1Title.textContent = `📊 Gráfico 1: Valores diarios VFC (${firstD} - ${lastD}): Máxima 5m vs Media Nocturna`;
       if (doubleWrap) doubleWrap.style.display = 'block';
-      if (chart2Title) chart2Title.textContent = `📈 Gráfico 2: Medias de 7 días y Túnel Basal de Referencia (43 - 56 ms)`;
+      if (chart2Title) chart2Title.textContent = `📈 Gráfico 2: Medias de 7 días y Túnel Basal de Referencia (${hrvLow} - ${hrvHigh} ms)`;
 
       const dayLabels = HRV_7DAYS.map(d => d.date_arg);
       chart1Config = {
@@ -12581,9 +12606,9 @@
         data: {
           labels: dayLabels,
           datasets: [
-            { label: 'Límite Inferior Referencia', data: dayLabels.map(() => 43), borderColor: 'rgba(16,185,129,0.4)', borderDash: [4, 4], borderWidth: 1, pointRadius: 0, fill: false },
-            { label: 'Túnel Basal (43-56 ms)', data: dayLabels.map(() => 56), borderColor: 'rgba(16,185,129,0.4)', borderDash: [4, 4], borderWidth: 1, backgroundColor: isDark ? 'rgba(16,185,129,0.18)' : 'rgba(16,185,129,0.15)', fill: '-1', pointRadius: 0 },
-            { label: 'Media 7d (Equilibrado)', data: HRV_7DAYS.map(d => d.weeklyAvg || 48), borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 2.5, pointRadius: 5, tension: 0.25, fill: false }
+            { label: 'Límite Inferior Referencia', data: dayLabels.map(() => hrvLow), borderColor: 'rgba(16,185,129,0.4)', borderDash: [4, 4], borderWidth: 1, pointRadius: 0, fill: false },
+            { label: `Túnel Basal (${hrvLow}-${hrvHigh} ms)`, data: dayLabels.map(() => hrvHigh), borderColor: 'rgba(16,185,129,0.4)', borderDash: [4, 4], borderWidth: 1, backgroundColor: isDark ? 'rgba(16,185,129,0.18)' : 'rgba(16,185,129,0.15)', fill: '-1', pointRadius: 0 },
+            { label: `Media 7d (${statusTxt})`, data: HRV_7DAYS.map(d => d.weeklyAvg || 46), borderColor: '#10b981', backgroundColor: '#10b981', borderWidth: 2.5, pointRadius: 5, tension: 0.25, fill: false }
           ]
         },
         options: {
@@ -12658,8 +12683,8 @@
       kpiThemeText = 'var(--pastel-amber-text)';
       kpiThemeBorder = 'var(--pastel-amber-border)';
 
-      const streakW = window.ACTIVE_STREAK_WEEKS || 60;
-      const totActs = (typeof ACTIVITIES !== 'undefined') ? ACTIVITIES.length : 467;
+      const streakW = window.ACTIVE_STREAK_WEEKS || 61;
+      const totActs = (typeof ACTIVITIES !== 'undefined') ? ACTIVITIES.length : 470;
 
       badgeEl.textContent = 'Constancia Crónica Ininterrumpida';
       titleEl.textContent = `Racha Activa: ${streakW} Semanas Seguidas Entrenando 🔥`;
@@ -17861,10 +17886,12 @@ function closeKpiModal(e) {
           if ((w.activities && w.activities > 0) || (w.dur_hours && w.dur_hours > 0) || (w.load && w.load > 0)) sw++;
           else break;
         }
-        streakWeeks = sw || 60;
+        streakWeeks = sw || 61;
         window.ACTIVE_STREAK_WEEKS = streakWeeks;
       }
-      if (!streakWeeks) streakWeeks = 60;
+      if (!streakWeeks) streakWeeks = 61;
+      const calHdrStreak = document.getElementById('calendar-header-streak-badge');
+      if (calHdrStreak) calHdrStreak.textContent = `${streakWeeks} Semanas Consecutivas`;
       const valStreak = document.getElementById('home-card-val-streak');
       if (valStreak) valStreak.textContent = String(streakWeeks);
       const badgeStreak = document.getElementById('home-card-badge-streak');
@@ -18100,6 +18127,18 @@ function closeKpiModal(e) {
           z2StatusEl.style.color = '#38bdf8';
         }
       }
+      const badgeZ2El = document.getElementById('home-card-badge-z2');
+      if (badgeZ2El) badgeZ2El.textContent = `${z2WeeklyHours.toFixed(1)}h sem ↗`;
+      const z2DecEl = document.getElementById('home-card-z2-decoupling');
+      if (z2DecEl && typeof getLongRunSessions === 'function' && typeof computeDecouplingFromPoints === 'function') {
+        const lRuns = getLongRunSessions();
+        if (lRuns.length > 0) {
+          const decObj = computeDecouplingFromPoints(lRuns[0]);
+          if (decObj && decObj.decoupling !== undefined) {
+            z2DecEl.textContent = `${Math.abs(Number(decObj.decoupling)).toFixed(1)}%`;
+          }
+        }
+      }
       const z2LvlNum = z2WeeklyHours >= 4.0 ? 4 : (z2WeeklyHours >= 2.5 ? 3 : (z2WeeklyHours >= 1.5 ? 2 : 1));
       const z2LvlEl = document.getElementById('home-card-z2-lvl');
       if (z2LvlEl) z2LvlEl.textContent = `Lvl ${z2LvlNum}`;
@@ -18236,9 +18275,9 @@ function closeKpiModal(e) {
 
     const curHrv7 = (typeof HRV_7DAYS !== 'undefined' && HRV_7DAYS.length > 0) ? HRV_7DAYS[HRV_7DAYS.length - 1] : { lastNight: 45, high5Min: 65, weeklyAvg: 48, status: 'BALANCED' };
 
-    const syncDateArg = window.SYNC_DATE_ARG || '16/10/2026';
+    const syncDateArg = window.SYNC_DATE_ARG || '28/10/2026';
 
-    const streakWeeks = window.ACTIVE_STREAK_WEEKS || 59;
+    const streakWeeks = window.ACTIVE_STREAK_WEEKS || 61;
 
     const bioObj = (typeof TRAINING_STATUS_INFO !== 'undefined' && TRAINING_STATUS_INFO.athlete_bio) ? TRAINING_STATUS_INFO.athlete_bio : {};
     const vo2Num = Number((typeof TRAINING_STATUS_INFO !== 'undefined' && TRAINING_STATUS_INFO.vo2_precise) || bioObj.vo2_precise || (typeof USER_VO2 !== 'undefined' ? USER_VO2 : 54.2));
@@ -18391,7 +18430,8 @@ function closeKpiModal(e) {
       }
 
       // Actualizar las 11 tarjetas interactivas oficiales Garmin en Inicio (V6.0)
-      if (typeof updateHomeCockpitV6 === 'function') updateHomeCockpitV6();
+      if (typeof recomputeAllDerivedData === 'function') recomputeAllDerivedData();
+  if (typeof updateHomeCockpitV6 === 'function') updateHomeCockpitV6();
 
       if (typeof renderTrainingStreakCalendar === 'function') renderTrainingStreakCalendar();
       const homeKpiActs = document.getElementById('streak-stat-acts-val');
@@ -18400,6 +18440,8 @@ function closeKpiModal(e) {
       if (homeKpiWeeks) homeKpiWeeks.textContent = streakWeeks + ' Semanas';
       const fireBadge = document.getElementById('streak-fire-badge-num');
       if (fireBadge) fireBadge.textContent = String(streakWeeks);
+      const calHdrBadge = document.getElementById('calendar-header-streak-badge');
+      if (calHdrBadge) calHdrBadge.textContent = streakWeeks + ' Semanas Consecutivas';
     } catch (e) { console.error('Error sección 1 Inicio:', e); }
 
     // -------------------------------------------------------------------------
@@ -18601,7 +18643,11 @@ function closeKpiModal(e) {
 
       const tsHrv = document.getElementById('ts-card-hrv-val');
 
-      if (tsHrv) tsHrv.innerHTML = curHrv7.weeklyAvg + ' <span style="font-size:13px; font-weight:normal; color:var(--text-muted);">ms (Nocturna: ' + curRec.hrv + ' ms)</span>';
+      if (tsHrv) {
+        tsHrv.innerHTML = curHrv7.weeklyAvg + ' <span style="font-size:13px; font-weight:normal; color:var(--text-muted);">ms (Nocturna: ' + curRec.hrv + ' ms)</span>';
+        const tsHrvSub = tsHrv.nextElementSibling;
+        if (tsHrvSub) tsHrvSub.innerHTML = `Tono vagal parasimpático dentro de tu rango basal saludable (<strong>${balLow} - ${balHigh} ms</strong>).`;
+      }
 
       const tsAcute = document.getElementById('ts-card-acute-val');
 
@@ -18751,16 +18797,15 @@ function closeKpiModal(e) {
 
       const tsStoryCards = document.querySelectorAll('#page-training-status .storytelling-grid .story-card');
 
-      if (tsStoryCards.length >= 2) {
-
+      if (tsStoryCards.length >= 4) {
         const desc1 = tsStoryCards[0].querySelector('.story-card-desc');
-
         if (desc1) desc1.innerHTML = `Carga aguda actual de <strong>${Math.round(curPmc.atl)} pts</strong> ubicada dentro del túnel óptimo Firstbeat (<strong>${curPmc.min_tunnel}-${curPmc.max_tunnel} pts</strong>, ACWR ${curPmc.acwr.toFixed(2)}). El estímulo induce supercompensación sin riesgo de sobreentrenamiento.`;
-
         const desc2 = tsStoryCards[1].querySelector('.story-card-desc');
-
         if (desc2) desc2.innerHTML = `Acumulás <strong>${lb.aerobic_low} pts</strong> de base aeróbica baja, <strong>${lb.aerobic_high} pts</strong> de aeróbico alto y <strong>${lb.anaerobic} pts</strong> anaeróbicos en las últimas 4 semanas, sosteniendo el VO₂ Máx en <strong>${vo2Display} ml/kg/min</strong>.`;
-
+        const desc3 = tsStoryCards[2].querySelector('.story-card-desc');
+        if (desc3) desc3.innerHTML = `Al ${syncDateArg}, tu VFC media de 7 días (<strong>${curHrv7.weeklyAvg} ms</strong>, anoche <strong>${curRec.hrv} ms</strong>) permanece dentro del pasillo basal (${balLow}-${balHigh} ms) sin señales de fatiga autonómica.`;
+        const desc4 = tsStoryCards[3].querySelector('.story-card-desc');
+        if (desc4) desc4.innerHTML = `Próximas 48h: priorizar 1 rodaje aeróbico en Zona 2 (45-60 min a <strong>${hrZones[1]}-${hrZones[2] - 1} ppm</strong>) y descanso reparador para consolidar la supercompensación.`;
       }
 
     } catch (e) { console.error('Error sección 4 Estado de Entreno:', e); }
@@ -18810,29 +18855,18 @@ function closeKpiModal(e) {
       });
 
       const totSecPol = secZ12 + secZ3 + secZ45;
-
-      if (totSecPol > 0 && charts.polarization) {
-
+      if (totSecPol > 0) {
         const p12 = Math.round((secZ12 / totSecPol) * 100);
-
         const p3 = Math.round((secZ3 / totSecPol) * 100);
-
         const p45 = Math.max(0, 100 - p12 - p3);
-
-        charts.polarization.data.datasets[0].data = [p12, p3, p45];
-
-        // charts.polarization.update();
-
-        const z2Cols = document.querySelectorAll('#page-z2 .strava-stats-row .strava-stat-col');
-
-        if (z2Cols.length >= 3) {
-
-          const polVal = z2Cols[2].querySelector('.strava-stat-value');
-
-          if (polVal) polVal.textContent = p12 + '% Base Z1-Z2';
-
+        if (charts.polarization) {
+          charts.polarization.data.datasets[0].data = [p12, p3, p45];
         }
-
+        const z2Cols = document.querySelectorAll('#page-z2 .strava-stats-row .strava-stat-col');
+        if (z2Cols.length >= 3) {
+          const polVal = z2Cols[2].querySelector('.strava-stat-value');
+          if (polVal) polVal.textContent = p12 + '% Base Z1-Z2';
+        }
       }
 
     } catch (e) { console.error('Error sección 5 Zona 2:', e); }
@@ -19037,8 +19071,9 @@ function closeKpiModal(e) {
 
         charts.hrv.data.datasets[0].data = validHRV.map(d => d.hrv);
 
+        charts.hrv.data.datasets[1].label = `Límite Superior (${balHigh} ms)`;
         charts.hrv.data.datasets[1].data = validHRV.map(() => balHigh);
-
+        charts.hrv.data.datasets[2].label = `Límite Inferior (${balLow} ms)`;
         charts.hrv.data.datasets[2].data = validHRV.map(() => balLow);
 
         charts.hrv.update();
@@ -19256,13 +19291,20 @@ function closeKpiModal(e) {
         if (prSubHrvD) prSubHrvD.textContent = `Media 7d: ${curHrv7.weeklyAvg} ms (Equilibrado)`;
 
         const prSubRecV = document.getElementById('pred-sub-rec-val');
-
-        if (prSubRecV) prSubRecV.textContent = (curPmc.iso_date > latest.iso_date) ? '0 h' : '24 h';
-
+        if (prSubRecV) prSubRecV.textContent = (bioObj.recovery_hours !== undefined) ? `${bioObj.recovery_hours} h` : ((curPmc.iso_date > latest.iso_date) ? '0 h' : '22 h');
         const prSubStressV = document.getElementById('pred-sub-stress-val');
-
-        if (prSubStressV) prSubStressV.textContent = `${curRec.stress || 19} pts`;
-
+        if (prSubStressV) prSubStressV.textContent = `${curRec.stress || curRec.avg_sleep_stress || 16} pts`;
+        const predDataCnt = document.getElementById('pred-chart-data-count');
+        if (predDataCnt) predDataCnt.textContent = `${RACE_PRED_HISTORY.length} registros sincronizados de Garmin Connect (al ${syncDateArg})`;
+        const predStoryCards = document.querySelectorAll('#page-predictions .storytelling-grid .story-card');
+        if (predStoryCards.length >= 2) {
+          const ps0d = predStoryCards[0].querySelector('.story-card-desc');
+          if (ps0d) ps0d.innerHTML = `Al ${syncDateArg}, tu predicción de 5K se sitúa en <strong>${fmtSecToTime(curP.time5K)} (${fmtPace(curP.time5K, 5.0)})</strong> y 10K en <strong>${fmtSecToTime(curP.time10K)} (${fmtPace(curP.time10K, 10.0)})</strong> con VO₂ Máx de <strong>${vo2Display} ml/kg/min</strong>.`;
+          const ps1v = predStoryCards[1].querySelector('.story-card-value');
+          const ps1d = predStoryCards[1].querySelector('.story-card-desc');
+          if (ps1v) ps1v.textContent = `Medio Maratón en ${fmtSecToTime(curP.timeHalfMarathon)}`;
+          if (ps1d) ps1d.innerHTML = `Con umbral de lactato oficial en <strong>${lthrBpm} ppm (${lthrPace})</strong>, proyectás <strong>${fmtPace(curP.timeHalfMarathon, 21.0975)}</strong> en 21.1K y <strong>${fmtSecToTime(curP.timeMarathon)}</strong> en Maratón.`;
+        }
       }
 
 
@@ -19440,9 +19482,13 @@ function closeKpiModal(e) {
           if (s2) s2.textContent = `${avg7Act.toLocaleString()} kcal / día`;
 
           const s3 = calStoryCards[2].querySelector('.story-card-value');
-
           if (s3) s3.textContent = `${avg7Total.toLocaleString()} kcal / día`;
-
+          const s3d = calStoryCards[2].querySelector('.story-card-desc');
+          if (s3d) s3d.textContent = `Demanda energética total promedio de los últimos 7 días (al ${syncDateArg}). Requiere una ingesta de soporte de ${(avg7Total - 150).toLocaleString()} a ${(avg7Total + 200).toLocaleString()} kcal para evitar fatiga crónica.`;
+        }
+        const calDiagTxt1 = document.getElementById('cal-diag-text1');
+        if (calDiagTxt1) {
+          calDiagTxt1.innerHTML = `Tu metabolismo basal garantiza el soporte de funciones vitales en <strong>${weightKg} kg</strong> (${lastDay.bmr.toLocaleString()} kcal BMR hoy). En días de entrenamiento como el ${lastDay.date_arg}, el gasto activo suma <strong>${lastDay.active.toLocaleString()} kcal</strong> (total <strong>${lastDay.total.toLocaleString()} kcal</strong>).`;
         }
 
       }
@@ -19469,6 +19515,7 @@ function closeKpiModal(e) {
 
 
 
+  if (typeof recomputeAllDerivedData === 'function') recomputeAllDerivedData();
   if (typeof updateHomeCockpitV6 === 'function') updateHomeCockpitV6();
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -20356,9 +20403,9 @@ function closeKpiModal(e) {
 
     const curW = (typeof FULL_TIMELINE_WEEKS !== 'undefined' && FULL_TIMELINE_WEEKS.length > 0) ? FULL_TIMELINE_WEEKS[FULL_TIMELINE_WEEKS.length - 1] : { dist_km: 32.03, z2_hours: 1.26, load: 631.7 };
 
-    const syncDateArg = window.SYNC_DATE_ARG || '16/10/2026';
+    const syncDateArg = window.SYNC_DATE_ARG || '28/10/2026';
 
-    const streakWeeks = window.ACTIVE_STREAK_WEEKS || 59;
+    const streakWeeks = window.ACTIVE_STREAK_WEEKS || 61;
 
 
 
@@ -20409,9 +20456,9 @@ function closeKpiModal(e) {
     const rDesc = document.getElementById('briefing-readiness-desc');
 
     if (rDesc) {
-
-      rDesc.innerHTML = `Al <strong>${syncDateArg}</strong>, tus biomarcadores confirman recuperación autonómica sólida tras 48h de descarga. La VFC se mantiene equilibrada en <strong>${curRec.hrv} ms</strong> (media semanal <strong>${curHrv7.weeklyAvg} ms</strong>), el descanso aportó <strong>${(curRec.deep_hours || 2.05).toFixed(1)}h de sueño profundo (${curRec.sleep_score} pts)</strong> y la Batería Corporal alcanzó <strong>${curBb.max}/100</strong>. El TSB mejoró de -436 a <strong>${Math.round(curPmc.tsb)} pts</strong>.`;
-
+      const trainedToday = (latest && latest.iso_date === window.SYNC_DATE_ISO);
+      const ctxPhrase = trainedToday ? `tras completar la sesión de hoy (<em>${latest.name}</em>)` : `con carga aguda controlada dentro del túnel óptimo`;
+      rDesc.innerHTML = `Al <strong>${syncDateArg}</strong>, tus biomarcadores confirman asimilación fisiológica sólida ${ctxPhrase}. La VFC se sitúa en <strong>${curRec.hrv} ms</strong> nocturna (media 7d <strong>${curHrv7.weeklyAvg} ms</strong> en túnel ${curHrv7.balLow || 44}-${curHrv7.balHigh || 56} ms), el descanso aportó <strong>${(curRec.deep_hours || 1.68).toFixed(1)}h de sueño profundo (${curRec.sleep_score} pts)</strong>, la Batería Corporal alcanzó <strong>${curBb.max}/100</strong> y el TSB se ubica en <strong>${Math.round(curPmc.tsb)} pts</strong>.`;
     }
 
 
@@ -20436,7 +20483,8 @@ function closeKpiModal(e) {
 
     const lastRec = document.getElementById('briefing-last-rec');
 
-    if (lastRec) lastRec.textContent = (curPmc.iso_date > latest.iso_date) ? 'Completada (0h)' : '24 horas';
+    const recBioH = (typeof TRAINING_STATUS_INFO !== 'undefined' && TRAINING_STATUS_INFO.athlete_bio && TRAINING_STATUS_INFO.athlete_bio.recovery_hours !== undefined) ? TRAINING_STATUS_INFO.athlete_bio.recovery_hours : 22;
+    if (lastRec) lastRec.textContent = (curPmc.iso_date > latest.iso_date) ? 'Completada (0h)' : `${recBioH} horas`;
 
     const lastDesc = document.getElementById('briefing-last-desc');
 
@@ -20524,7 +20572,7 @@ function closeKpiModal(e) {
 
         '<li style="margin-bottom:6px;"><strong>Meta de Endurance Score:</strong> Con <strong>' + endScore.toLocaleString() + ' pts</strong>, estás a solo <strong>' + endMissing + ' pts</strong> de alcanzar el nivel Intermedio (4.500 pts).</li>' +
 
-        '<li><strong>Equilibrio Firstbeat:</strong> Priorizar volumen aeróbico bajo (Z2) en el fin de semana para balancear el foco anaeróbico reciente (753 pts).</li>' +
+        '<li><strong>Equilibrio Firstbeat:</strong> Priorizar volumen aeróbico bajo (Z2) en las próximas sesiones para balancear el foco anaeróbico de 4 semanas (' + ((typeof TRAINING_STATUS_INFO !== 'undefined' && TRAINING_STATUS_INFO.load_balance && TRAINING_STATUS_INFO.load_balance.anaerobic) || 784) + ' pts).</li>' +
 
         '</ul>';
 
